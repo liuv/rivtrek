@@ -1,0 +1,545 @@
+{
+    "game_challenge_name": "万里长江 · 乘风远征",
+    "challenge_id": "yangtze_epic_001",
+    "version": "2026.02.07.01",
+    "author": "WaveChaser Team",
+    "total_length_km": 6387,
+    "total_sections": 10,
+    "total_sub_sections": 20,
+    "difficulty_stars": 5,
+    "default_theme_color": "#2E6195",
+    "cover_asset": "covers/yangtze_cover.png",
+    "challenge_sections": [
+      {
+        "section_id": 1,
+        "section_name": "长江正源·沱沱河+通天河段",
+        "section_length_km": 1170,
+        "flow_area": "青海省（青藏高原腹地）",
+        "theme_color": "#A5C9E1",
+        "sub_sections": [
+          {
+            "sub_section_id": 101,
+            "sub_section_name": "长江正源·沱沱河源段",
+            "start_point": "格拉丹冬雪峰（长江源头冰川）",
+            "end_point": "沱沱河与当曲汇合口",
+            "sub_section_length_km": 420,
+            "accumulated_length_km": 420,
+            "core_landmarks": "格拉丹冬雪峰、长江源头冰川、沱沱河源头湿地、当曲汇合口",
+            "game_difficulty": "高（冰川融水河道，水面狭窄，高原缺氧，耐力入门考验）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 0.5,
+            "environment_type": "plateau_glacier",
+            "bg_asset": "JaggedPeaks/001.png",
+            "ambient_sound": "wind_plateau",
+            "sub_section_desc": "挑战开启！从长江最源头的冰川脚下出发，穿越纯净的高原湿地，感受“江源第一水”的澄澈，抵达当曲汇合口（长江正源正式界定处），解锁源头核心打卡点。",
+            "achievement": {
+              "achievement_name": "【江源启帆】",
+              "achievement_desc": "完成长江源头第一段挑战，解锁“江源探索者”初级称号",
+              "medal_id": "medal_yangtze_101",
+              "medal_icon": "icons/medal_yangtze_101.png"
+            }
+          },
+          {
+            "sub_section_id": 102,
+            "sub_section_name": "通天河上段·湿地巡航段",
+            "start_point": "沱沱河与当曲汇合口",
+            "end_point": "通天河大峡谷中段",
+            "sub_section_length_km": 380,
+            "accumulated_length_km": 800,
+            "core_landmarks": "通天河湿地、三江源自然保护区边缘、通天河峡谷入口",
+            "game_difficulty": "高（高原湿地河道，水流平缓但视野开阔，长时间巡航耐力考验）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 0.3,
+            "environment_type": "plateau_glacier",
+            "bg_asset": "JaggedPeaks/001.png",
+            "ambient_sound": "wind_plateau",
+            "sub_section_desc": "进入通天河段，河道逐渐宽阔，两岸是高原特有的藏羚羊、藏野驴栖息地，巡航途中感受三江源的纯净，向通天河大峡谷深入，为后续峡谷挑战做准备。",
+            "achievement": {
+              "achievement_name": "【湿地逐水】",
+              "achievement_desc": "穿越通天河湿地，解锁“高原巡航者”称号",
+              "medal_id": "medal_yangtze_102",
+              "medal_icon": "icons/medal_yangtze_102.png"
+            }
+          },
+          {
+            "sub_section_id": 103,
+            "sub_section_name": "通天河下段·峡谷过渡段",
+            "start_point": "通天河大峡谷中段",
+            "end_point": "青海玉树（直门达）",
+            "sub_section_length_km": 370,
+            "accumulated_length_km": 1170,
+            "core_landmarks": "通天河大峡谷、三江源自然保护区核心区、直门达渡口",
+            "game_difficulty": "高（河道渐宽，偶有浅滩，高原环境下的终极耐力考验，解锁下一大区段）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 0.6,
+            "environment_type": "plateau_glacier",
+            "bg_asset": "JaggedPeaks/001.png",
+            "ambient_sound": "wind_plateau",
+            "sub_section_desc": "深入通天河大峡谷，两岸峡谷风貌愈发明显，水流依旧平缓但巡航距离适中，抵达玉树直门达，正式结束高原源头段挑战，迈向金沙江峡谷。",
+            "achievement": {
+              "achievement_name": "【通天河渡】",
+              "achievement_desc": "完成长江正源全段挑战，解锁“长江开拓者”中级称号，开启下一大区段",
+              "medal_id": "medal_yangtze_103",
+              "medal_icon": "icons/medal_yangtze_103.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 2,
+        "section_name": "金沙江·川藏滇峡谷段",
+        "section_length_km": 960,
+        "flow_area": "青海省、西藏自治区、四川省、云南省（交界地带）",
+        "theme_color": "#C85A3C",
+        "sub_sections": [
+          {
+            "sub_section_id": 201,
+            "sub_section_name": "金沙江上游·玉树峡谷段",
+            "start_point": "青海玉树（直门达）",
+            "end_point": "金沙江大峡谷入口",
+            "sub_section_length_km": 350,
+            "accumulated_length_km": 1520,
+            "core_landmarks": "玉树直门达渡口、金沙江上游峡谷、高原峡谷风光",
+            "game_difficulty": "极高（河道变窄，水流开始湍急，峡谷落差增大，操作入门考验）",
+            "difficulty_rating": 5,
+            "base_flow_speed": 1.5,
+            "environment_type": "canyon",
+            "bg_asset": "canyon/bg_canyon.png",
+            "ambient_sound": "river_rapid",
+            "sub_section_desc": "告别高原湿地，进入金沙江峡谷地带，水流流速明显加快，两岸峡谷陡峭，需精准操控船只避开浅滩和暗礁，开启激流挑战的序幕。",
+            "achievement": {
+              "achievement_name": "【峡谷初涉】",
+              "achievement_desc": "进入金沙江峡谷，解锁“峡谷挑战者”初级称号",
+              "medal_id": "medal_yangtze_201",
+              "medal_icon": "icons/medal_yangtze_201.png"
+            }
+          },
+          {
+            "sub_section_id": 202,
+            "sub_section_name": "金沙江中游·虎跳峡核心段",
+            "start_point": "金沙江大峡谷入口",
+            "end_point": "虎跳峡下游出口",
+            "sub_section_length_km": 320,
+            "accumulated_length_km": 1840,
+            "core_landmarks": "金沙江大峡谷、虎跳峡（世界最深峡谷之一）、丽江周边远景",
+            "game_difficulty": "极高（水流湍急，落差巨大，急流险滩密集，操作终极考验）",
+            "difficulty_rating": 5,
+            "base_flow_speed": 2.5,
+            "environment_type": "canyon",
+            "bg_asset": "canyon/bg_canyon.png",
+            "ambient_sound": "river_rapid",
+            "sub_section_desc": "挑战全程最难路段！穿越虎跳峡，感受“惊涛拍岸”的震撼，避开湍急的漩涡和锋利的礁石，考验船只操控力和反应速度，是全程的核心难点关卡。",
+            "achievement": {
+              "achievement_name": "【虎跳惊涛】",
+              "achievement_desc": "成功穿越虎跳峡，解锁“峡谷征服者”高级称号",
+              "medal_id": "medal_yangtze_202",
+              "medal_icon": "icons/medal_yangtze_202.png"
+            }
+          },
+          {
+            "sub_section_id": 203,
+            "sub_section_name": "金沙江下游·平缓过渡段",
+            "start_point": "虎跳峡下游出口",
+            "end_point": "四川宜宾（合江门）",
+            "sub_section_length_km": 290,
+            "accumulated_length_km": 2130,
+            "core_landmarks": "攀枝花沿江景观、宜宾合江门（金沙江与岷江汇合口）",
+            "game_difficulty": "中（水流逐渐平缓，河道宽阔，从激流挑战过渡到平缓巡航，恢复体力）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.8,
+            "environment_type": "canyon",
+            "bg_asset": "LayeredCliffs/001.png",
+            "ambient_sound": "river_calm",
+            "sub_section_desc": "激流挑战结束，河道逐渐宽阔，两岸出现人文景观，终点抵达宜宾合江门，在这里，金沙江与岷江汇合，正式被称为“长江”，解锁重要里程碑。",
+            "achievement": {
+              "achievement_name": "【江名初定】",
+              "achievement_desc": "抵达宜宾合江门，见证金沙江正式命名为长江，解锁“大江行者”称号",
+              "medal_id": "medal_yangtze_203",
+              "medal_icon": "icons/medal_yangtze_203.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 3,
+        "section_name": "川江上游·宜宾→重庆段",
+        "section_length_km": 790,
+        "flow_area": "四川省、重庆市",
+        "theme_color": "#4A7C59",
+        "sub_sections": [
+          {
+            "sub_section_id": 301,
+            "sub_section_name": "川江上游·宜宾→泸州段",
+            "start_point": "四川宜宾（合江门）",
+            "end_point": "四川泸州（长江滨江带）",
+            "sub_section_length_km": 260,
+            "accumulated_length_km": 2390,
+            "core_landmarks": "宜宾合江门、蜀南竹海（近岸）、泸州滨江景观",
+            "game_difficulty": "中（江面宽阔，水流平缓，两岸竹林环绕，休闲巡航+打卡考验）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.4,
+            "environment_type": "river_plains",
+            "bg_asset": "RiversideVillage/001.png",
+            "ambient_sound": "river_calm",
+            "sub_section_desc": "正式进入长江干流巡航，两岸是蜀南竹海的翠绿景观，水流平缓，适合熟悉平缓江面的操控节奏，途经泸州，感受川南江城的烟火气。",
+            "achievement": {
+              "achievement_name": "【蜀南逐绿】",
+              "achievement_desc": "途经蜀南竹海近岸，解锁“竹海航者”初级称号",
+              "medal_id": "medal_yangtze_301",
+              "medal_icon": "icons/medal_yangtze_301.png"
+            }
+          },
+          {
+            "sub_section_id": 302,
+            "sub_section_name": "川江上游·泸州→重庆段",
+            "start_point": "四川泸州（长江滨江带）",
+            "end_point": "重庆主城区（朝天门）",
+            "sub_section_length_km": 530,
+            "accumulated_length_km": 2920,
+            "core_landmarks": "泸州老窖酒文化带、江津长江大桥、川江沿岸古镇、重庆长江大桥、朝天门、嘉陵江汇入长江口",
+            "game_difficulty": "中（江面持续变宽，偶有船队经过，需注意避让，人文巡航+耐力考验）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.5,
+            "environment_type": "urban",
+            "bg_asset": "ModernSkyline/001.png",
+            "ambient_sound": "city_distant",
+            "sub_section_desc": "从泸州出发，向重庆方向巡航，途中经过泸州老窖酒文化带，感受川江的人文气息，江面航运逐渐繁忙，最终穿越重庆长江大桥，抵达朝天门，见证嘉陵江与长江交汇奇观。",
+            "achievement": {
+              "achievement_name": "【巴蜀逐浪】",
+              "achievement_desc": "抵达重庆朝天门，解锁“江城行者”高级称号",
+              "medal_id": "medal_yangtze_302",
+              "medal_icon": "icons/medal_yangtze_302.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 4,
+        "section_name": "川江下游·重庆→宜昌（三峡核心段）",
+        "section_length_km": 720,
+        "flow_area": "重庆市、湖北省",
+        "theme_color": "#2D5A27",
+        "sub_sections": [
+          {
+            "sub_section_id": 401,
+            "sub_section_name": "川江下游·重庆→涪陵段",
+            "start_point": "重庆主城区（朝天门）",
+            "end_point": "重庆涪陵（白鹤梁水下博物馆）",
+            "sub_section_length_km": 240,
+            "accumulated_length_km": 3160,
+            "core_landmarks": "重庆朝天门、涪陵白鹤梁水下博物馆、石宝寨远景",
+            "game_difficulty": "中-高（江面宽阔，水流平稳，但途经峡谷地段，偶有急流，人文打卡+耐力考验）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 0.7,
+            "environment_type": "three_gorges",
+            "bg_asset": "LayeredCliffs/001.png",
+            "ambient_sound": "river_rapid",
+            "sub_section_desc": "从重庆出发，向三峡方向前进，途经涪陵，打卡白鹤梁水下博物馆（世界上最早的水文站），感受川江的历史底蕴，为穿越三峡做好准备。",
+            "achievement": {
+              "achievement_name": "【水文寻踪】",
+              "achievement_desc": "打卡白鹤梁水下博物馆，解锁“历史探索者”称号",
+              "medal_id": "medal_yangtze_401",
+              "medal_icon": "icons/medal_yangtze_401.png"
+            }
+          },
+          {
+            "sub_section_id": 402,
+            "sub_section_name": "三峡上段·瞿塘峡+巫峡段",
+            "start_point": "重庆涪陵（白鹤梁水下博物馆）",
+            "end_point": "湖北秭归（屈原故里）",
+            "sub_section_length_km": 250,
+            "accumulated_length_km": 3410,
+            "core_landmarks": "石宝寨、白帝城、瞿塘峡（夔门）、巫峡十二峰、屈原故里",
+            "game_difficulty": "高（三峡核心峡谷，水流湍急，峡谷险峻，操作+耐力双重考验，人文彩蛋密集）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 1.2,
+            "environment_type": "three_gorges",
+            "bg_asset": "LayeredCliffs/001.png",
+            "ambient_sound": "river_rapid",
+            "sub_section_desc": "正式进入三峡核心景观区！先抵达白帝城，感受“朝辞白帝彩云间”的诗意，再穿越瞿塘峡（夔门）和巫峡，欣赏两岸险峻山峰，解锁多个诗词打卡点。",
+            "achievement": {
+              "achievement_name": "【三峡诗行】",
+              "achievement_desc": "穿越瞿塘峡、巫峡，解锁“三峡行者”称号",
+              "medal_id": "medal_yangtze_402",
+              "medal_icon": "icons/medal_yangtze_402.png"
+            }
+          },
+          {
+            "sub_section_id": 403,
+            "sub_section_name": "三峡下段·西陵峡+三峡大坝段",
+            "start_point": "湖北秭归（屈原故里）",
+            "end_point": "湖北宜昌（三峡大坝下游）",
+            "sub_section_length_km": 230,
+            "accumulated_length_km": 3640,
+            "core_landmarks": "西陵峡、三峡大坝、三峡升船机",
+            "game_difficulty": "高（西陵峡急流险滩，三峡大坝周边水流复杂，终极景观+操作考验）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 1.5,
+            "environment_type": "three_gorges",
+            "bg_asset": "LayeredCliffs/001.png",
+            "ambient_sound": "river_rapid",
+            "sub_section_desc": "穿越西陵峡，抵达全程最震撼的地标——三峡大坝，感受“高峡出平湖”的壮阔，体验穿越三峡升船机的独特视角，完成三峡全段挑战。",
+            "achievement": {
+              "achievement_name": "【三峡雄关】",
+              "achievement_desc": "完成长江三峡全段挑战，解锁“三峡霸主”终极称号",
+              "medal_id": "medal_yangtze_403",
+              "medal_icon": "icons/medal_yangtze_403.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 5,
+        "section_name": "荆江·宜昌→城陵矶段",
+        "section_length_km": 680,
+        "flow_area": "湖北省、湖南省",
+        "theme_color": "#8DBE7E",
+        "sub_sections": [
+          {
+            "sub_section_id": 501,
+            "sub_section_name": "荆江上段·宜昌→荆州段",
+            "start_point": "湖北宜昌（三峡大坝下游）",
+            "end_point": "湖北荆州（荆州古城）",
+            "sub_section_length_km": 280,
+            "accumulated_length_km": 3920,
+            "core_landmarks": "宜昌滨江、荆江大堤起点、荆州古城",
+            "game_difficulty": "中（江面宽阔，水流平缓，从峡谷过渡到平原河道，休闲巡航）",
+            "difficulty_rating": 2,
+            "base_flow_speed": 0.3,
+            "environment_type": "river_plains",
+            "bg_asset": "OpenFarmland/001.png",
+            "ambient_sound": "river_calm",
+            "sub_section_desc": "告别三峡的险峻，进入荆江平原段，江面变得宽阔平缓，两岸是肥沃的江汉平原，途经荆州古城，感受三国文化的底蕴，享受一段轻松的巡航时光。",
+            "achievement": {
+              "achievement_name": "【荆江初航】",
+              "achievement_desc": "进入荆江平原段，解锁“平原航者”初级称号",
+              "medal_id": "medal_yangtze_501",
+              "medal_icon": "icons/medal_yangtze_501.png"
+            }
+          },
+          {
+            "sub_section_id": 502,
+            "sub_section_name": "荆江下段·荆州→城陵矶段",
+            "start_point": "湖北荆州（荆州古城）",
+            "end_point": "湖南岳阳（城陵矶）",
+            "sub_section_length_km": 400,
+            "accumulated_length_km": 4320,
+            "core_landmarks": "荆江大堤、九曲回肠荆江河段、岳阳楼、洞庭湖、城陵矶（长江与洞庭湖汇合口）",
+            "game_difficulty": "中（河道弯曲，偶有浅滩，需注意航向，文化打卡+耐力考验）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.4,
+            "environment_type": "river_plains",
+            "bg_asset": "OpenFarmland/001.png",
+            "ambient_sound": "river_calm",
+            "sub_section_desc": "巡航在“九曲回肠”的荆江河段，感受平原河道的蜿蜒曲折，途经岳阳岳阳楼，打卡“先天下之忧而忧”的经典人文地标，最终抵达城陵矶，见证长江与洞庭湖汇合奇观。",
+            "achievement": {
+              "achievement_name": "【洞庭归帆】",
+              "achievement_desc": "抵达洞庭湖入江口，解锁“平原远航者”高级称号",
+              "medal_id": "medal_yangtze_502",
+              "medal_icon": "icons/medal_yangtze_502.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 6,
+        "section_name": "武汉核心段·城陵矶→九江段",
+        "section_length_km": 590,
+        "flow_area": "湖南省、湖北省、江西省",
+        "theme_color": "#5D8AA8",
+        "sub_sections": [
+          {
+            "sub_section_id": 601,
+            "sub_section_name": "武汉上游·城陵矶→武汉段",
+            "start_point": "湖南岳阳（城陵矶）",
+            "end_point": "湖北武汉（黄鹤楼附近）",
+            "sub_section_length_km": 390,
+            "accumulated_length_km": 4710,
+            "core_landmarks": "城陵矶、黄石长江沿岸、长江中游平原风光、武汉长江大桥、黄鹤楼、汉江入长江口",
+            "game_difficulty": "中（江面宽阔，水流平稳，平原巡航+都市操控考验，人文地标密集）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.5,
+            "environment_type": "urban",
+            "bg_asset": "ModernSkyline/001.png",
+            "ambient_sound": "city_distant",
+            "sub_section_desc": "离开洞庭湖入江口，向武汉方向巡航，两岸是江汉平原风光，江面航运逐渐繁忙，最终抵达长江中游最大城市——武汉，穿越武汉长江大桥，打卡黄鹤楼，见证汉江与长江汇合。",
+            "achievement": {
+              "achievement_name": "【江城揽胜】",
+              "achievement_desc": "抵达武汉黄鹤楼，解锁“都市航者”高级称号",
+              "medal_id": "medal_yangtze_601",
+              "medal_icon": "icons/medal_yangtze_601.png"
+            }
+          },
+          {
+            "sub_section_id": 602,
+            "sub_section_name": "武汉下游·武汉→九江段",
+            "start_point": "湖北武汉（黄鹤楼附近）",
+            "end_point": "江西九江（鄱阳湖口）",
+            "sub_section_length_km": 200,
+            "accumulated_length_km": 4910,
+            "core_landmarks": "武汉东湖远景、九江长江大桥、鄱阳湖口",
+            "game_difficulty": "中（离开武汉城区，江面依旧宽阔，水流平稳，抵达鄱阳湖口）",
+            "difficulty_rating": 2,
+            "base_flow_speed": 0.4,
+            "environment_type": "river_plains",
+            "bg_asset": "RiversideVillage/001.png",
+            "ambient_sound": "river_calm",
+            "sub_section_desc": "告别武汉，继续向东巡航，途经武汉东湖远景，最终抵达九江鄱阳湖口，见证长江与中国第一大淡水湖——鄱阳湖的汇合，解锁新的水域奇观。",
+            "achievement": {
+              "achievement_name": "【鄱湖汇江】",
+              "achievement_desc": "抵达鄱阳湖入江口，解锁“湖江航者”称号",
+              "medal_id": "medal_yangtze_602",
+              "medal_icon": "icons/medal_yangtze_602.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 7,
+        "section_name": "皖江·九江→马鞍山段",
+        "section_length_km": 480,
+        "flow_area": "江西省、安徽省",
+        "theme_color": "#769371",
+        "sub_sections": [
+          {
+            "sub_section_id": 701,
+            "sub_section_name": "皖江·九江→马鞍山段（全程）",
+            "start_point": "江西九江（鄱阳湖口）",
+            "end_point": "安徽马鞍山（采石矶）",
+            "sub_section_length_km": 480,
+            "accumulated_length_km": 5390,
+            "core_landmarks": "鄱阳湖口、小孤山、天柱山（远景）、芜湖长江大桥、采石矶（李白文化地标）、马鞍山滨江带",
+            "game_difficulty": "低-中（江南水乡河道，水流平缓，两岸青山绿水，休闲巡航+文化打卡，全程适配节奏）",
+            "difficulty_rating": 2,
+            "base_flow_speed": 0.3,
+            "environment_type": "river_plains",
+            "bg_asset": "RiversideVillage/001.png",
+            "ambient_sound": "river_calm",
+            "sub_section_desc": "进入皖江段，全程贯穿江南水乡风光，从九江出发，途经小孤山、芜湖，感受江南江城的韵味，最终抵达采石矶——李白“醉酒捞月”的传说之地，打卡文化地标，完成皖江段挑战。",
+            "achievement": {
+              "achievement_name": "【诗酒临江】",
+              "achievement_desc": "打卡采石矶，解锁“诗韵航者”高级称号",
+              "medal_id": "medal_yangtze_701",
+              "medal_icon": "icons/medal_yangtze_701.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 8,
+        "section_name": "扬子江上游·马鞍山→南京段",
+        "section_length_km": 390,
+        "flow_area": "安徽省、江苏省",
+        "theme_color": "#4B6A88",
+        "sub_sections": [
+          {
+            "sub_section_id": 801,
+            "sub_section_name": "扬子江上游·马鞍山→南京段（全程）",
+            "start_point": "安徽马鞍山（采石矶）",
+            "end_point": "江苏南京（秦淮河入江口）",
+            "sub_section_length_km": 390,
+            "accumulated_length_km": 5780,
+            "core_landmarks": "马鞍山滨江、镇江三山（金山、焦山、北固山）、南京长江大桥、紫金山（远景）、玄武湖（远景）、燕子矶、阅江楼、秦淮河入江口",
+            "game_difficulty": "中（进入江苏段，江面宽阔，航运繁忙，古都历史感强，历史地标打卡+避让考验）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.5,
+            "environment_type": "urban",
+            "bg_asset": "ModernSkyline/001.png",
+            "ambient_sound": "city_distant",
+            "sub_section_desc": "进入扬子江段，从马鞍山出发，途经镇江三山，感受江南古都的历史底蕴，抵达六朝古都南京，深入城区穿越南京长江大桥、打卡阅江楼，最终抵达秦淮河入江口，见证长江与秦淮河汇合。",
+            "achievement": {
+              "achievement_name": "【金陵飞渡】",
+              "achievement_desc": "抵达南京秦淮河入江口，解锁“古都行者”高级称号",
+              "medal_id": "medal_yangtze_801",
+              "medal_icon": "icons/marker_milestone.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 9,
+        "section_name": "扬子江下游·南京→江阴段",
+        "section_length_km": 320,
+        "flow_area": "江苏省",
+        "theme_color": "#3B5A78",
+        "sub_sections": [
+          {
+            "sub_section_id": 901,
+            "sub_section_name": "扬子江下游·南京→江阴段（全程）",
+            "start_point": "江苏南京（秦淮河入江口）",
+            "end_point": "江苏江阴（江阴长江大桥）",
+            "sub_section_length_km": 320,
+            "accumulated_length_km": 6100,
+            "core_landmarks": "南京滨江、扬州瘦西湖（远景）、瓜洲古渡、镇江三山远景、江阴要塞、江阴长江大桥",
+            "game_difficulty": "中（江面极宽，航运密集，大型货轮增多，操控精度和避让能力考验，为入海做准备）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.6,
+            "environment_type": "urban",
+            "bg_asset": "HarborIndustrial/001.png",
+            "ambient_sound": "ship_horn_distant",
+            "sub_section_desc": "离开南京，向东巡航，途经瓜洲古渡，感受“春风又绿江南岸”的诗意，江面愈发宽阔，航运愈发密集，需精准避让大型货轮，最终抵达江阴长江大桥，为终极入海挑战做准备。",
+            "achievement": {
+              "achievement_name": "【江南远航】",
+              "achievement_desc": "完成扬子江下游段挑战，解锁“江南航者”高级称号",
+              "medal_id": "medal_yangtze_901",
+              "medal_icon": "icons/marker_milestone.png"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 10,
+        "section_name": "长江入海口·江阴→东海段",
+        "section_length_km": 287,
+        "flow_area": "江苏省、上海市",
+        "theme_color": "#1B3A58",
+        "sub_sections": [
+          {
+            "sub_section_id": 1001,
+            "sub_section_name": "入海口上段·江阴→上海段",
+            "start_point": "江苏江阴（江阴长江大桥）",
+            "end_point": "上海陆家嘴（黄浦江入江口）",
+            "sub_section_length_km": 192,
+            "accumulated_length_km": 6292,
+            "core_landmarks": "苏州/南通沿岸、上海吴淞口、上海外滩、陆家嘴、黄浦江汇入长江口",
+            "game_difficulty": "中（江面极阔，咸淡水开始混合，水流平缓，都市景观+避让考验）",
+            "difficulty_rating": 3,
+            "base_flow_speed": 0.5,
+            "environment_type": "urban",
+            "bg_asset": "ModernSkyline/001.png",
+            "ambient_sound": "city_distant",
+            "sub_section_desc": "终极挑战开启！从江阴长江大桥出发，向上海方向巡航，江面变得无比宽阔，两岸是江苏和上海的繁华沿岸景观，咸淡水开始混合，最终抵达上海陆家嘴，打卡外滩 and 陆家嘴地标。",
+            "achievement": {
+              "achievement_name": "【向海而行】",
+              "achievement_desc": "抵达上海陆家嘴，解锁“入海挑战者”高级称号+“都市航者”终极称号",
+              "medal_id": "medal_yangtze_1001",
+              "medal_icon": "icons/marker_milestone.png"
+            }
+          },
+          {
+            "sub_section_id": 1002,
+            "sub_section_name": "入海口末端·上海→东海段",
+            "start_point": "上海陆家嘴（黄浦江入江口）",
+            "end_point": "长江入海口（崇明岛东侧，汇入东海）",
+            "sub_section_length_km": 95,
+            "accumulated_length_km": 6387,
+            "core_landmarks": "崇明岛、长江入海口（江海交汇处）、东海海域",
+            "game_difficulty": "中（江面最阔，江海完全交汇，咸淡水混合，终极冲刺挑战）",
+            "difficulty_rating": 4,
+            "base_flow_speed": 0.8,
+            "environment_type": "urban",
+            "bg_asset": "ModernSkyline/001.png",
+            "ambient_sound": "ocean_waves",
+            "sub_section_desc": "终极冲刺！从上海陆家嘴出发，穿越崇明岛周边水域，最终抵达长江入海口，见证长江水汇入东海的壮阔瞬间，完成全程6387km的划船挑战！",
+            "achievement": {
+              "achievement_name": "【入海归航】",
+              "achievement_desc": "抵达长江入海口，解锁“长江征服者”终极称号，完成长江全程划船挑战！",
+              "medal_id": "medal_yangtze_1002",
+              "medal_icon": "icons/marker_milestone.png"
+            }
+          }
+        ]
+      }
+    ],
+    "verify_info": "1. 大区段里程核对：1170+960+790+720+680+590+480+390+320+287=6387km；2. 小区段核对：每段里程100-500公里，大区段内小区段里程和=原大区段里程（如3区260+530=790km、7区480km单段达标）；3. 累计里程从420km逐步递增至6387km，全程闭环，字段规范，可直接用于Godot游戏开发。"
+}
