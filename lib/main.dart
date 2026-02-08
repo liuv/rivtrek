@@ -158,9 +158,11 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
               painter: RiverShaderPainter(
                 shader: _shader!,
                 time: _stopwatch.elapsedMilliseconds / 1000.0,
-                turbulence: 0.5 + (sub.difficulty * 0.4), 
+                // 湍流度受 difficulty 影响更加明显
+                turbulence: 0.3 + (sub.difficulty * 0.6), 
                 width: 0.16 + (sub.baseFlowSpeed * 0.04),
-                speed: 0.2 + (sub.baseFlowSpeed * 0.2), 
+                // 流速受 baseFlowSpeed 驱动，确保差异化
+                speed: 0.15 + (sub.baseFlowSpeed * 0.4), 
                 themeColor: sub.color,
                 offset: _currentDistance / 10.0, 
               ),
