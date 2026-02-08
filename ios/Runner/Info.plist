@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <key>NSHealthShareUsageDescription</key>
+    <string>遇见江河需要读取步数数据以同步你的行进进度</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>遇见江河需要记录你的行走成就</string>
 </dict>
 </plist>
