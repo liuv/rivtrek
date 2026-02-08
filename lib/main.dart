@@ -25,8 +25,6 @@ class RiverMeetApp extends StatelessWidget {
   }
 }
 
-// --- 数据模型 ---
-
 class RiverSection {
   final String name;
   final String themeColor;
@@ -63,8 +61,6 @@ class SubSection {
   }
 }
 
-// --- 主页面 ---
-
 class FlowScreen extends StatefulWidget {
   const FlowScreen({super.key});
 
@@ -75,29 +71,25 @@ class FlowScreen extends StatefulWidget {
 class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateMixin {
   ui.FragmentShader? _shader;
   late AnimationController _controller;
-  late Stopwatch _stopwatch; // 新增：精密计时器
+  late Stopwatch _stopwatch;
   
-  double uTurbulence = 1.0; 
-  double uWidth = 0.18;
-  double uSpeed = 0.15;
-
   List<SubSection> _allSubSections = [];
   SubSection? _currentSubSection;
-  
-  // 模拟当前行进的总里程 (km)
   double _currentDistance = 0.0;
-  final double _stepLengthKm = 0.0007; // 每步 0.7 米
+  final double _stepLengthKm = 0.0007;
 
   @override
   void initState() {
     super.initState();
     _loadData();
     _loadShader();
-    _stopwatch = Stopwatch()..start(); // 启动计时
+    _stopwatch = Stopwatch()..start();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1), 
-    )..repeat();
+    )..addListener(() {
+      setState(() {}); // 核心修复：确保每一帧都触发重绘
+    })..repeat();
   }
 
   Future<void> _loadData() async {
@@ -105,39 +97,21 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
       final String response = await rootBundle.loadString('assets/json/rivers/yangtze_full.json');
       final data = json.decode(response);
       final List sections = data['challenge_sections'];
-      
       List<SubSection> flatList = [];
       for (var s in sections) {
-        final riverSection = RiverSection.fromJson(s);
-        flatList.addAll(riverSection.subSections);
+        flatList.addAll(RiverSection.fromJson(s).subSections);
       }
-
       setState(() {
         _allSubSections = flatList;
-        _updateCurrentProgress(0); // 初始位置
+        _updateCurrentProgress(0);
       });
     } catch (e) {
       debugPrint("Error loading river data: $e");
-      // 如果加载失败，给一个保底数据，防止界面卡死
-      setState(() {
-        _allSubSections = [
-          SubSection.fromJson({
-            "sub_section_name": "数据加载失败",
-            "accumulated_length_km": 0.0,
-            "base_flow_speed": 0.5,
-            "difficulty_rating": 1,
-            "environment_type": "error",
-            "core_landmarks": "请检查资源配置",
-          }, "#FF0000")
-        ];
-        _updateCurrentProgress(0);
-      });
     }
   }
 
   void _updateCurrentProgress(double distance) {
     _currentDistance = distance;
-    // 根据当前里程寻找匹配的河段
     SubSection? found;
     for (var sub in _allSubSections) {
       if (distance <= sub.accumulatedLength) {
@@ -145,14 +119,20 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
         break;
       }
     }
-    _currentSubSection = found ?? _allSubSections.last;
+    setState(() {
+      _currentSubSection = found ?? (_allSubSections.isNotEmpty ? _allSubSections.last : null);
+    });
   }
 
   Future<void> _loadShader() async {
-    final program = await ui.FragmentProgram.fromAsset('shaders/river.frag');
-    setState(() {
-      _shader = program.fragmentShader();
-    });
+    try {
+      final program = await ui.FragmentProgram.fromAsset('shaders/river.frag');
+      setState(() {
+        _shader = program.fragmentShader();
+      });
+    } catch (e) {
+      debugPrint("Shader load error: $e");
+    }
   }
 
   @override
@@ -173,23 +153,19 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // 1. 数据驱动的 Shader 背景
           Positioned.fill(
             child: CustomPaint(
               painter: RiverShaderPainter(
                 shader: _shader!,
-                time: _stopwatch.elapsedMilliseconds / 1000.0, 
+                time: _stopwatch.elapsedMilliseconds / 1000.0,
                 turbulence: 0.5 + (sub.difficulty * 0.4), 
                 width: 0.16 + (sub.baseFlowSpeed * 0.04),
-                // 恢复优雅流速：源头 0.2，下游 0.4
                 speed: 0.2 + (sub.baseFlowSpeed * 0.2), 
                 themeColor: sub.color,
                 offset: _currentDistance / 10.0, 
               ),
             ),
           ),
-
-          // 2. UI 层
           SafeArea(
             child: Column(
               children: [
@@ -201,11 +177,7 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
               ],
             ),
           ),
-
-          // 3. 底部导航
           _buildBottomNavBar(),
-          
-          // 4. 模拟调试滑块 (正式版删除，仅供你现在演示河段切换效果)
           _buildDebugSlider(),
         ],
       ),
@@ -221,18 +193,12 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                sub.name.split('·')[0], // 取大名字
-                style: const TextStyle(color: Color(0xFF222222), fontSize: 18, fontWeight: FontWeight.w400),
-              ),
+              Text(sub.name.split('·')[0], style: const TextStyle(color: Color(0xFF222222), fontSize: 18, fontWeight: FontWeight.w400)),
               const Icon(Icons.wb_sunny_outlined, size: 20, color: Color(0xFF222222)),
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            sub.name,
-            style: TextStyle(color: const Color(0xFF222222).withOpacity(0.5), fontSize: 13, fontWeight: FontWeight.w300),
-          ),
+          Text(sub.name, style: TextStyle(color: const Color(0xFF222222).withOpacity(0.5), fontSize: 13, fontWeight: FontWeight.w300)),
         ],
       ),
     );
@@ -247,38 +213,26 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
           style: const TextStyle(color: Color(0xFF222222), fontSize: 110, fontWeight: FontWeight.w100, letterSpacing: -4),
         ),
         const SizedBox(height: 5),
-        Text(
-          "已航行 ${_currentDistance.toStringAsFixed(1)} km / 6387 km",
-          style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, fontWeight: FontWeight.w300, letterSpacing: 1.2),
-        ),
+        Text("已航行 ${_currentDistance.toStringAsFixed(1)} km / 6387 km", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, fontWeight: FontWeight.w300, letterSpacing: 1.2)),
       ],
     );
   }
 
   Widget _buildBottomNavBar() {
     return Positioned(
-      left: 35,
-      right: 35,
-      bottom: 45,
+      left: 35, right: 35, bottom: 45,
       child: Container(
         height: 85,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.4),
-          borderRadius: BorderRadius.circular(44),
-          border: Border.all(color: Colors.white.withOpacity(0.4), width: 0.5),
-        ),
+        decoration: BoxDecoration(color: Colors.white.withOpacity(0.4), borderRadius: BorderRadius.circular(44)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(44),
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(Icons.waves_rounded, "Flow", true),
-                _buildNavItem(Icons.map_outlined, "Map", false),
-                _buildNavItem(Icons.person_outline_rounded, "Me", false),
-              ],
-            ),
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              _buildNavItem(Icons.waves_rounded, "Flow", true),
+              _buildNavItem(Icons.map_outlined, "Map", false),
+              _buildNavItem(Icons.person_outline_rounded, "Me", false),
+            ]),
           ),
         ),
       ),
@@ -286,33 +240,15 @@ class _FlowScreenState extends State<FlowScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: isActive ? const Color(0xFF0097A7) : const Color(0xFF888888), size: 26),
-        const SizedBox(height: 4),
-        Text(label, style: TextStyle(color: isActive ? const Color(0xFF222222) : const Color(0xFF888888), fontSize: 10)),
-      ],
-    );
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Icon(icon, color: isActive ? const Color(0xFF0097A7) : const Color(0xFF888888), size: 26),
+      const SizedBox(height: 4),
+      Text(label, style: TextStyle(color: isActive ? const Color(0xFF222222) : const Color(0xFF888888), fontSize: 10)),
+    ]);
   }
 
   Widget _buildDebugSlider() {
-    return Positioned(
-      top: 150,
-      right: -100,
-      child: Transform.rotate(
-        angle: math.pi / 2,
-        child: SizedBox(
-          width: 300,
-          child: Slider(
-            value: _currentDistance,
-            max: 6387,
-            onChanged: (v) => setState(() => _updateCurrentProgress(v)),
-            activeColor: Colors.cyan.withOpacity(0.3),
-          ),
-        ),
-      ),
-    );
+    return Positioned(top: 150, right: -100, child: Transform.rotate(angle: math.pi / 2, child: SizedBox(width: 300, child: Slider(value: _currentDistance, max: 6387, onChanged: (v) => _updateCurrentProgress(v), activeColor: Colors.cyan.withOpacity(0.3)))));
   }
 }
 
@@ -325,21 +261,10 @@ class RiverShaderPainter extends CustomPainter {
   final Color themeColor;
   final double offset;
 
-  RiverShaderPainter({
-    required this.shader,
-    required this.time,
-    required this.turbulence,
-    required this.width,
-    required this.speed,
-    required this.themeColor,
-    required this.offset,
-  });
+  RiverShaderPainter({required this.shader, required this.time, required this.turbulence, required this.width, required this.speed, required this.themeColor, required this.offset});
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 严格匹配 river.frag 的 uniform 顺序:
-    // 0: uTime, 1: uCanvasW, 2: uCanvasH, 3: uSpeed, 4: uTurbulence, 
-    // 5: uWidth, 6: uRed, 7: uGreen, 8: uBlue, 9: uOffset
     shader.setFloat(0, time);
     shader.setFloat(1, size.width);
     shader.setFloat(2, size.height);
@@ -350,9 +275,7 @@ class RiverShaderPainter extends CustomPainter {
     shader.setFloat(7, themeColor.green / 255.0);
     shader.setFloat(8, themeColor.blue / 255.0);
     shader.setFloat(9, offset);
-
-    final paint = Paint()..shader = shader;
-    canvas.drawRect(Offset.zero & size, paint);
+    canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 
   @override
