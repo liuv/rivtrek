@@ -146,9 +146,12 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
         ),
       ).timeout(const Duration(seconds: 10));
       
-      setState(() => _coords = "${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)}");
+      setState(() {
+        _coords = "${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)}";
+        _cityName = "查询中...";
+      });
 
-      // 4. 获取城市名称 (Web API 适配)
+      // 4. 获取城市名称 (不阻塞天气请求)
       _fetchCityNameWeb(position.latitude, position.longitude);
 
       // 5. 获取天气
@@ -186,15 +189,26 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
 
   Future<void> _fetchCityNameWeb(double lat, double lon) async {
     try {
-      final url = Uri.parse('https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lon&accept-language=zh');
-      final response = await http.get(url, headers: {'User-Agent': 'RiverMeetApp'});
+      // 优先使用 open-meteo 的 geocoding 反查（国内可访问）
+      final url = Uri.parse(
+        'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=zh'
+      );
+      final response = await http.get(url).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final address = data['address'];
-        String city = address['city'] ?? address['town'] ?? address['village'] ?? address['municipality'] ?? "大连市";
-        setState(() => _cityName = city);
+        String city = data['city'] ?? data['locality'] ?? data['principalSubdivision'] ?? "";
+        if (city.isNotEmpty && mounted) {
+          setState(() => _cityName = city);
+          return;
+        }
       }
-    } catch (e) { debugPrint("Web Geocoding Error: $e"); }
+    } catch (e) {
+      debugPrint("Geocoding Error: $e");
+    }
+    // fallback: 坐标作为显示
+    if (mounted) {
+      setState(() => _cityName = "${lat.toStringAsFixed(1)}°N");
+    }
   }
 
   void _fetchDefaultWeather() async {
