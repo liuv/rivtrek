@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -42,11 +43,12 @@ class FlowScreen extends StatefulWidget {
   State<FlowScreen> createState() => _FlowScreenState();
 }
 
-class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
+class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
   ui.FragmentShader? _shader;
   late AnimationController _timeController;
   late AnimationController _distanceController;
   late Stopwatch _stopwatch;
+  StreamSubscription? _pedometerSubscription;
 
   List<SubSection> _allSubSections = [];
   SubSection? _currentSubSection;
@@ -67,15 +69,22 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
   String _coords = "无信号";
   IconData _weatherIcon = Icons.wb_cloudy_outlined;
 
+  // 缓存键名
+  static const String _kLastWeatherTime = 'last_weather_time';
+  static const String _kCachedWeather = 'cached_weather_data';
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadData();
     _loadShader();
     _stopwatch = Stopwatch()..start();
     _timeController =
         AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _timeController.addListener(() => setState(() {}));
+    _timeController.addListener(() {
+      if (mounted) setState(() {});
+    });
     _timeController.repeat();
     _distanceController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
@@ -83,19 +92,102 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
     _initPermissionsSequentially();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timeController.dispose();
+    _distanceController.dispose();
+    _pedometerSubscription?.cancel();
+    _stopwatch.stop();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // 当应用进入后台，停止动画和秒表以节省 CPU 和电量
+      _timeController.stop();
+      _stopwatch.stop();
+    } else if (state == AppLifecycleState.resumed) {
+      // 当应用回到前台，恢复动画和秒表
+      if (mounted) {
+        _timeController.repeat();
+        _stopwatch.start();
+        // 回到前台时顺便检查一下天气是否需要更新
+        _initWeatherWithGeolocator();
+      }
+    }
+  }
+
   void _initPermissionsSequentially() async {
     await _initHybridSync();
+    await _loadCachedWeather(); // 先加载缓存
     _initWeatherWithGeolocator();
+  }
+
+  Future<void> _loadCachedWeather() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? cachedData = prefs.getString(_kCachedWeather);
+      if (cachedData != null && mounted) {
+        final data = json.decode(cachedData);
+        setState(() {
+          _temp = data['temp'] ?? "--";
+          _cityName = data['city'] ?? "待定位";
+          _weatherDesc = data['desc'] ?? "未知";
+          _coords = data['coords'] ?? "无信号";
+          _weatherIcon = _getWeatherIcon(data['icon_code'] ?? 0);
+        });
+      }
+    } catch (e) {
+      debugPrint("Error loading cached weather: $e");
+    }
+  }
+
+  bool _shouldUpdateWeather(SharedPreferences prefs) {
+    final int? lastTime = prefs.getInt(_kLastWeatherTime);
+    if (lastTime == null) return true;
+
+    final lastDate = DateTime.fromMillisecondsSinceEpoch(lastTime);
+    final now = DateTime.now();
+
+    // 如果不是同一天，更新
+    if (lastDate.year != now.year ||
+        lastDate.month != now.month ||
+        lastDate.day != now.day) {
+      return true;
+    }
+
+    // 如果超过8小时，更新
+    final difference = now.difference(lastDate).inHours;
+    if (difference >= 8) {
+      return true;
+    }
+
+    return false;
   }
 
   void _initWeatherWithGeolocator() async {
     try {
-      setState(() => _cityName = "检查权限...");
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() => _cityName = "GPS未开启");
+      final prefs = await SharedPreferences.getInstance();
+      
+      // 检查是否需要更新
+      if (!_shouldUpdateWeather(prefs) && _cityName != "待定位") {
+        debugPrint("Using cached weather data, skipping fetch.");
         return;
       }
+
+      if (!mounted) return;
+      setState(() => _cityName = _cityName == "待定位" ? "检查权限..." : _cityName);
+      
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted && _cityName == "检查权限...") {
+          setState(() => _cityName = "GPS未开启");
+        }
+        return;
+      }
+
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -103,40 +195,54 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
           throw "权限被拒绝";
         }
       }
+      
       if (permission == LocationPermission.deniedForever) {
-        setState(() => _cityName = "权限已封死");
-        _showManualPermissionHint();
+        if (mounted && _cityName == "检查权限...") {
+          setState(() => _cityName = "权限已封死");
+          _showManualPermissionHint();
+        }
         return;
       }
-      setState(() => _cityName = "定位中...");
-      Position position = await Geolocator.getCurrentPosition(
-        locationSettings:
-            const LocationSettings(accuracy: LocationAccuracy.low),
-      ).timeout(const Duration(seconds: 10));
-      setState(() {
-        _coords =
-            "${position.latitude.toStringAsFixed(2)}, ${position.longitude.toStringAsFixed(2)}";
-        _cityName = "查询中...";
-      });
-      _fetchCityNameWeb(position.latitude, position.longitude);
-      final url = Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=${position.latitude}&longitude=${position.longitude}&current_weather=true&timezone=auto');
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final current = data['current_weather'];
-        if (mounted) {
-          setState(() {
-            _temp = "${current['temperature'].round()}°";
-            _weatherIcon = _getWeatherIcon(current['weathercode']);
-            _weatherDesc = _getWeatherDesc(current['weathercode']);
-          });
-        }
+
+      if (mounted) {
+        setState(() => _cityName = _cityName == "检查权限..." || _cityName == "待定位" ? "定位中..." : _cityName);
       }
+
+      // 优化：先尝试获取最后一次已知位置，提高速度
+      Position? position = await Geolocator.getLastKnownPosition();
+      
+      // 如果没有最后已知位置，或者位置太旧，则获取当前位置
+      if (position == null) {
+        position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium, // 提高到中等精度
+            timeLimit: Duration(seconds: 8),
+          ),
+        ).timeout(const Duration(seconds: 10));
+      }
+
+      final double lat = position.latitude;
+      final double lon = position.longitude;
+
+      if (mounted) {
+        setState(() {
+          _coords = "${lat.toStringAsFixed(2)}, ${lon.toStringAsFixed(2)}";
+          if (_cityName == "定位中...") _cityName = "查询中...";
+        });
+      }
+
+      // 并发获取城市名和天气
+      await Future.wait([
+        _fetchCityNameWeb(lat, lon),
+        _fetchWeather(lat, lon, prefs),
+      ]);
+
     } catch (e) {
       debugPrint("Geolocator Logic Error: $e");
-      setState(() => _cityName = "定位偏差");
-      _fetchDefaultWeather();
+      if (mounted && (_cityName == "定位中..." || _cityName == "检查权限...")) {
+        setState(() => _cityName = "定位偏差");
+        _fetchDefaultWeather();
+      }
     }
   }
 
@@ -148,11 +254,52 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
     ));
   }
 
+  Future<void> _fetchWeather(double lat, double lon, SharedPreferences prefs) async {
+    try {
+      final url = Uri.parse(
+          'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true&timezone=auto');
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final current = data['current_weather'];
+        final int iconCode = current['weathercode'];
+        final String temp = "${current['temperature'].round()}°";
+        final String desc = _getWeatherDesc(iconCode);
+
+        if (mounted) {
+          setState(() {
+            _temp = temp;
+            _weatherIcon = _getWeatherIcon(iconCode);
+            _weatherDesc = desc;
+          });
+          
+          // 缓存数据
+          _saveWeatherToCache(prefs, temp, desc, iconCode);
+        }
+      }
+    } catch (e) {
+      debugPrint("Weather Fetch Error: $e");
+    }
+  }
+
+  void _saveWeatherToCache(SharedPreferences prefs, String temp, String desc, int iconCode) {
+    final weatherData = {
+      'temp': temp,
+      'city': _cityName,
+      'desc': desc,
+      'coords': _coords,
+      'icon_code': iconCode,
+      'last_update': DateTime.now().millisecondsSinceEpoch,
+    };
+    prefs.setString(_kCachedWeather, json.encode(weatherData));
+    prefs.setInt(_kLastWeatherTime, DateTime.now().millisecondsSinceEpoch);
+  }
+
   Future<void> _fetchCityNameWeb(double lat, double lon) async {
     try {
       final url = Uri.parse(
           'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=zh');
-      final response = await http.get(url).timeout(const Duration(seconds: 5));
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         String city = data['city'] ??
@@ -161,13 +308,24 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
             "";
         if (city.isNotEmpty && mounted) {
           setState(() => _cityName = city);
+          
+          // 更新缓存中的城市名
+          final prefs = await SharedPreferences.getInstance();
+          final String? cachedData = prefs.getString(_kCachedWeather);
+          if (cachedData != null) {
+            final Map<String, dynamic> weatherMap = json.decode(cachedData);
+            weatherMap['city'] = city;
+            prefs.setString(_kCachedWeather, json.encode(weatherMap));
+          }
           return;
         }
       }
     } catch (e) {
       debugPrint("Geocoding Error: $e");
     }
-    if (mounted) setState(() => _cityName = "${lat.toStringAsFixed(1)}°N");
+    if (mounted && (_cityName == "查询中..." || _cityName == "定位中...")) {
+      setState(() => _cityName = "${lat.toStringAsFixed(1)}°N");
+    }
   }
 
   void _fetchDefaultWeather() async {
@@ -261,7 +419,7 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
       DateTime now = DateTime.now();
       DateTime midnight = DateTime(now.year, now.month, now.day);
       int? steps = await health.getTotalStepsInInterval(midnight, now);
-      if (steps != null && steps > 0) {
+      if (steps != null && steps > 0 && mounted) {
         setState(() {
           _displaySteps = steps;
           _animateToDistance(steps * _stepLengthKm);
@@ -275,7 +433,7 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
   }
 
   void _startPedometerStream() {
-    Pedometer.stepCountStream.listen((event) async {
+    _pedometerSubscription = Pedometer.stepCountStream.listen((event) async {
       final prefs = await SharedPreferences.getInstance();
       final String today = DateTime.now().toString().split(' ')[0];
       int hardwareTotal = event.steps;
@@ -293,7 +451,8 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
           _animateToDistance(stepsToday * _stepLengthKm);
         });
       }
-    }).onError((e) => debugPrint("Pedometer Error: $e"));
+    });
+    _pedometerSubscription?.onError((e) => debugPrint("Pedometer Error: $e"));
   }
 
   void _animateToDistance(double target) {
@@ -315,16 +474,19 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
       for (var s in data['challenge_sections']) {
         flatList.addAll(RiverSection.fromJson(s).subSections);
       }
-      setState(() {
-        _allSubSections = flatList;
-        _updateCurrentProgress(_currentDistance);
-      });
+      if (mounted) {
+        setState(() {
+          _allSubSections = flatList;
+          _updateCurrentProgress(_currentDistance);
+        });
+      }
     } catch (e) {
       debugPrint("Data load error: $e");
     }
   }
 
   void _updateCurrentProgress(double distance) {
+    if (!mounted) return;
     _currentDistance = distance.clamp(0.0, 6387.0);
     SubSection? found;
     for (var sub in _allSubSections) {
@@ -342,14 +504,20 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin {
   Future<void> _loadShader() async {
     try {
       final program = await ui.FragmentProgram.fromAsset('shaders/river.frag');
-      setState(() => _shader = program.fragmentShader());
+      if (mounted) {
+        setState(() => _shader = program.fragmentShader());
+      }
     } catch (e) {
       debugPrint("Shader error: $e");
     }
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (_allSubSections.isEmpty || _shader == null)
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     final sub = _currentSubSection!;
