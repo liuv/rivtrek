@@ -22,7 +22,7 @@ class RiverMeetApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '遇见江河',
+      title: '徒步江河',
       theme: ThemeData(
         brightness: Brightness.light, 
         fontFamily: 'Inter',

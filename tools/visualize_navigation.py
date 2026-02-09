@@ -36,7 +36,7 @@ def generate():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>长江导航效果模拟验证</title>
+        <title>长江徒步效果模拟验证</title>
         <meta charset="utf-8" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -109,7 +109,7 @@ def generate():
     """
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html_content)
-    print(f"✅ 导航模拟验证工具已生成: {HTML_PATH}")
+    print(f"✅ 徒步模拟验证工具已生成: {HTML_PATH}")
     webbrowser.open('file://' + os.path.abspath(HTML_PATH))
 
 if __name__ == "__main__":

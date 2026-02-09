@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>River Meet</string>
+	<string>徒步江河</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>river_meet</string>
+	<string>徒步江河</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -46,8 +46,8 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
     <key>NSHealthShareUsageDescription</key>
-    <string>遇见江河需要读取步数数据以同步你的行进进度</string>
+    <string>徒步江河需要读取步数数据以同步你的行进进度</string>
     <key>NSHealthUpdateUsageDescription</key>
-    <string>遇见江河需要记录你的行走成就</string>
+    <string>徒步江河需要记录你的行走成就</string>
 </dict>
 </plist>

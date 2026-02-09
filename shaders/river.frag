@@ -13,6 +13,8 @@ uniform float uRed;        // 主题色 R（0~1）
 uniform float uGreen;      // 主题色 G（0~1）
 uniform float uBlue;       // 主题色 B（0~1）
 uniform float uOffset;     // 河道纵向偏移（里程/10），驱动河床滚动
+uniform float uUseRealPath; // 是否使用真实路径 (0 或 1)
+uniform float uPath[32];    // 真实路径偏移数据
 
 out vec4 fragColor;
 
@@ -26,6 +28,15 @@ float noise(vec2 p) {
     f = f * f * (3.0 - 2.0 * f);
     return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
                mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+
+// 插值函数，用于从 uPath 中平滑获取偏移
+float get_path_offset(float y) {
+    float idx = (y * 0.5 + 0.5) * 31.0;
+    int i = int(floor(idx));
+    int j = min(i + 1, 31);
+    float f = fract(idx);
+    return mix(uPath[i], uPath[j], f);
 }
 
 // ============================================================
@@ -64,7 +75,12 @@ void main() {
     //    3.5   —— 【可调】次级弯曲频率
     // ============================================================
     float scrollY = p.y + uOffset * 2.0;
-    float path = sin(scrollY * 1.5) * 0.25;
+    float path;
+    if (uUseRealPath > 0.5) {
+        path = get_path_offset(p.y) * 0.5;
+    } else {
+        path = sin(scrollY * 1.5) * 0.25;
+    }
     path += cos(scrollY * 3.5) * 0.05 * uTurbulence;
 
     // ============================================================

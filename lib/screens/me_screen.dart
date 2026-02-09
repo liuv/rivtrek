@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'settings_screen.dart';
 
 class MeScreen extends StatelessWidget {
   const MeScreen({super.key});
@@ -63,15 +64,20 @@ class MeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 50),
                   // Stats Section
-                  _buildStatItem("累计航行", "1,240 km", Icons.auto_awesome_outlined),
+                  _buildStatItem("累计徒步", "1,240 km", Icons.auto_awesome_outlined),
                   _buildStatItem("解锁河段", "4 / 20", Icons.waves_rounded),
                   _buildStatItem("收集物件", "12 个", Icons.inventory_2_outlined),
                   const SizedBox(height: 40),
                   const Divider(color: Color(0xFFEEEEEE)),
                   const SizedBox(height: 20),
                   // Settings/Menu
-                  _buildMenuItem("航行设置", Icons.settings_outlined),
-                  _buildMenuItem("关于遇见江河", Icons.info_outline_rounded),
+                  _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                    );
+                  }),
+                  _buildMenuItem("关于徒步江河", Icons.info_outline_rounded),
                   _buildMenuItem("退出登录", Icons.logout_rounded),
                   const SizedBox(height: 120), // Padding for bottom nav
                 ],
@@ -150,24 +156,27 @@ class MeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(String title, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      child: Row(
-        children: [
-          Icon(icon, size: 22, color: const Color(0xFF888888)),
-          const SizedBox(width: 15),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w300,
-              color: Color(0xFF555555),
+  Widget _buildMenuItem(String title, IconData icon, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: const Color(0xFF888888)),
+            const SizedBox(width: 15),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                color: Color(0xFF555555),
+              ),
             ),
-          ),
-          const Spacer(),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFFCCCCCC)),
-        ],
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFFCCCCCC)),
+          ],
+        ),
       ),
     );
   }

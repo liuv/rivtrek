@@ -10,6 +10,8 @@ uniform float uRed;
 uniform float uGreen;
 uniform float uBlue;
 uniform float uOffset;
+uniform float uUseRealPath;
+uniform float uPath[32];
 
 out vec4 fragColor;
 
@@ -41,6 +43,14 @@ float fbm(vec2 p) {
     return v;
 }
 
+float get_path_offset(float y) {
+    float idx = (y * 0.5 + 0.5) * 31.0;
+    int i = int(floor(idx));
+    int j = min(i + 1, 31);
+    float f = fract(idx);
+    return mix(uPath[i], uPath[j], f);
+}
+
 void main() {
     vec2 res = vec2(uCanvasW, uCanvasH);
     vec2 uv = FlutterFragCoord().xy / res;
@@ -53,8 +63,13 @@ void main() {
 
     // 1. 河床蜿蜒路径
     float scrollY = p.y + uOffset * 2.0;
-    float path = sin(scrollY * 1.5) * 0.25
-               + cos(scrollY * 3.5) * 0.05 * turb;
+    float path;
+    if (uUseRealPath > 0.5) {
+        path = get_path_offset(p.y) * 0.5;
+    } else {
+        path = sin(scrollY * 1.5) * 0.25;
+    }
+    path += cos(scrollY * 3.5) * 0.05 * turb;
 
     float dx = p.x - path;
     float dist = abs(dx);

@@ -9,8 +9,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import '../models/river_settings.dart';
+import '../models/daily_stats.dart';
+import '../services/database_service.dart';
+import 'package:intl/intl.dart';
+
+import 'dart:math' as math;
 
 // --- 数据模型 ---
+class Lantern {
+  final double id;
+  double localY; // -1.0 to 1.0
+  final double randomX; // -0.05 to 0.05
+  final double wobbleSpeed;
+  final double wobblePhase;
+  final double scaleBase;
+  double rotation = 0;
+
+  Lantern({
+    required this.id,
+    this.localY = -1.2,
+    required this.randomX,
+    required this.wobbleSpeed,
+    required this.wobblePhase,
+    required this.scaleBase,
+  });
+}
+
 class RiverSection {
   final String name;
   final String themeColor;
@@ -43,8 +68,21 @@ class FlowScreen extends StatefulWidget {
   State<FlowScreen> createState() => _FlowScreenState();
 }
 
-class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
-  ui.FragmentShader? _shader;
+class _FlowScreenState extends State<FlowScreen>
+    with
+        TickerProviderStateMixin,
+        WidgetsBindingObserver,
+        AutomaticKeepAliveClientMixin {
+  ui.FragmentShader? _proceduralShader;
+  ui.FragmentShader? _inkShader;
+  ui.FragmentShader? _auroraShader;
+
+  List<Offset> _riverPoints = []; // [lon, lat]
+  List<double> _cumulativeDistances = [];
+  List<double> _currentPathOffsets = List.filled(32, 0.0);
+  final List<Lantern> _lanterns = [];
+  double _lastFrameTime = 0;
+
   late AnimationController _timeController;
   late AnimationController _distanceController;
   late Stopwatch _stopwatch;
@@ -64,9 +102,15 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
 
   // 天气与定位状态
   String _temp = "--";
+  String _maxTemp = "--";
+  String _minTemp = "--";
   String _cityName = "待定位";
-  String _weatherDesc = "未知";
+  WeatherType _weatherType = WeatherType.unknown;
+  int _wmoCode = 0;
   String _coords = "无信号";
+  double _windSpeed = 0.0;
+  double _lat = 0.0;
+  double _lon = 0.0;
   IconData _weatherIcon = Icons.wb_cloudy_outlined;
 
   // 缓存键名
@@ -77,13 +121,18 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _loadInitialSettings();
     _loadData();
-    _loadShader();
+    _loadShaders();
+    _loadRealRiverPath();
     _stopwatch = Stopwatch()..start();
     _timeController =
         AnimationController(vsync: this, duration: const Duration(seconds: 1));
     _timeController.addListener(() {
-      if (mounted) setState(() {});
+      if (mounted) {
+        _updateLanterns();
+        setState(() {});
+      }
     });
     _timeController.repeat();
     _distanceController = AnimationController(
@@ -133,10 +182,16 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
         final data = json.decode(cachedData);
         setState(() {
           _temp = data['temp'] ?? "--";
+          _maxTemp = data['max_temp'] ?? "--";
+          _minTemp = data['min_temp'] ?? "--";
           _cityName = data['city'] ?? "待定位";
-          _weatherDesc = data['desc'] ?? "未知";
+          _wmoCode = data['wmo_code'] ?? 0;
+          _weatherType = _mapWeatherCode(_wmoCode);
           _coords = data['coords'] ?? "无信号";
-          _weatherIcon = _getWeatherIcon(data['icon_code'] ?? 0);
+          _windSpeed = (data['wind_speed'] ?? 0.0).toDouble();
+          _lat = data['lat'] ?? 0.0;
+          _lon = data['lon'] ?? 0.0;
+          _weatherIcon = _weatherType.icon;
         });
       }
     } catch (e) {
@@ -170,7 +225,7 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
   void _initWeatherWithGeolocator() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // 检查是否需要更新
       if (!_shouldUpdateWeather(prefs) && _cityName != "待定位") {
         debugPrint("Using cached weather data, skipping fetch.");
@@ -179,7 +234,7 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
 
       if (!mounted) return;
       setState(() => _cityName = _cityName == "待定位" ? "检查权限..." : _cityName);
-      
+
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (mounted && _cityName == "检查权限...") {
@@ -195,7 +250,7 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
           throw "权限被拒绝";
         }
       }
-      
+
       if (permission == LocationPermission.deniedForever) {
         if (mounted && _cityName == "检查权限...") {
           setState(() => _cityName = "权限已封死");
@@ -205,12 +260,14 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
       }
 
       if (mounted) {
-        setState(() => _cityName = _cityName == "检查权限..." || _cityName == "待定位" ? "定位中..." : _cityName);
+        setState(() => _cityName = _cityName == "检查权限..." || _cityName == "待定位"
+            ? "定位中..."
+            : _cityName);
       }
 
       // 优化：先尝试获取最后一次已知位置，提高速度
       Position? position = await Geolocator.getLastKnownPosition();
-      
+
       // 如果没有最后已知位置，或者位置太旧，则获取当前位置
       if (position == null) {
         position = await Geolocator.getCurrentPosition(
@@ -226,6 +283,8 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
 
       if (mounted) {
         setState(() {
+          _lat = lat;
+          _lon = lon;
           _coords = "${lat.toStringAsFixed(2)}, ${lon.toStringAsFixed(2)}";
           if (_cityName == "定位中...") _cityName = "查询中...";
         });
@@ -236,7 +295,6 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
         _fetchCityNameWeb(lat, lon),
         _fetchWeather(lat, lon, prefs),
       ]);
-
     } catch (e) {
       debugPrint("Geolocator Logic Error: $e");
       if (mounted && (_cityName == "定位中..." || _cityName == "检查权限...")) {
@@ -254,27 +312,38 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
     ));
   }
 
-  Future<void> _fetchWeather(double lat, double lon, SharedPreferences prefs) async {
+  Future<void> _fetchWeather(
+      double lat, double lon, SharedPreferences prefs) async {
     try {
       final url = Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true&timezone=auto');
+          'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto');
       final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final current = data['current_weather'];
+        final daily = data['daily'];
+
         final int iconCode = current['weathercode'];
         final String temp = "${current['temperature'].round()}°";
-        final String desc = _getWeatherDesc(iconCode);
+        final String maxT = "${daily['temperature_2m_max'][0].round()}°";
+        final String minT = "${daily['temperature_2m_min'][0].round()}°";
+        final double windSpeed = current['windspeed'].toDouble();
+        final WeatherType type = _mapWeatherCode(iconCode);
 
         if (mounted) {
           setState(() {
             _temp = temp;
-            _weatherIcon = _getWeatherIcon(iconCode);
-            _weatherDesc = desc;
+            _maxTemp = maxT;
+            _minTemp = minT;
+            _windSpeed = windSpeed;
+            _wmoCode = iconCode;
+            _weatherType = type;
+            _weatherIcon = type.icon;
           });
-          
+
           // 缓存数据
-          _saveWeatherToCache(prefs, temp, desc, iconCode);
+          _saveWeatherToCache(prefs, temp, maxT, minT, iconCode, windSpeed);
+          _saveToDatabase();
         }
       }
     } catch (e) {
@@ -282,17 +351,80 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
     }
   }
 
-  void _saveWeatherToCache(SharedPreferences prefs, String temp, String desc, int iconCode) {
+  WeatherType _mapWeatherCode(int code) {
+    if (code == 0) return WeatherType.clearSky;
+    if (code == 1) return WeatherType.mainlyClear;
+    if (code == 2) return WeatherType.partlyCloudy;
+    if (code == 3) return WeatherType.overcast;
+    if (code == 45 || code == 48) return WeatherType.fog;
+    if (code == 51 || code == 53 || code == 55) return WeatherType.drizzle;
+    if (code == 56 || code == 57) return WeatherType.freezingDrizzle;
+    if (code == 61) return WeatherType.rainSlight;
+    if (code == 63) return WeatherType.rainModerate;
+    if (code == 65) return WeatherType.rainHeavy;
+    if (code == 66 || code == 67) return WeatherType.freezingRain;
+    if (code == 71) return WeatherType.snowSlight;
+    if (code == 73) return WeatherType.snowModerate;
+    if (code == 75) return WeatherType.snowHeavy;
+    if (code == 77) return WeatherType.snowGrains;
+    if (code >= 80 && code <= 82) return WeatherType.rainShowers;
+    if (code == 85 || code == 86) return WeatherType.snowShowers;
+    if (code == 95) return WeatherType.thunderstorm;
+    if (code >= 96) return WeatherType.thunderstormHail;
+    return WeatherType.unknown;
+  }
+
+  void _saveWeatherToCache(SharedPreferences prefs, String temp, String maxT,
+      String minT, int wmoCode, double windSpeed) {
     final weatherData = {
       'temp': temp,
+      'max_temp': maxT,
+      'min_temp': minT,
       'city': _cityName,
-      'desc': desc,
+      'wmo_code': wmoCode,
       'coords': _coords,
-      'icon_code': iconCode,
+      'wind_speed': windSpeed,
+      'lat': _lat,
+      'lon': _lon,
       'last_update': DateTime.now().millisecondsSinceEpoch,
     };
     prefs.setString(_kCachedWeather, json.encode(weatherData));
     prefs.setInt(_kLastWeatherTime, DateTime.now().millisecondsSinceEpoch);
+  }
+
+  Future<void> _saveToDatabase() async {
+    try {
+      final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+      // 1. 保存活动数据 (步数、里程)
+      final activity = DailyActivity(
+        date: date,
+        steps: _displaySteps,
+        distanceKm: _displaySteps * _stepLengthKm,
+        accumulatedDistanceKm: _currentDistance,
+      );
+      await DatabaseService.instance.saveActivity(activity);
+
+      // 2. 保存天气数据 (只有在天气已获取的情况下)
+      if (_wmoCode != 0) {
+        final weather = DailyWeather(
+          date: date,
+          wmoCode: _wmoCode,
+          currentTemp: _temp,
+          maxTemp: _maxTemp,
+          minTemp: _minTemp,
+          windSpeed: _windSpeed,
+          cityName: _cityName,
+          latitude: _lat,
+          longitude: _lon,
+        );
+        await DatabaseService.instance.saveWeather(weather);
+      }
+
+      debugPrint("Daily data synced to DB for $date");
+    } catch (e) {
+      debugPrint("DB Save Error: $e");
+    }
   }
 
   Future<void> _fetchCityNameWeb(double lat, double lon) async {
@@ -308,7 +440,7 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
             "";
         if (city.isNotEmpty && mounted) {
           setState(() => _cityName = city);
-          
+
           // 更新缓存中的城市名
           final prefs = await SharedPreferences.getInstance();
           final String? cachedData = prefs.getString(_kCachedWeather);
@@ -331,41 +463,24 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
   void _fetchDefaultWeather() async {
     try {
       final url = Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=38.91&longitude=121.61&current_weather=true&timezone=auto');
+          'https://api.open-meteo.com/v1/forecast?latitude=38.91&longitude=121.61&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto');
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final current = data['current_weather'];
+        final daily = data['daily'];
         if (mounted) {
           setState(() {
             _temp = "${current['temperature'].round()}°";
-            _weatherIcon = _getWeatherIcon(current['weathercode']);
-            _weatherDesc = _getWeatherDesc(current['weathercode']);
+            _maxTemp = "${daily['temperature_2m_max'][0].round()}°";
+            _minTemp = "${daily['temperature_2m_min'][0].round()}°";
+            _wmoCode = current['weathercode'];
+            _weatherType = _mapWeatherCode(_wmoCode);
+            _weatherIcon = _weatherType.icon;
           });
         }
       }
     } catch (_) {}
-  }
-
-  IconData _getWeatherIcon(int code) {
-    if (code == 0) return Icons.wb_sunny_outlined;
-    if (code < 3) return Icons.wb_cloudy_outlined;
-    if (code < 40) return Icons.cloud_queue_outlined;
-    if (code < 70) return Icons.umbrella_outlined;
-    return Icons.ac_unit_outlined;
-  }
-
-  String _getWeatherDesc(int code) {
-    if (code == 0) return "晴朗";
-    if (code <= 3) return "多云";
-    if (code <= 48) return "雾";
-    if (code <= 57) return "毛毛雨";
-    if (code <= 67) return "阵雨";
-    if (code <= 77) return "雪";
-    if (code <= 82) return "大雨";
-    if (code <= 86) return "阵雪";
-    if (code <= 99) return "雷暴";
-    return "未知";
   }
 
   void _showWeatherDetail() {
@@ -386,11 +501,23 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
             Text("坐标: $_coords",
                 style: const TextStyle(fontSize: 12, color: Colors.grey)),
             const Divider(height: 30),
-            Text("温度: $_temp", style: const TextStyle(fontSize: 18)),
-            Text("状态: $_weatherDesc", style: const TextStyle(fontSize: 18)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("当前温度: $_temp", style: const TextStyle(fontSize: 16)),
+                Text("状态: ${_weatherType.label}",
+                    style: const TextStyle(fontSize: 16)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text("今日温差: $_minTemp ~ $_maxTemp",
+                style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 8),
+            Text("当前风速: ${_windSpeed.toStringAsFixed(1)} km/h",
+                style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 10),
             Text(
-                "时间: ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}",
+                "同步时间: ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}",
                 style: const TextStyle(fontSize: 14, color: Colors.cyan)),
           ],
         ),
@@ -485,9 +612,223 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
     }
   }
 
+  Future<void> _loadInitialSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    RiverSettings.instance.update(
+      pathMode: RiverPathMode.values[prefs.getInt('river_path_mode') ?? 0],
+      style: RiverStyle.values[prefs.getInt('river_style') ?? 0],
+      speed: prefs.getDouble('river_speed') ?? 0.3,
+      turbulence: prefs.getDouble('river_turbulence') ?? 0.6,
+      width: prefs.getDouble('river_width') ?? 0.18,
+    );
+  }
+
+  Future<void> _loadShaders() async {
+    try {
+      final p1 = await ui.FragmentProgram.fromAsset('shaders/river.frag');
+      final p2 = await ui.FragmentProgram.fromAsset('shaders/river_ink.frag');
+      final p4 =
+          await ui.FragmentProgram.fromAsset('shaders/river_aurora.frag');
+      if (mounted) {
+        setState(() {
+          _proceduralShader = p1.fragmentShader();
+          _inkShader = p2.fragmentShader();
+          _auroraShader = p4.fragmentShader();
+        });
+      }
+    } catch (e) {
+      debugPrint("Shader error: $e");
+    }
+  }
+
+  Future<void> _loadRealRiverPath() async {
+    try {
+      final String response =
+          await rootBundle.loadString('assets/json/rivers/yangtze_points.json');
+      final data = json.decode(response);
+      final List sections = data['sections_points'];
+
+      List<Offset> allPoints = [];
+      for (var section in sections) {
+        for (var point in section) {
+          allPoints.add(Offset(point[0].toDouble(), point[1].toDouble()));
+        }
+      }
+
+      // 计算累计里程
+      List<double> distances = [0.0];
+      double totalDist = 0.0;
+      for (int i = 1; i < allPoints.length; i++) {
+        totalDist += Geolocator.distanceBetween(allPoints[i - 1].dy,
+                allPoints[i - 1].dx, allPoints[i].dy, allPoints[i].dx) /
+            1000.0; // km
+        distances.add(totalDist);
+      }
+
+      if (mounted) {
+        setState(() {
+          _riverPoints = allPoints;
+          _cumulativeDistances = distances;
+        });
+        _updatePathOffsets(_currentDistance);
+      }
+    } catch (e) {
+      debugPrint("Real path load error: $e");
+    }
+  }
+
+  void _updatePathOffsets(double distance) {
+    if (_riverPoints.isEmpty || _cumulativeDistances.isEmpty) return;
+
+    // 找到当前距离对应的索引
+    int centerIdx = _findDistanceIndex(distance);
+
+    // 我们想要显示当前里程前后约 10km 的路径
+    double windowKm = 10.0;
+    List<double> offsets = [];
+
+    // 采样32个点
+    for (int i = 0; i < 32; i++) {
+      double targetDist = distance + (i / 31.0 - 0.5) * windowKm * 2;
+      int idx = _findDistanceIndex(targetDist);
+      offsets.add(_calculateRelativeOffset(idx, centerIdx));
+    }
+
+    setState(() {
+      _currentPathOffsets = offsets;
+    });
+  }
+
+  int _findDistanceIndex(double dist) {
+    if (dist <= 0) return 0;
+    if (dist >= _cumulativeDistances.last)
+      return _cumulativeDistances.length - 1;
+
+    // 二分查找
+    int low = 0, high = _cumulativeDistances.length - 1;
+    while (low <= high) {
+      int mid = (low + high) ~/ 2;
+      if (_cumulativeDistances[mid] < dist) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+    return low;
+  }
+
+  double _calculateRelativeOffset(int idx, int centerIdx) {
+    // 简单的相对经度偏移作为曲线模拟（在小范围内经度变化可近似为水平偏移）
+    // 为了让效果更明显，我们乘以一个放大系数
+    return (_riverPoints[idx].dx - _riverPoints[centerIdx].dx) * 10.0;
+  }
+
+  void _updateLanterns() {
+    final double currentTime = _stopwatch.elapsedMilliseconds / 1000.0;
+    if (_lastFrameTime == 0) {
+      _lastFrameTime = currentTime;
+      return;
+    }
+    final double dt = currentTime - _lastFrameTime;
+    _lastFrameTime = currentTime;
+
+    final settings = RiverSettings.instance;
+    final sub = _currentSubSection!;
+    final double currentSpeed =
+        (settings.speed + (sub.baseFlowSpeed * 0.1)) * 0.5;
+
+    for (int i = _lanterns.length - 1; i >= 0; i--) {
+      final lantern = _lanterns[i];
+      lantern.localY += currentSpeed * dt;
+      
+      // 1. 摇摆频率受当前流速影响
+      double combinedWobbleSpeed = lantern.wobbleSpeed * (1.0 + currentSpeed * 2.0);
+      
+      // 2. 组合多个不同频率的正弦波 (1D Fractal Noise)，模拟非线性的、随机的水流扰动
+      // 这样摇摆就不会像钟摆那样机械，而是带有快慢交替的自然感
+      double noise = math.sin(currentTime * combinedWobbleSpeed + lantern.wobblePhase) * 0.7
+                   + math.sin(currentTime * combinedWobbleSpeed * 2.1 + lantern.wobblePhase * 1.3) * 0.3;
+      
+      // 3. 摇摆幅度受流速影响：流速越快，受到的水流冲击力越大，摆幅越明显
+      double speedFactor = (currentSpeed * 4.0).clamp(0.4, 1.2);
+      lantern.rotation = noise * (math.pi / 4) * speedFactor;
+
+      // 如果出屏则移除
+      if (lantern.localY > 1.2) {
+        _lanterns.removeAt(i);
+      }
+    }
+  }
+
+  void _addLantern() {
+    setState(() {
+      _lanterns.add(Lantern(
+        id: DateTime.now().millisecondsSinceEpoch.toDouble(),
+        randomX: (math.Random().nextDouble() - 0.5) * 0.1,
+        wobbleSpeed: 1.5 + math.Random().nextDouble() * 1.5,
+        wobblePhase: math.Random().nextDouble() * math.pi * 2,
+        scaleBase: 0.8 + math.Random().nextDouble() * 0.4,
+      ));
+    });
+
+    // 记录到数据库作为事件
+    _recordLanternEvent();
+  }
+
+  Future<void> _recordLanternEvent() async {
+    try {
+      final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      await DatabaseService.instance.recordEvent(RiverEvent(
+        date: date,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        type: RiverEventType.activity,
+        name: "放河灯",
+        description: "在 ${_currentSubSection?.name} 放下一盏河灯",
+        latitude: _lat,
+        longitude: _lon,
+        distanceAtKm: _currentDistance,
+      ));
+    } catch (e) {
+      debugPrint("Record lantern event error: $e");
+    }
+  }
+
+  double _getRiverPathAt(double py, RiverSettings settings, SubSection sub) {
+    final double scrollY = py + (_currentDistance / 10.0) * 2.0;
+    final double turbulence = settings.turbulence + (sub.difficulty * 0.1);
+
+    double path;
+    if (settings.pathMode == RiverPathMode.realPath &&
+        _riverPoints.isNotEmpty) {
+      // 真实路径插值
+      double idx = (py * 0.5 + 0.5) * 31.0;
+      int i = idx.floor().clamp(0, 31);
+      int j = (i + 1).clamp(0, 31);
+      double f = idx - i;
+      path = math.max(
+              -1.0,
+              math.min(
+                  1.0,
+                  _currentPathOffsets[i] * (1 - f) +
+                      _currentPathOffsets[j] * f)) *
+          0.5;
+    } else {
+      // 程序化路径公式
+      path = math.sin(scrollY * 1.5) * 0.25;
+    }
+    path += math.cos(scrollY * 3.5) * 0.05 * turbulence;
+    return path;
+  }
+
   void _updateCurrentProgress(double distance) {
     if (!mounted) return;
     _currentDistance = distance.clamp(0.0, 6387.0);
+
+    // 更新路径偏移
+    if (RiverSettings.instance.pathMode == RiverPathMode.realPath) {
+      _updatePathOffsets(_currentDistance);
+    }
+
     SubSection? found;
     for (var sub in _allSubSections) {
       if (_currentDistance <= sub.accumulatedLength) {
@@ -499,17 +840,9 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
       _currentSubSection =
           found ?? (_allSubSections.isNotEmpty ? _allSubSections.last : null);
     });
-  }
 
-  Future<void> _loadShader() async {
-    try {
-      final program = await ui.FragmentProgram.fromAsset('shaders/river.frag');
-      if (mounted) {
-        setState(() => _shader = program.fragmentShader());
-      }
-    } catch (e) {
-      debugPrint("Shader error: $e");
-    }
+    // 异步保存数据到数据库（不阻塞 UI）
+    _saveToDatabase();
   }
 
   @override
@@ -518,61 +851,131 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (_allSubSections.isEmpty || _shader == null)
+    if (_allSubSections.isEmpty || _proceduralShader == null)
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     final sub = _currentSubSection!;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Listener(
-        onPointerDown: (e) => setState(() => _pointers.add(e.pointer)),
-        onPointerUp: (e) => setState(() => _pointers.remove(e.pointer)),
-        onPointerCancel: (e) => setState(() => _pointers.remove(e.pointer)),
-        onPointerMove: (event) {
-          if (_pointers.length == 2) {
-            double sensitivity = 1.0;
-            _updateCurrentProgress(
-                _currentDistance - (event.delta.dy * sensitivity));
+    return ListenableBuilder(
+        listenable: RiverSettings.instance,
+        builder: (context, _) {
+          final settings = RiverSettings.instance;
+          ui.FragmentShader currentShader;
+          switch (settings.style) {
+            case RiverStyle.classic:
+              currentShader = _proceduralShader!;
+              break;
+            case RiverStyle.ink:
+              currentShader = _inkShader ?? _proceduralShader!;
+              break;
+            case RiverStyle.aurora:
+              currentShader = _auroraShader ?? _proceduralShader!;
+              break;
           }
-        },
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: CustomPaint(
-                painter: RiverShaderPainter(
-                  shader: _shader!,
-                  time: _stopwatch.elapsedMilliseconds / 1000.0,
-                  turbulence: 0.5 + (sub.difficulty * 0.4),
-                  width: 0.16 + (sub.baseFlowSpeed * 0.04),
-                  speed: 0.2 + (sub.baseFlowSpeed * 0.2),
-                  themeColor: sub.color,
-                  offset: _currentDistance / 10.0,
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: GestureDetector(
+              onDoubleTap: _addLantern,
+              child: Listener(
+                onPointerDown: (e) => setState(() => _pointers.add(e.pointer)),
+                onPointerUp: (e) => setState(() => _pointers.remove(e.pointer)),
+                onPointerCancel: (e) =>
+                    setState(() => _pointers.remove(e.pointer)),
+                onPointerMove: (event) {
+                  if (_pointers.length == 2) {
+                    double sensitivity = 1.0;
+                    _updateCurrentProgress(
+                        _currentDistance - (event.delta.dy * sensitivity));
+                  }
+                },
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: RiverShaderPainter(
+                          shader: currentShader,
+                          useRealPath:
+                              settings.pathMode == RiverPathMode.realPath,
+                          pathOffsets: _currentPathOffsets,
+                          time: _stopwatch.elapsedMilliseconds / 1000.0,
+                          turbulence:
+                              settings.turbulence + (sub.difficulty * 0.1),
+                          width: settings.width + (sub.baseFlowSpeed * 0.02),
+                          speed: settings.speed + (sub.baseFlowSpeed * 0.1),
+                          themeColor: sub.color,
+                          offset: _currentDistance / 10.0,
+                        ),
+                      ),
+                    ),
+                    // 河灯渲染层
+                    ..._lanterns.map((l) {
+                      final double pathX =
+                          _getRiverPathAt(l.localY, settings, sub);
+                      final Size screenSize = MediaQuery.of(context).size;
+                      final double aspect =
+                          screenSize.width / screenSize.height;
+
+                      // 将 GL 坐标 (-1, 1) 映射到屏幕坐标
+                      // 注意 GL 的 X 是经过 aspect 缩放的：p.x *= res.x / res.y;
+                      final double screenX = (pathX + l.randomX) / aspect;
+                      final double x = (screenX * 0.5 + 0.5) * screenSize.width;
+                      final double y =
+                          (l.localY * 0.5 + 0.5) * screenSize.height;
+
+                      // 拟真缩放：越往下（越近）越大
+                      final double scale =
+                          l.scaleBase * (0.8 + (l.localY + 1.0) * 0.2);
+
+                      return Positioned(
+                        left: x - 25, // 图片中心对齐
+                        top: y - 25,
+                        child: Transform.rotate(
+                          angle: l.rotation,
+                          child: Opacity(
+                            // 边缘淡入淡出
+                            opacity: (1.0 -
+                                (l.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
+                            child: Image.asset(
+                              'assets/icons/light01.png',
+                              width: 50 * scale,
+                              height: 50 * scale,
+                              // 叠加辉光效果（在极光模式下更明显）
+                              color: settings.style == RiverStyle.aurora
+                                  ? Colors.white.withOpacity(0.9)
+                                  : null,
+                              colorBlendMode:
+                                  settings.style == RiverStyle.aurora
+                                      ? BlendMode.plus
+                                      : null,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    SafeArea(
+                        child: Column(children: [
+                      const SizedBox(height: 25),
+                      _buildHeader(sub),
+                      const Spacer(flex: 3),
+                      _buildStepsAndProgress(),
+                      const Spacer(flex: 4),
+                    ])),
+                    Positioned(
+                        top: 50,
+                        right: 20,
+                        child: Icon(
+                          _isUsingHealthPlugin
+                              ? Icons.health_and_safety
+                              : Icons.directions_walk,
+                          color: Colors.black26,
+                          size: 16,
+                        )),
+                  ],
                 ),
               ),
             ),
-            SafeArea(
-                child: Column(children: [
-              const SizedBox(height: 25),
-              _buildHeader(sub),
-              const Spacer(flex: 3),
-              _buildStepsAndProgress(),
-              const Spacer(flex: 4),
-            ])),
-            // 同步状态指示器
-            Positioned(
-                top: 50,
-                right: 20,
-                child: Icon(
-                  _isUsingHealthPlugin
-                      ? Icons.health_and_safety
-                      : Icons.directions_walk,
-                  color: Colors.black26,
-                  size: 16,
-                )),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   Widget _buildHeader(SubSection sub) {
@@ -632,6 +1035,8 @@ class _FlowScreenState extends State<FlowScreen> with TickerProviderStateMixin, 
 
 class RiverShaderPainter extends CustomPainter {
   final ui.FragmentShader shader;
+  final bool useRealPath;
+  final List<double> pathOffsets;
   final double time;
   final double turbulence;
   final double width;
@@ -640,6 +1045,8 @@ class RiverShaderPainter extends CustomPainter {
   final double offset;
   RiverShaderPainter(
       {required this.shader,
+      required this.useRealPath,
+      required this.pathOffsets,
       required this.time,
       required this.turbulence,
       required this.width,
@@ -658,6 +1065,13 @@ class RiverShaderPainter extends CustomPainter {
     shader.setFloat(7, themeColor.green / 255.0);
     shader.setFloat(8, themeColor.blue / 255.0);
     shader.setFloat(9, offset);
+    shader.setFloat(10, useRealPath ? 1.0 : 0.0);
+
+    // 始终填充路径数据，防止未初始化
+    for (int i = 0; i < 32; i++) {
+      shader.setFloat(11 + i, pathOffsets[i]);
+    }
+
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 

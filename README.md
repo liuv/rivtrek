@@ -1,15 +1,15 @@
-# river_meet
+# 徒步江河
 
 这份设计说明书专为 Flutter 开发环境下的 AI 编程助手（如 Cursor, Claude 3.5 Sonnet, GPT-4o）编写。它将复杂的构思拆解为技术可实现的模块，重点突出了“极简主义”、“程序化流体”和“步数映射机制”。
 
 ---
 
-# “遇见江河 (Meet the River)” App 开发设计说明书 (PRD)
+# “徒步江河 (Walking the River)” App 开发设计说明书 (PRD)
 
 ## 1. 项目概述
 
 * **定位**：一款文艺、极简的健康运动 App。
-* **核心逻辑**：将用户的每日步行数映射为在地理名川（如长江）上的虚拟航行距离。
+* **核心逻辑**：将用户的每日步行数映射为在地理名川（如长江）上的虚拟徒步距离。
 * **设计风格**：Digital Zen（数字禅意）、极简主义、高通透感、磨砂玻璃效果。
 * **技术栈**：Flutter (Canvas/CustomPainter), Shader (GLSL), HealthKit/Google Fit API。
 
@@ -25,7 +25,7 @@
 
 * **交互风格**：
 * 全屏竖排布局。
-* **磨砂玻璃 (Glassmorphism)**：底部导航栏和弹出面板需具备 `BackdropFilter` 模糊效果。
+* **磨砂玻璃 (Glassmorphism)**：底部菜单栏和弹出面板需具备 `BackdropFilter` 模糊效果。
 
 
 
@@ -48,7 +48,7 @@
 * **UI 元素**：
 * 顶部：`Text(Current_Location)` & `Icon(Weather)`。
 * 中部：`Big Text(Step_Count)`，字体粗细为 `FontWeight.w100`。
-* 底部：悬浮胶囊式导航栏。
+* 底部：悬浮胶囊式功能菜单栏。
 
 
 
@@ -98,7 +98,7 @@
 
 1. **SplashPage**: 极简 Logo + 渐显诗词。
 2. **MainFlowPage**: 核心流体交互面，包含：
-* `Stack` 布局：底层 Shader 背景 + 中层数据文本 + 顶层磨砂导航。
+* `Stack` 布局：底层 Shader 背景 + 中层数据文本 + 顶层磨砂菜单。
 
 
 3. **DiscoveryPage**: 垂直滚动的河流地图，已走过的路段呈彩色，未达到的呈灰色。
@@ -111,7 +111,7 @@
 > "你现在是一名资深 Flutter 开发专家。请根据以上设计说明书，首先搭建 App 的基础架构。
 > 1. 创建基于 Provider 的数据模型 `RiverProgressModel`。
 > 2. 实现主页面 `FlowScreen` 的基本布局，使用 Stack 放置一个占位的蓝色渐变 Canvas 背景。
-> 3. 编写一个磨砂玻璃质感的悬浮导航栏 `FloatingNavBar`。
+> 3. 编写一个磨砂玻璃质感的悬浮菜单栏 `FloatingMenuBar`。
 > 请先给出这部分的核心代码实现。"
 > 
 > 

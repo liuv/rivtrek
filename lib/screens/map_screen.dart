@@ -273,7 +273,7 @@ class _MapScreenState extends State<MapScreen> {
             height: 100,
             padding: const EdgeInsets.only(top: 50, left: 25),
             color: Colors.white.withOpacity(0.4),
-            child: const Text("航行地图", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+            child: const Text("徒步地图", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
           ),
         ),
       ),

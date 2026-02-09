@@ -24,6 +24,8 @@ dependencies:
   flutter_map_cache: ^2.0.0+1
   path_provider: ^2.1.5
   dio: ^5.9.1
+  sqflite: ^2.4.1
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
@@ -34,7 +36,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/json/rivers/
+    - assets/icons/
     - assets/geo/rivers/yangtze/
   shaders:
     - shaders/river.frag
     - shaders/river_ink.frag
+    - shaders/river_real.frag
+    - shaders/river_aurora.frag
