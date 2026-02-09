@@ -105,6 +105,7 @@ class _FlowScreenState extends State<FlowScreen>
 
   // 节流，防止频繁写入数据库
   DateTime _lastDbSaveTime = DateTime.fromMillisecondsSinceEpoch(0);
+  int _lastSavedSteps = 0;
   late AnimationController _distanceController;
   late Stopwatch _stopwatch;
   StreamSubscription? _pedometerSubscription;
@@ -181,6 +182,7 @@ class _FlowScreenState extends State<FlowScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _saveToDatabase(force: true); // 销毁前强制保存
     _timeController.dispose();
     _distanceController.dispose();
     _pulseController.dispose();
@@ -192,7 +194,9 @@ class _FlowScreenState extends State<FlowScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      // 当应用进入后台，停止动画和秒表以节省 CPU 和电量
+      // 当应用进入后台，强制保存一次数据
+      _saveToDatabase(force: true);
+      // 停止动画和秒表以节省 CPU 和电量
       _timeController.stop();
       _stopwatch.stop();
     } else if (state == AppLifecycleState.resumed) {
@@ -430,13 +434,11 @@ class _FlowScreenState extends State<FlowScreen>
     prefs.setInt(_kLastWeatherTime, DateTime.now().millisecondsSinceEpoch);
   }
 
-  Future<void> _saveToDatabase() async {
-    // 节流：5秒内只允许写入一次，除非是步数发生显著变化（此处简单处理为时间间隔）
-    final now = DateTime.now();
-    if (now.difference(_lastDbSaveTime).inSeconds < 5) {
+  Future<void> _saveToDatabase({bool force = false}) async {
+    // 如果不是强制保存，则检查步数变化是否显著（例如超过500步）
+    if (!force && (_displaySteps - _lastSavedSteps).abs() < 500) {
       return;
     }
-    _lastDbSaveTime = now;
 
     try {
       final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -449,6 +451,7 @@ class _FlowScreenState extends State<FlowScreen>
         accumulatedDistanceKm: _currentDistance,
       );
       await DatabaseService.instance.saveActivity(activity);
+      _lastSavedSteps = _displaySteps;
 
       // 2. 保存天气数据 (只有在天气已获取的情况下)
       if (_wmoCode != 0) {
@@ -596,6 +599,7 @@ class _FlowScreenState extends State<FlowScreen>
           _displaySteps = steps;
           _animateToDistance(steps * _stepLengthKm);
         });
+        _saveToDatabase(force: true); // 初始获取步数后强制保存一次
         return true;
       }
     } catch (e) {
@@ -921,7 +925,7 @@ class _FlowScreenState extends State<FlowScreen>
           found ?? (_allSubSections.isNotEmpty ? _allSubSections.last : null);
     });
 
-    // 异步保存数据到数据库（不阻塞 UI）
+    // 只有在步数变化显著时才会触发保存（内部逻辑控制）
     _saveToDatabase();
   }
 
