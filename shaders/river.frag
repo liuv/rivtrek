@@ -15,6 +15,9 @@ uniform float uBlue;       // 主题色 B（0~1）
 uniform float uOffset;     // 河道纵向偏移（里程/10），驱动河床滚动
 uniform float uUseRealPath; // 是否使用真实路径 (0 或 1)
 uniform float uPath[32];    // 真实路径偏移数据
+uniform float uPulse;       // 脉冲进度 (0.0 - 1.0)
+uniform float uPulseX;      // 脉冲中心 X (UV 坐标)
+uniform float uPulseY;      // 脉冲中心 Y
 
 out vec4 fragColor;
 
@@ -149,6 +152,21 @@ void main() {
     // ============================================================
     float mask = clamp(strands * 1.3 + glow + core, 0.0, 1.0);
     vec3 finalColor = mix(bgColor, riverColor + baseColor * glow, mask);
+
+    // ============================================================
+    // 7. 祭江脉冲效果 (金色波纹)
+    // ============================================================
+    if (uPulse > 0.0) {
+        vec2 pulseCenter = vec2(uPulseX, uPulseY);
+        float d = distance(uv, pulseCenter);
+        // 波纹环带计算
+        float ring = smoothstep(uPulse, uPulse - 0.1, d) * smoothstep(uPulse - 0.2, uPulse - 0.1, d);
+        vec3 gold = vec3(1.0, 0.84, 0.0); // 黄金色
+        finalColor += gold * ring * 0.6 * (1.0 - uPulse);
+        
+        // 全局亮度微增 (呼吸感)
+        finalColor += gold * 0.1 * (1.0 - uPulse);
+    }
 
     fragColor = vec4(finalColor, 1.0);
 }

@@ -19,8 +19,8 @@ allprojects {
 
 // 终极属性注入：解决所有插件找不到 compileSdkVersion 的问题
 rootProject.ext {
-    compileSdkVersion = 35
-    targetSdkVersion = 35
+    compileSdkVersion = 36
+    targetSdkVersion = 36
     minSdkVersion = 26
 }
 

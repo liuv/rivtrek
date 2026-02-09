@@ -19,8 +19,8 @@ import 'dart:math' as math;
 // --- 数据模型 ---
 class Lantern {
   final double id;
-  double localY; // -1.0 to 1.0
-  final double randomX; // -0.05 to 0.05
+  double localY; 
+  final double randomX; 
   final double wobbleSpeed;
   final double wobblePhase;
   final double scaleBase;
@@ -33,6 +33,20 @@ class Lantern {
     required this.wobbleSpeed,
     required this.wobblePhase,
     required this.scaleBase,
+  });
+}
+
+class Blessing {
+  final String text;
+  double localY;
+  double opacity = 1.0;
+  double blur = 0.0;
+  final double randomX;
+
+  Blessing({
+    required this.text,
+    required this.localY,
+    required this.randomX,
   });
 }
 
@@ -81,9 +95,16 @@ class _FlowScreenState extends State<FlowScreen>
   List<double> _cumulativeDistances = [];
   List<double> _currentPathOffsets = List.filled(32, 0.0);
   final List<Lantern> _lanterns = [];
+  final List<Blessing> _blessings = [];
   double _lastFrameTime = 0;
 
   late AnimationController _timeController;
+  // 祭江特效相关
+  late AnimationController _pulseController;
+  Offset _pulseCenter = Offset.zero;
+
+  // 节流，防止频繁写入数据库
+  DateTime _lastDbSaveTime = DateTime.fromMillisecondsSinceEpoch(0);
   late AnimationController _distanceController;
   late Stopwatch _stopwatch;
   StreamSubscription? _pedometerSubscription;
@@ -138,6 +159,22 @@ class _FlowScreenState extends State<FlowScreen>
     _distanceController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
 
+    _timeController = AnimationController(
+        vsync: this, duration: const Duration(seconds: 10))
+      ..repeat();
+    _timeController.addListener(() {
+      if (mounted) {
+        _updateLanterns();
+        setState(() {});
+      }
+    });
+
+    _pulseController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2500));
+    _pulseController.addListener(() {
+      if (mounted) setState(() {});
+    });
+
     _initPermissionsSequentially();
   }
 
@@ -146,6 +183,7 @@ class _FlowScreenState extends State<FlowScreen>
     WidgetsBinding.instance.removeObserver(this);
     _timeController.dispose();
     _distanceController.dispose();
+    _pulseController.dispose();
     _pedometerSubscription?.cancel();
     _stopwatch.stop();
     super.dispose();
@@ -393,6 +431,13 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   Future<void> _saveToDatabase() async {
+    // 节流：5秒内只允许写入一次，除非是步数发生显著变化（此处简单处理为时间间隔）
+    final now = DateTime.now();
+    if (now.difference(_lastDbSaveTime).inSeconds < 5) {
+      return;
+    }
+    _lastDbSaveTime = now;
+
     try {
       final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
@@ -737,26 +782,61 @@ class _FlowScreenState extends State<FlowScreen>
     final double currentSpeed =
         (settings.speed + (sub.baseFlowSpeed * 0.1)) * 0.5;
 
+    // 更新河灯
     for (int i = _lanterns.length - 1; i >= 0; i--) {
       final lantern = _lanterns[i];
       lantern.localY += currentSpeed * dt;
-      
-      // 1. 摇摆频率受当前流速影响
       double combinedWobbleSpeed = lantern.wobbleSpeed * (1.0 + currentSpeed * 2.0);
-      
-      // 2. 组合多个不同频率的正弦波 (1D Fractal Noise)，模拟非线性的、随机的水流扰动
-      // 这样摇摆就不会像钟摆那样机械，而是带有快慢交替的自然感
       double noise = math.sin(currentTime * combinedWobbleSpeed + lantern.wobblePhase) * 0.7
                    + math.sin(currentTime * combinedWobbleSpeed * 2.1 + lantern.wobblePhase * 1.3) * 0.3;
-      
-      // 3. 摇摆幅度受流速影响：流速越快，受到的水流冲击力越大，摆幅越明显
       double speedFactor = (currentSpeed * 4.0).clamp(0.4, 1.2);
       lantern.rotation = noise * (math.pi / 4) * speedFactor;
+      if (lantern.localY > 1.2) _lanterns.removeAt(i);
+    }
 
-      // 如果出屏则移除
-      if (lantern.localY > 1.2) {
-        _lanterns.removeAt(i);
-      }
+    // 更新祈福文字
+    for (int i = _blessings.length - 1; i >= 0; i--) {
+      final b = _blessings[i];
+      b.localY += currentSpeed * 0.8 * dt; // 文字漂得慢一点
+      b.opacity = (b.opacity - 0.15 * dt).clamp(0.0, 1.0); // 减慢消失速度 (从0.25改为0.15)
+      b.blur += 2.0 * dt; // 减慢模糊速度 (从5.0改为2.0)
+      if (b.opacity <= 0) _blessings.removeAt(i);
+    }
+  }
+
+  void _addBlessing(Offset position) {
+    final List<String> words = ["安", "顺", "福", "宁", "和"];
+    final Size size = MediaQuery.of(context).size;
+    
+    setState(() {
+      _pulseCenter = Offset(position.dx / size.width, position.dy / size.height);
+      _blessings.add(Blessing(
+        text: words[math.Random().nextInt(words.length)],
+        localY: (position.dy / size.height) * 2.0 - 1.0,
+        randomX: (math.Random().nextDouble() - 0.5) * 0.05,
+      ));
+    });
+    
+    _pulseController.reset();
+    _pulseController.forward();
+    _recordRitualEvent();
+  }
+
+  Future<void> _recordRitualEvent() async {
+    try {
+      final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      await DatabaseService.instance.recordEvent(RiverEvent(
+        date: date,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        type: RiverEventType.activity,
+        name: "祭江祈福",
+        description: "在 ${_currentSubSection?.name} 举行祭江仪式",
+        latitude: _lat,
+        longitude: _lon,
+        distanceAtKm: _currentDistance,
+      ));
+    } catch (e) {
+      debugPrint("Record ritual event error: $e");
     }
   }
 
@@ -856,27 +936,28 @@ class _FlowScreenState extends State<FlowScreen>
     final sub = _currentSubSection!;
 
     return ListenableBuilder(
-        listenable: RiverSettings.instance,
-        builder: (context, _) {
-          final settings = RiverSettings.instance;
-          ui.FragmentShader currentShader;
-          switch (settings.style) {
-            case RiverStyle.classic:
-              currentShader = _proceduralShader!;
-              break;
-            case RiverStyle.ink:
-              currentShader = _inkShader ?? _proceduralShader!;
-              break;
-            case RiverStyle.aurora:
-              currentShader = _auroraShader ?? _proceduralShader!;
-              break;
-          }
+      listenable: RiverSettings.instance,
+      builder: (context, _) {
+        final settings = RiverSettings.instance;
+        ui.FragmentShader currentShader;
+        switch (settings.style) {
+          case RiverStyle.classic:
+            currentShader = _proceduralShader!;
+            break;
+          case RiverStyle.ink:
+            currentShader = _inkShader ?? _proceduralShader!;
+            break;
+          case RiverStyle.aurora:
+            currentShader = _auroraShader ?? _proceduralShader!;
+            break;
+        }
 
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            body: GestureDetector(
-              onDoubleTap: _addLantern,
-              child: Listener(
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: GestureDetector(
+            onDoubleTap: _addLantern,
+            onLongPressStart: (details) => _addBlessing(details.localPosition),
+            child: Listener(
                 onPointerDown: (e) => setState(() => _pointers.add(e.pointer)),
                 onPointerUp: (e) => setState(() => _pointers.remove(e.pointer)),
                 onPointerCancel: (e) =>
@@ -904,9 +985,55 @@ class _FlowScreenState extends State<FlowScreen>
                           speed: settings.speed + (sub.baseFlowSpeed * 0.1),
                           themeColor: sub.color,
                           offset: _currentDistance / 10.0,
+                          pulse: _pulseController.value,
+                          pulseX: _pulseCenter.dx,
+                          pulseY: _pulseCenter.dy,
                         ),
                       ),
                     ),
+                    // 祈福文字渲染层
+                    ..._blessings.map((b) {
+                      final double pathX =
+                          _getRiverPathAt(b.localY, settings, sub);
+                      final Size screenSize = MediaQuery.of(context).size;
+                      final double aspect =
+                          screenSize.width / screenSize.height;
+                      final double screenX = (pathX + b.randomX) / aspect;
+                      final double x = (screenX * 0.5 + 0.5) * screenSize.width;
+                      final double y =
+                          (b.localY * 0.5 + 0.5) * screenSize.height;
+
+                      return Positioned(
+                        left: x - 20,
+                        top: y - 40,
+                        child: Opacity(
+                          opacity: b.opacity,
+                          child: ImageFiltered(
+                            imageFilter: ui.ImageFilter.blur(
+                                sigmaX: b.blur, sigmaY: b.blur),
+                            child: Text(
+                              b.text,
+                              style: const TextStyle(
+                                fontSize: 52, // 稍微加大字号
+                                color: Color(0xFFFFD700), // 纯正金色
+                                fontWeight: FontWeight.w600, // 加粗，更有书法力道
+                                fontFamily: 'Serif', 
+                                shadows: [
+                                  Shadow(
+                                      color: Colors.orangeAccent,
+                                      blurRadius: 15,
+                                      offset: Offset(0, 0)),
+                                  Shadow(
+                                      color: Colors.black45,
+                                      blurRadius: 5,
+                                      offset: Offset(2, 2)), // 增加一个深色底影，提升对比度
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                     // 河灯渲染层
                     ..._lanterns.map((l) {
                       final double pathX =
@@ -1043,6 +1170,9 @@ class RiverShaderPainter extends CustomPainter {
   final double speed;
   final Color themeColor;
   final double offset;
+  final double pulse;
+  final double pulseX;
+  final double pulseY;
   RiverShaderPainter(
       {required this.shader,
       required this.useRealPath,
@@ -1052,7 +1182,10 @@ class RiverShaderPainter extends CustomPainter {
       required this.width,
       required this.speed,
       required this.themeColor,
-      required this.offset});
+      required this.offset,
+      required this.pulse,
+      required this.pulseX,
+      required this.pulseY});
   @override
   void paint(Canvas canvas, Size size) {
     shader.setFloat(0, time);
@@ -1066,12 +1199,17 @@ class RiverShaderPainter extends CustomPainter {
     shader.setFloat(8, themeColor.blue / 255.0);
     shader.setFloat(9, offset);
     shader.setFloat(10, useRealPath ? 1.0 : 0.0);
-
-    // 始终填充路径数据，防止未初始化
+    
+    // 路径数据 (11-42)
     for (int i = 0; i < 32; i++) {
       shader.setFloat(11 + i, pathOffsets[i]);
     }
 
+    // 脉冲数据
+    shader.setFloat(43, pulse);
+    shader.setFloat(44, pulseX);
+    shader.setFloat(45, pulseY);
+    
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 

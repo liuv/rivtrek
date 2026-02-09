@@ -12,6 +12,9 @@ uniform float uBlue;
 uniform float uOffset;
 uniform float uUseRealPath;
 uniform float uPath[32];
+uniform float uPulse;
+uniform float uPulseX;
+uniform float uPulseY;
 
 out vec4 fragColor;
 
@@ -99,6 +102,15 @@ void main() {
 
     float alpha = clamp(auroraStrands + core + outerGlow, 0.0, 1.0);
     vec3 finalColor = mix(bgColor, riverColor, alpha);
+
+    // 祭江脉冲效果
+    if (uPulse > 0.0) {
+        vec2 pulseCenter = vec2(uPulseX, uPulseY);
+        float d = distance(uv, pulseCenter);
+        float ring = smoothstep(uPulse, uPulse - 0.1, d) * smoothstep(uPulse - 0.2, uPulse - 0.1, d);
+        vec3 gold = vec3(1.0, 0.9, 0.3);
+        finalColor += gold * ring * 0.7 * (1.0 - uPulse);
+    }
 
     fragColor = vec4(finalColor, 1.0);
 }
