@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.0
+  sdk: '>=3.5.3 <4.0.0'
 
 dependencies:
   flutter:
@@ -14,18 +14,19 @@ dependencies:
   cupertino_icons: ^1.0.8
   pedometer: ^4.0.0
   health: ^11.0.0
-  workmanager: ^0.9.0+3
-  shared_preferences: ^2.5.4
-  permission_handler: ^11.4.0
-  geolocator: ^13.0.4
-  http: ^1.3.0
-  flutter_map: ^8.2.0
+  workmanager: ^0.7.0
+  shared_preferences: ^2.3.2
+  permission_handler: ^11.3.1
+  geolocator: ^13.0.1
+  http: ^1.2.2
+  flutter_map: ^7.0.2
   latlong2: ^0.9.1
-  flutter_map_cache: ^2.0.0+1
-  path_provider: ^2.1.5
-  dio: ^5.9.1
-  sqflite: ^2.4.1
-  path: ^1.9.1
+  flutter_map_cache: ^1.5.0
+  path_provider: ^2.1.4
+  dio: ^5.7.0
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  provider: ^6.1.1
 
 dev_dependencies:
   flutter_test:

@@ -4,24 +4,8 @@ from pyproj import Geod
 from scipy.interpolate import interp1d
 import os
 import glob
-import sys
-
-# 河流配置
-RIVER_CONFIGS = {
-    'yangtze': {
-        'name': '长江',
-        'keywords': ['长江', '金沙江', '通天河', '沱沱河'],
-        'output_suffix': 'yangtze_raw_path_50m.json'
-    },
-    'yellow': {
-        'name': '黄河',
-        'keywords': ['黄河'],
-        'output_suffix': 'yellow_river_raw_path_50m.json'
-    }
-}
-
-DEFAULT_SPACING = 50
-MAX_GAP_METERS = 20000  # 放宽到 20 公里，适应水库等区域的间断
+import heapq
+import argparse
 
 def get_line_length(coords):
     if len(coords) < 2: return 0
@@ -30,122 +14,100 @@ def get_line_length(coords):
     _, _, dists = geod.inv(lons[:-1], lats[:-1], lons[1:], lats[1:])
     return np.sum(dists)
 
-def smart_merge(river_key, spacing=DEFAULT_SPACING):
-    if river_key not in RIVER_CONFIGS:
-        print(f"❌ 未知的河流: {river_key}. 可用选项: {list(RIVER_CONFIGS.keys())}")
-        return
+def get_dist(p1, p2):
+    geod = Geod(ellps="WGS84")
+    _, _, d = geod.inv(p1[0], p1[1], p2[0], p2[1])
+    return d
 
-    config = RIVER_CONFIGS[river_key]
-    keywords = config['keywords']
-    output_file = f'assets/json/rivers/{config["output_suffix"].replace("50m", f"{spacing}m")}'
-    
-    print(f"🚀 开始合并河流: {config['name']} (间隔: {spacing}m)")
+def smart_merge(pattern, output_base, spacing=50):
+    output_file = f'assets/json/rivers/{output_base}_raw_path_{spacing}m.json'
+    print(f"🚀 重新重构：长路径拓扑提取模式")
     
     files = []
-    for kw in keywords:
-        files.extend(glob.glob(f"tools/{kw}*.geojson"))
-        files.extend(glob.glob(f"tools/{kw}*.json"))
+    for p in pattern.split('|'):
+        glob_p = p if '*' in p or '?' in p else f"{p}*"
+        files.extend(glob.glob(f"tools/{glob_p}.geojson"))
+        files.extend(glob.glob(f"tools/{glob_p}.json"))
     files = sorted(list(set(files)))
     
-    if not files:
-        print(f"⚠️ 未找到匹配的 GeoJSON/JSON 文件，关键词: {keywords}")
-        return
-
-    all_segs = []
+    all_segments = []
     for f_path in files:
-        if 'full' in f_path: continue
+        if '_raw_path_' in f_path or '_points' in f_path: continue
         with open(f_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            temp = []
+            data = json.load(f); file_segs = []
             def _walk(obj):
                 if isinstance(obj, dict):
-                    if obj.get('type') == 'LineString': temp.append(obj['coordinates'])
-                    elif obj.get('type') == 'MultiLineString': temp.extend(obj['coordinates'])
+                    if obj.get('type') == 'LineString': file_segs.append(obj['coordinates'])
+                    elif obj.get('type') == 'MultiLineString': file_segs.extend(obj['coordinates'])
                     else: [ _walk(v) for v in obj.values() if isinstance(v, (dict, list)) ]
                 elif isinstance(obj, list):
-                    if len(obj) > 0 and isinstance(obj[0], list) and not isinstance(obj[0][0], list): temp.append(obj)
+                    if len(obj) > 0 and isinstance(obj[0], list) and not isinstance(obj[0][0], list): file_segs.append(obj)
                     else: [ _walk(v) for v in obj if isinstance(v, (dict, list)) ]
             _walk(data)
-            for i, s in enumerate(temp):
-                if len(s) >= 2: all_segs.append({"coords": list(s), "file": os.path.basename(f_path), "id": i})
+            for s in file_segs:
+                if len(s) >= 2: all_segments.append({"coords": s, "len": get_line_length(s), "file": os.path.basename(f_path)})
 
-    if not all_segs:
-        print("❌ 未在文件中找到有效的 LineString 数据")
-        return
+    if not all_segments: return
 
-    # 1. 找最西边的段作为起点
-    all_segs.sort(key=lambda x: min(p[0] for p in x['coords']))
-    first = all_segs.pop(0)
-    merged_path = list(first['coords'])
-    if merged_path[0][0] > merged_path[-1][0]: merged_path = merged_path[::-1]
+    # 逻辑核心：全量拓扑拼接（种子增长法，但允许更聪明的方向选择）
+    # 选最长的一段作为主干种子
+    all_segments.sort(key=lambda x: x['len'], reverse=True)
+    current_main = list(all_segments.pop(0)['coords'])
     
-    total_real_river_len = get_line_length(merged_path)
-    
-    print(f"\n{'文件名':<20} | {'段号':<4} | {'净长度(km)':<10} | {'累计干流(km)'}")
-    print("-" * 65)
-    print(f"{first['file']:<20} | {first['id']:<4} | {total_real_river_len/1000:>10.2f} | {total_real_river_len/1000:>10.2f}")
-
-    geod = Geod(ellps="WGS84")
-    
-    # 2. 严格按地理顺序拼接
-    while all_segs:
-        tail = merged_path[-1]
-        best_idx, best_dist, is_rev = -1, float('inf'), False
+    while True:
+        changed = False
+        head, tail = current_main[0], current_main[-1]
         
-        for i, s in enumerate(all_segs):
-            c = s['coords']
-            _, _, d_h = geod.inv(tail[0], tail[1], c[0][0], c[0][1])
-            _, _, d_t = geod.inv(tail[0], tail[1], c[-1][0], c[-1][1])
-            if d_h < best_dist: best_dist, best_idx, is_rev = d_h, i, False
-            if d_t < best_dist: best_dist, best_idx, is_rev = d_t, i, True
+        best_match_idx = -1
+        best_d = 50000 # 50km 阈值，适应可能的断缺
+        target_pos = "" # 'head' or 'tail'
+        should_reverse = False
         
-        if best_idx == -1 or best_dist > MAX_GAP_METERS:
-            reason = "距离太远" if best_dist > MAX_GAP_METERS else "没有符合流向的数据"
-            print(f"\n--- 拼接自然结束：{reason} ({best_dist/1000:.2f} km) ---")
-            break 
+        for i, seg in enumerate(all_segments):
+            s = seg['coords']
+            # 四种衔接可能
+            d_tail_start = get_dist(tail, s[0])
+            d_tail_end = get_dist(tail, s[-1])
+            d_head_end = get_dist(head, s[-1])
+            d_head_start = get_dist(head, s[0])
             
-        target = all_segs.pop(best_idx)
-        next_coords = list(target['coords'])
-        if is_rev: next_coords = next_coords[::-1]
+            opts = [
+                (d_tail_start, 'tail', False),
+                (d_tail_end, 'tail', True),
+                (d_head_end, 'head', False),
+                (d_head_start, 'head', True)
+            ]
+            
+            d, pos, rev = min(opts, key=lambda x: x[0])
+            if d < best_d:
+                best_d, best_match_idx, target_pos, should_reverse = d, i, pos, rev
         
-        seg_len = get_line_length(next_coords)
-        merged_path.extend(next_coords[1:])
-        total_real_river_len += seg_len
-        print(f"{target['file']:<20} | {target['id']:<4} | {seg_len/1000:>10.2f} | {total_real_river_len/1000:>10.2f}")
+        if best_match_idx != -1:
+            match_seg = all_segments.pop(best_match_idx)['coords']
+            if should_reverse: match_seg = match_seg[::-1]
+            
+            if target_pos == 'tail':
+                current_main.extend(match_seg[1:])
+            else:
+                current_main = match_seg[:-1] + current_main
+            changed = True
+        else:
+            break
 
-    # 3. 生成插值点
-    coords = np.array(merged_path)
-    mask = np.ones(len(coords), dtype=bool); mask[1:] = np.any(np.diff(coords, axis=0) != 0, axis=1)
-    coords = coords[mask]
-    
-    actual_dists = [0]
-    for i in range(len(coords)-1):
-        _, _, d = geod.inv(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
-        actual_dists.append(actual_dists[-1] + d)
-    
-    visual_path_len = actual_dists[-1]
-    target_d = np.arange(0, visual_path_len, spacing)
-    f_lng = interp1d(actual_dists, coords[:, 0], kind='linear', fill_value="extrapolate")
-    f_lat = interp1d(actual_dists, coords[:, 1], kind='linear', fill_value="extrapolate")
+    total_km = get_line_length(current_main)
+    print(f"✅ 合并完成！总里程: {total_km/1000:.2f} km")
+
+    # 插值与输出
+    coords = np.array(current_main); mask = np.ones(len(coords), dtype=bool); mask[1:] = np.any(np.diff(coords, axis=0) != 0, axis=1); coords = coords[mask]
+    actual_dists = [0]; geod = Geod(ellps="WGS84")
+    for i in range(len(coords)-1): _, _, d = geod.inv(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1]); actual_dists.append(actual_dists[-1] + d)
+    target_d = np.arange(0, actual_dists[-1], spacing); f_lng = interp1d(actual_dists, coords[:, 0], kind='linear', fill_value="extrapolate"); f_lat = interp1d(actual_dists, coords[:, 1], kind='linear', fill_value="extrapolate")
     final_points = [[round(float(f_lng(d)), 6), round(float(f_lat(d)), 6)] for d in target_d]
     
-    res = {
-        "river_name": f"{config['name']}全流路 (物理逻辑版)", 
-        "total_km": round(total_real_river_len/1000, 2), 
-        "point_count": len(final_points), 
-        "coordinates": final_points
-    }
-    
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(res, f, ensure_ascii=False, separators=(',', ':'))
-    
-    print(f"\n✅ 合并与插值完成！")
-    print(f"📊 最终统计：")
-    print(f"   - 真实干流净长: {total_real_river_len/1000:.2f} km")
-    print(f"   - 落地文件: {output_file}")
+    res = {"river_name": f"{output_base} combined", "total_km": round(total_km/1000, 2), "point_count": len(final_points), "coordinates": final_points}
+    with open(output_file, 'w', encoding='utf-8') as f: json.dump(res, f, ensure_ascii=False, separators=(',', ':'))
+    print(f"💾 落地文件: {output_file}")
 
 if __name__ == "__main__":
-    river = sys.argv[1] if len(sys.argv) > 1 else 'yangtze'
-    dist = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_SPACING
-    smart_merge(river, dist)
+    parser = argparse.ArgumentParser(); parser.add_argument('pattern'); parser.add_argument('output_base'); parser.add_argument('--spacing', type=int, default=50); args = parser.parse_args()
+    smart_merge(args.pattern, args.output_base, args.spacing)

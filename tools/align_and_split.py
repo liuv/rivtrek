@@ -3,40 +3,21 @@ import os
 import numpy as np
 from pyproj import Geod
 import sys
+import argparse
 
-# 输入输出配置
-RIVER_CONFIGS = {
-    'yangtze': {
-        'name': '长江',
-        'master_config': 'assets/json/rivers/yangtze_master.json',
-        'full_path_suffix': 'yangtze_raw_path_50m.json',
-        'output_points': 'assets/json/rivers/yangtze_points.json'
-    },
-    'yellow': {
-        'name': '黄河',
-        'master_config': 'assets/json/rivers/yellow_river_master.json',
-        'full_path_suffix': 'yellow_river_raw_path_50m.json',
-        'output_points': 'assets/json/rivers/yellow_river_points.json'
-    }
-}
-
-DEFAULT_SPACING = 50
-
-def process(river_key, spacing=DEFAULT_SPACING):
-    if river_key not in RIVER_CONFIGS:
-        print(f"❌ 未知的河流: {river_key}. 可用选项: {list(RIVER_CONFIGS.keys())}")
-        return
-
-    config = RIVER_CONFIGS[river_key]
-    master_path = config['master_config']
-    path_in = f'assets/json/rivers/{config["full_path_suffix"].replace("50m", f"{spacing}m")}'
+def process(master_base, spacing=50):
+    """
+    master_base: 配置文件基础名，如 "yangtze" 或 "songhua_river"
+    """
+    master_path = f'assets/json/rivers/{master_base}_master.json'
+    raw_path_in = f'assets/json/rivers/{master_base}_raw_path_{spacing}m.json'
+    points_out = f'assets/json/rivers/{master_base}_points.json'
     
-    # 输出点位文件名处理
-    points_out = config['output_points']
-    if spacing != DEFAULT_SPACING:
+    # 如果是非标准 50m，输出点位文件名带上间隔
+    if spacing != 50:
         points_out = points_out.replace(".json", f"_{spacing}m.json")
 
-    print(f"🚀 开始处理河流数据: {river_key} (间隔: {spacing}m)")
+    print(f"🚀 开始分割河流数据: {master_base} (间隔: {spacing}m)")
 
     # 1. 加载主配置文件 (master)
     if not os.path.exists(master_path):
@@ -60,12 +41,12 @@ def process(river_key, spacing=DEFAULT_SPACING):
         sub['target_end_km'] = acc
         sub['points_list'] = [] # 临时存放点位
 
-    # 2. 加载 GPS 路径
-    if not os.path.exists(path_in):
-        print(f"❌ 找不到 GPS 路径文件: {path_in}. 请先运行 merge_rivers.py")
+    # 2. 加载 Raw GPS 路径
+    if not os.path.exists(raw_path_in):
+        print(f"❌ 找不到原始路径文件: {raw_path_in}. 请先运行 merge_rivers.py")
         return
 
-    with open(path_in, 'r', encoding='utf-8') as f:
+    with open(raw_path_in, 'r', encoding='utf-8') as f:
         gps_data = json.load(f)
     coords = gps_data['coordinates']
     
@@ -76,7 +57,7 @@ def process(river_key, spacing=DEFAULT_SPACING):
         _, _, d = geod.inv(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
         real_dists.append(real_dists[-1] + d/1000.0)
     
-    # 3. 核心修正系数
+    # 3. 核心修正系数 (目标长度 / 实际长度)
     k = target_total_km / real_dists[-1]
     
     # 4. 顺着路径“装填”分段 (按 sub_section)
@@ -95,14 +76,13 @@ def process(river_key, spacing=DEFAULT_SPACING):
                 curr_sub_idx += 1
 
     # 5. 准备输出数据
-    # 分离后的 points 数据
     points_data = {
         "river_name": master_data['game_challenge_name'],
         "correction_coefficient": round(k, 6),
         "sections_points": [sub['points_list'] for sub in all_sub_sections]
     }
     
-    # 更新 master 数据 (元数据)
+    # 更新 master 数据
     master_data['correction_coefficient'] = round(k, 6)
     master_data['real_path_km'] = round(real_dists[-1], 2)
     # 移除临时的辅助字段
@@ -111,22 +91,20 @@ def process(river_key, spacing=DEFAULT_SPACING):
         sub.pop('points_list', None)
 
     # 6. 保存文件
-    # 更新原有的 master 文件
     with open(master_path, 'w', encoding='utf-8') as f:
         json.dump(master_data, f, ensure_ascii=False, indent=2)
     
-    # 保存分离出的 points 文件
     with open(points_out, 'w', encoding='utf-8') as f:
         json.dump(points_data, f, ensure_ascii=False, separators=(',', ':'))
     
-    print(f"✅ 处理完成！")
-    print(f"修正系数: {k:.4f}")
-    print(f"💾 已更新业务配置: {master_path}")
-    print(f"💾 已生成坐标点集: {points_out}")
-    print(f"📊 包含 {len(all_sub_sections)} 个子路段，总里程 {target_total_km}km")
+    print(f"✅ 处理完成！修正系数: {k:.4f}")
+    print(f"💾 已更新配置: {master_path}")
+    print(f"💾 已生成点位: {points_out}")
 
 if __name__ == "__main__":
-    river = sys.argv[1] if len(sys.argv) > 1 else 'yangtze'
-    dist = int(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_SPACING
-    process(river, dist)
-
+    parser = argparse.ArgumentParser(description='河流数据分割工具')
+    parser.add_argument('master_base', help='主配置文件基础名，如 "songhua_river"')
+    parser.add_argument('--spacing', type=int, default=50, help='插值间隔（米），默认50')
+    
+    args = parser.parse_args()
+    process(args.master_base, args.spacing)

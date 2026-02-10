@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'package:provider/provider.dart';
+import '../providers/challenge_provider.dart';
 import 'settings_screen.dart';
 
 class MeScreen extends StatelessWidget {
@@ -7,6 +9,8 @@ class MeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final challenge = context.watch<ChallengeProvider>();
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: Stack(
@@ -64,8 +68,9 @@ class MeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 50),
                   // Stats Section
-                  _buildStatItem("累计徒步", "1,240 km", Icons.auto_awesome_outlined),
-                  _buildStatItem("解锁河段", "4 / 20", Icons.waves_rounded),
+                  _buildStatItem("当前挑战", challenge.activeRiver?.name ?? "未选择", Icons.explore_outlined),
+                  _buildStatItem("累计徒步", "${challenge.currentDistance.toStringAsFixed(1)} km", Icons.auto_awesome_outlined),
+                  _buildStatItem("解锁河段", "${challenge.allSubSections.indexWhere((s) => s.name == challenge.currentSubSection?.name) + 1} / ${challenge.allSubSections.length}", Icons.waves_rounded),
                   _buildStatItem("收集物件", "12 个", Icons.inventory_2_outlined),
                   const SizedBox(height: 40),
                   const Divider(color: Color(0xFFEEEEEE)),

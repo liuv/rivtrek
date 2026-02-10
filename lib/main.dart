@@ -1,9 +1,12 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'screens/flow_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/me_screen.dart';
+import 'providers/challenge_provider.dart';
+import 'controllers/flow_controller.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -13,7 +16,19 @@ void callbackDispatcher() {
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-  runApp(const RiverMeetApp());
+  
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ChallengeProvider()),
+        ChangeNotifierProxyProvider<ChallengeProvider, FlowController>(
+          create: (_) => FlowController(),
+          update: (_, challenge, flow) => flow!..updateFromChallenge(challenge),
+        ),
+      ],
+      child: const RiverMeetApp(),
+    ),
+  );
 }
 
 class RiverMeetApp extends StatelessWidget {
@@ -68,7 +83,7 @@ class _MainContainerState extends State<MainContainer> {
                 _currentIndex = index;
               });
             },
-            physics: const NeverScrollableScrollPhysics(), // Disable swipe to avoid conflict with map
+            physics: const NeverScrollableScrollPhysics(),
             children: const [
               FlowScreen(),
               MapScreen(),
@@ -106,9 +121,9 @@ class _MainContainerState extends State<MainContainer> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildNavItem(Icons.waves_rounded, "Flow", 0),
-                _buildNavItem(Icons.map_outlined, "Map", 1),
-                _buildNavItem(Icons.person_outline_rounded, "Me", 2),
+                _buildNavItem(Icons.waves_rounded, "徒步", 0),
+                _buildNavItem(Icons.map_outlined, "地图", 1),
+                _buildNavItem(Icons.person_outline_rounded, "我的", 2),
               ],
             ),
           ),
