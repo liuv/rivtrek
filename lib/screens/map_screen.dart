@@ -143,7 +143,7 @@ class _MapScreenState extends State<MapScreen> {
           
           Positioned(
             right: 20,
-            bottom: selectedSubSectionIdx != -1 ? 220 : 150,
+            bottom: 150,
             child: FloatingActionButton(
               mini: true,
               backgroundColor: Colors.white.withOpacity(0.8),
@@ -194,42 +194,82 @@ class _MapScreenState extends State<MapScreen> {
     if (target == null) return const SizedBox();
 
     return Positioned(
-      bottom: 20, left: 20, right: 20,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text(target.subSectionName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.close, size: 20),
-                  onPressed: () => setState(() => selectedSubSectionIdx = -1),
-                ),
-              ],
+      top: 110,
+      left: 20, right: 20,
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutQuint,
+        tween: Tween(begin: 0.0, end: 1.0),
+        builder: (context, value, child) {
+          return Transform.translate(
+            offset: Offset(0, -20 * (1 - value)),
+            child: Opacity(
+              opacity: value,
+              child: child,
             ),
-            const SizedBox(height: 4),
-            Text("${target.startPoint} -> ${target.endPoint}", style: TextStyle(fontSize: 14, color: Colors.grey[700])),
-            const SizedBox(height: 8),
-            Text(target.subSectionDesc, style: const TextStyle(fontSize: 14), maxLines: 3, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildInfoTag("长度: ${target.subSectionLengthKm} km", Colors.blue),
-                _buildInfoTag("累积: ${target.accumulatedLengthKm} km", Colors.green),
-              ],
-            ),
-          ],
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      target.subSectionName, 
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 0.5)
+                    )
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.close, size: 20, color: Colors.black38),
+                    onPressed: () => setState(() => selectedSubSectionIdx = -1),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  const Icon(Icons.location_on_outlined, size: 14, color: Colors.black45),
+                  const SizedBox(width: 4),
+                  Text(
+                    "${target.startPoint} → ${target.endPoint}", 
+                    style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w300)
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                target.subSectionDesc, 
+                style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.7), height: 1.5), 
+                maxLines: 3, 
+                overflow: TextOverflow.ellipsis
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildInfoTag("里程: ${target.subSectionLengthKm} km", Colors.blue),
+                  _buildInfoTag("全线累积: ${target.accumulatedLengthKm} km", Colors.green),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
