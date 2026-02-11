@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "cn.lindenliu" "\0"
-            VALUE "FileDescription", "徒步江河" "\0"
+            VALUE "FileDescription", "涉川" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "徒步江河" "\0"
+            VALUE "InternalName", "涉川" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 cn.lindenliu. All rights reserved." "\0"
-            VALUE "OriginalFilename", "徒步江河.exe" "\0"
-            VALUE "ProductName", "徒步江河" "\0"
+            VALUE "OriginalFilename", "涉川.exe" "\0"
+            VALUE "ProductName", "涉川" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

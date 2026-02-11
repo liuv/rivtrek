@@ -1,10 +1,10 @@
-# 徒步江河
+# 涉川
 
 这份设计说明书专为 Flutter 开发环境下的 AI 编程助手（如 Cursor, Claude 3.5 Sonnet, GPT-4o）编写。它将复杂的构思拆解为技术可实现的模块，重点突出了“极简主义”、“程序化流体”和“步数映射机制”。
 
 ---
 
-# “徒步江河 (Walking the River)” App 开发设计说明书 (PRD)
+# “涉川 (Walking the River)” App 开发设计说明书 (PRD)
 
 ## 1. 项目概述
 

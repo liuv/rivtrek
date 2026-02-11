@@ -10,7 +10,7 @@ class MeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final challenge = context.watch<ChallengeProvider>();
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: Stack(
@@ -40,7 +40,8 @@ class MeScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.person_outline_rounded, size: 40, color: Color(0xFF888888)),
+                        child: const Icon(Icons.person_outline_rounded,
+                            size: 40, color: Color(0xFF888888)),
                       ),
                       const SizedBox(width: 20),
                       const Column(
@@ -68,16 +69,26 @@ class MeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 50),
                   // Stats Section
-                  _buildStatItem("当前挑战", challenge.activeRiver?.name ?? "未选择", Icons.explore_outlined),
-                  _buildStatItem("累计徒步", "${challenge.currentDistance.toStringAsFixed(1)} km", Icons.auto_awesome_outlined),
-                  _buildStatItem("解锁河段", "${challenge.allSubSections.indexWhere((s) => s.name == challenge.currentSubSection?.name) + 1} / ${challenge.allSubSections.length}", Icons.waves_rounded),
+                  _buildStatItem("当前挑战", challenge.activeRiver?.name ?? "未选择",
+                      Icons.explore_outlined),
+                  _buildStatItem(
+                      "累计徒步",
+                      "${challenge.currentDistance.toStringAsFixed(1)} km",
+                      Icons.auto_awesome_outlined),
+                  _buildStatItem(
+                      "解锁河段",
+                      "${challenge.allSubSections.indexWhere((s) => s.name == challenge.currentSubSection?.name) + 1} / ${challenge.allSubSections.length}",
+                      Icons.waves_rounded),
                   _buildStatItem("收集物件", "12 个", Icons.inventory_2_outlined),
                   const SizedBox(height: 40),
-                  
+
                   // 勋章成就墙
                   const Text(
                     "江河勋章",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, letterSpacing: 0.5),
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.5),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -87,7 +98,8 @@ class MeScreen extends StatelessWidget {
                       itemCount: challenge.allSubSections.length,
                       itemBuilder: (context, index) {
                         final sub = challenge.allSubSections[index];
-                        final isUnlocked = challenge.currentDistance >= sub.accumulatedLength;
+                        final isUnlocked =
+                            challenge.currentDistance >= sub.accumulatedLength;
                         final medalIcon = sub.medalIcon;
 
                         return Container(
@@ -114,14 +126,18 @@ class MeScreen extends StatelessWidget {
                                     'assets/$medalIcon',
                                     width: 50,
                                     height: 50,
-                                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                                    errorBuilder: (context, error,
+                                            stackTrace) =>
+                                        const Icon(Icons.military_tech_outlined,
+                                            color: Colors.black12),
                                   ),
                                 )
                               else
-                                const Icon(Icons.military_tech_outlined, color: Colors.black12),
-                              
+                                const Icon(Icons.military_tech_outlined,
+                                    color: Colors.black12),
                               if (!isUnlocked)
-                                const Icon(Icons.lock_outline_rounded, size: 16, color: Colors.black26),
+                                const Icon(Icons.lock_outline_rounded,
+                                    size: 16, color: Colors.black26),
                             ],
                           ),
                         );
@@ -136,10 +152,11 @@ class MeScreen extends StatelessWidget {
                   _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsScreen()),
                     );
                   }),
-                  _buildMenuItem("关于徒步江河", Icons.info_outline_rounded),
+                  _buildMenuItem("关于涉川", Icons.info_outline_rounded),
                   _buildMenuItem("退出登录", Icons.logout_rounded),
                   const SizedBox(height: 120), // Padding for bottom nav
                 ],
@@ -236,7 +253,8 @@ class MeScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFFCCCCCC)),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                size: 14, color: Color(0xFFCCCCCC)),
           ],
         ),
       ),

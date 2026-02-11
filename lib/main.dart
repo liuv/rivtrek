@@ -19,15 +19,15 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // 启动时仅请求基础权限，避开复杂的健康授权
   if (Platform.isIOS) {
     await Geolocator.requestPermission();
     await Permission.sensors.request();
   }
-  
+
   Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-  
+
   runApp(
     MultiProvider(
       providers: [
@@ -48,9 +48,9 @@ class RiverMeetApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '徒步江河',
+      title: '涉川',
       theme: ThemeData(
-        brightness: Brightness.light, 
+        brightness: Brightness.light,
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF9F9F9),
       ),
@@ -171,14 +171,17 @@ class _MainContainerState extends State<MainContainer> {
           children: [
             Icon(
               icon,
-              color: isActive ? const Color(0xFF0097A7) : const Color(0xFF888888),
+              color:
+                  isActive ? const Color(0xFF0097A7) : const Color(0xFF888888),
               size: 26,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isActive ? const Color(0xFF222222) : const Color(0xFF888888),
+                color: isActive
+                    ? const Color(0xFF222222)
+                    : const Color(0xFF888888),
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.w500 : FontWeight.w300,
               ),
