@@ -47,6 +47,11 @@ class _FlowScreenState extends State<FlowScreen>
   final List<Blessing> _blessings = [];
   double _lastFrameTime = 0;
 
+  // 里程碑相关
+  String? _lastTriggeredSubSectionName;
+  String? _milestoneMedalPath;
+  late AnimationController _milestoneController;
+
   late AnimationController _timeController;
   late AnimationController _pulseController;
   Offset _pulseCenter = Offset.zero;
@@ -62,6 +67,11 @@ class _FlowScreenState extends State<FlowScreen>
     _distanceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
+    );
+
+    _milestoneController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
     );
 
     _timeController = AnimationController(
@@ -83,9 +93,8 @@ class _FlowScreenState extends State<FlowScreen>
     _stopwatch = Stopwatch()..start();
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = context.read<FlowController>();
-      controller.init();
-      controller.startStepListening();
+      context.read<FlowController>().init();
+      context.read<FlowController>().startStepListening();
       _refreshWeather();
     });
     
@@ -93,10 +102,9 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _updateFrame() {
-    final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     
-    // 同步视觉距离：检测跳变并执行动画
+    // 同步视觉距离
     if (!_distanceController.isAnimating) {
       if ((_visualDistance - challenge.currentDistance).abs() > 5.0) {
         _animateTo(challenge.currentDistance);
@@ -105,11 +113,36 @@ class _FlowScreenState extends State<FlowScreen>
       }
     }
 
+    // 里程碑边界检测
+    final currentSub = challenge.currentSubSection;
+    if (currentSub != null && _lastTriggeredSubSectionName != currentSub.name) {
+      if (_lastTriggeredSubSectionName != null) {
+        _triggerMilestone(currentSub);
+      }
+      _lastTriggeredSubSectionName = currentSub.name;
+    }
+
     if (challenge.activeRiver != null && _loadedPointsRiverId != challenge.activeRiver!.id) {
       _loadRealRiverPath(challenge.activeRiver!.pointsJsonPath, challenge.activeRiver!.id);
     }
 
     _updateLanterns(challenge.currentSubSection);
+  }
+
+  void _triggerMilestone(SubSection sub) {
+    if (sub.medalIcon == null) return;
+    
+    setState(() {
+      _milestoneMedalPath = sub.medalIcon;
+    });
+    
+    _pulseController.reset();
+    _pulseController.forward();
+    
+    _milestoneController.reset();
+    _milestoneController.forward();
+    
+    HapticFeedback.heavyImpact();
   }
 
   void _animateTo(double target) {
@@ -137,6 +170,7 @@ class _FlowScreenState extends State<FlowScreen>
     WidgetsBinding.instance.removeObserver(this);
     _timeController.dispose();
     _distanceController.dispose();
+    _milestoneController.dispose();
     _pulseController.dispose();
     _stopwatch.stop();
     super.dispose();
@@ -415,6 +449,10 @@ class _FlowScreenState extends State<FlowScreen>
                 ))),
                 ..._blessings.map((b) => _buildBlessingWidget(b, settings, sub, _visualDistance)),
                 ..._lanterns.map((l) => _buildLanternWidget(l, settings, sub, _visualDistance)),
+                
+                // 里程碑勋章浮现层
+                if (_milestoneMedalPath != null) _buildMilestoneOverlay(),
+
                 SafeArea(child: Column(children: [
                   const SizedBox(height: 25),
                   _buildHeader(sub, controller),
@@ -423,6 +461,69 @@ class _FlowScreenState extends State<FlowScreen>
                   const Spacer(flex: 4),
                 ])),
               ]),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMilestoneOverlay() {
+    return AnimatedBuilder(
+      animation: _milestoneController,
+      builder: (context, child) {
+        final double val = _milestoneController.value;
+        if (val <= 0 || val >= 1.0) return const SizedBox();
+        
+        double opacity = 1.0;
+        double scale = 1.0;
+        
+        if (val < 0.2) {
+          opacity = val / 0.2;
+          scale = 0.5 + (val / 0.2) * 0.5;
+        } else if (val > 0.8) {
+          opacity = (1.0 - val) / 0.2;
+          scale = 1.0 + ((val - 0.8) / 0.2) * 0.2;
+        }
+
+        return Center(
+          child: Opacity(
+            opacity: opacity,
+            child: Transform.scale(
+              scale: scale,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 180,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.3),
+                          blurRadius: 40,
+                          spreadRadius: 10,
+                        )
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/$_milestoneMedalPath',
+                      errorBuilder: (_, __, ___) => const Icon(Icons.military_tech, size: 100, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "解锁新境界",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w200,
+                      letterSpacing: 4,
+                      shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -463,6 +564,8 @@ class _FlowScreenState extends State<FlowScreen>
 
   Widget _buildHeader(SubSection? sub, FlowController controller) {
     final weatherType = _mapWeatherCode(controller.wmoCode);
+    final medalIcon = sub?.medalIcon;
+
     return Padding(padding: const EdgeInsets.symmetric(horizontal: 45), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         GestureDetector(
@@ -475,11 +578,23 @@ class _FlowScreenState extends State<FlowScreen>
             ],
           ),
         ),
-        GestureDetector(onTap: () => _showWeatherDetail(controller), child: Row(children: [
-          Text(controller.temp, style: const TextStyle(color: Color(0xFF222222), fontSize: 18, fontWeight: FontWeight.w300)),
-          const SizedBox(width: 8),
-          Icon(weatherType.icon, size: 22, color: const Color(0xFF222222)),
-        ])),
+        Row(children: [
+          if (medalIcon != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Image.asset(
+                'assets/$medalIcon',
+                width: 24,
+                height: 24,
+                errorBuilder: (_, __, ___) => const SizedBox(),
+              ),
+            ),
+          GestureDetector(onTap: () => _showWeatherDetail(controller), child: Row(children: [
+            Text(controller.temp, style: const TextStyle(color: Color(0xFF222222), fontSize: 18, fontWeight: FontWeight.w300)),
+            const SizedBox(width: 8),
+            Icon(weatherType.icon, size: 22, color: const Color(0xFF222222)),
+          ])),
+        ]),
       ]),
       Text(sub?.name ?? '正在加载...', style: TextStyle(color: const Color(0xFF222222).withOpacity(0.5), fontSize: 13)),
     ]));

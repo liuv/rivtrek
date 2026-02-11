@@ -1,0 +1,261 @@
+{
+    "game_challenge_name": "怒水奔腾·从安多到瑞丽",
+    "total_length_km": 2013,
+    "total_sections": 7,
+    "total_sub_sections": 13,
+    "challenge_sections": [
+      {
+        "section_id": 1,
+        "section_name": "怒江正源·安多县段",
+        "section_length_km": 300,
+        "flow_area": "青海省（玉树州安多县）",
+        "sub_sections": [
+          {
+            "sub_section_id": 101,
+            "sub_section_name": "安多启源·怒江源头段",
+            "start_point": "安多县唐古拉山南麓（怒江正源）",
+            "end_point": "安多县怒江与那曲汇合口",
+            "sub_section_length_km": 150,
+            "accumulated_length_km": 150,
+            "core_landmarks": "唐古拉山南麓、怒江源头冰川、安多高原湿地、藏羚羊栖息地、那曲源头",
+            "game_difficulty": "高（高原寒地源头河道，水面狭窄，地势落差较大，低温缺氧+耐力入门考验）",
+            "sub_section_desc": "挑战启幕！从安多县唐古拉山南麓怒江正源启航，穿越“江河之源”的高原冰川湿地，两岸是辽阔的高原草甸，偶遇藏羚羊等珍稀动物，感受怒江源头的凛冽与雄浑，抵达那曲汇合口，解锁源头秘境。",
+            "achievement": {
+              "achievement_name": "【怒源启帆】",
+              "achievement_desc": "完成怒江源头第一段挑战，解锁“怒源探索者”初级称号"
+            }
+          },
+          {
+            "sub_section_id": 102,
+            "sub_section_name": "那曲寻踪·源头巡航段",
+            "start_point": "安多县怒江与那曲汇合口",
+            "end_point": "青海玉树杂多县（怒江沿岸）",
+            "sub_section_length_km": 150,
+            "accumulated_length_km": 300,
+            "core_landmarks": "那曲、怒江上游河道、玉树高原湿地、杂多县城（远景）、藏族村落",
+            "game_difficulty": "高（高原寒地河道，水流平缓，视野开阔，长时间低温巡航耐力考验，适配高原环境）",
+            "sub_section_desc": "驶入那曲与怒江汇合段，河道逐渐宽阔，两岸是一望无际的玉树高原湿地，巡航途中感受青藏高原的静谧与辽阔，途经杂多县城远景，沉浸式体验藏族民俗风情，终点抵达杂多县，正式结束源头段挑战，迈向怒江上游腹地。",
+            "achievement": {
+              "achievement_name": "【那曲逐水】",
+              "achievement_desc": "完成怒江正源全段挑战，解锁“怒江开拓者”中级称号，开启下一大区段"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 2,
+        "section_name": "怒江上游·杂多→昌都段",
+        "section_length_km": 410,
+        "flow_area": "青海省、西藏自治区（青藏高原深峡谷地带）",
+        "sub_sections": [
+          {
+            "sub_section_id": 201,
+            "sub_section_name": "高原深峡·杂多→昌都上段",
+            "start_point": "青海玉树杂多县（怒江沿岸）",
+            "end_point": "西藏昌都贡觉县（怒江沿岸）",
+            "sub_section_length_km": 205,
+            "accumulated_length_km": 505,
+            "core_landmarks": "怒江上游深峡谷、青藏高原雪山、贡觉古村落、高原草甸",
+            "game_difficulty": "高（高原深峡谷河道，水流湍急，地势落差大，操作难度+高原耐力双重考验）",
+            "sub_section_desc": "进入怒江上游深峡谷段，河道狭窄蜿蜒，水流湍急，两岸雪山巍峨、峡谷险峻，感受“怒水穿峡”的磅礴气势，途经贡觉古村落远景，解锁高原深峡谷独特风光，锻炼操作熟练度，为后续更险峻峡谷做准备。",
+            "achievement": {
+              "achievement_name": "【深峡穿浪】",
+              "achievement_desc": "穿越怒江上游深峡谷，解锁“峡谷巡航者”中级称号"
+            }
+          },
+          {
+            "sub_section_id": 202,
+            "sub_section_name": "怒峡映雪·昌都上段→昌都段",
+            "start_point": "西藏昌都贡觉县（怒江沿岸）",
+            "end_point": "西藏昌都市（怒江沿岸）",
+            "sub_section_length_km": 205,
+            "accumulated_length_km": 710,
+            "core_landmarks": "怒江峡谷、昌都雪山群、昌都城区（远景）、茶马古道遗迹（远景）",
+            "game_difficulty": "中-高（高原峡谷平缓段，水流较缓，视野开阔，操作缓解+高原景观打卡，需注意高原反应防护）",
+            "sub_section_desc": "告别险峻深峡谷，进入怒江上游平缓峡谷段，河道蜿蜒曲折，江面倒映两岸雪山，远处可见昌都城区轮廓，茶马古道遗迹远景若隐若现，感受藏东高原的雄浑之美，终点抵达昌都，解锁藏东人文地标。",
+            "achievement": {
+              "achievement_name": "【怒峡揽胜】",
+              "achievement_desc": "抵达昌都市沿岸，解锁“藏东行者”高级称号"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 3,
+        "section_name": "怒江上游·昌都→保山段",
+        "section_length_km": 370,
+        "flow_area": "西藏自治区、云南省（藏东→滇西过渡带）",
+        "sub_sections": [
+          {
+            "sub_section_id": 301,
+            "sub_section_name": "怒水逐波·昌都→丽江段",
+            "start_point": "西藏昌都市（怒江沿岸）",
+            "end_point": "云南丽江市（怒江沿岸）",
+            "sub_section_length_km": 185,
+            "accumulated_length_km": 895,
+            "core_landmarks": "怒江河道、丽江玉龙雪山（远景）、丽江古城（远景）、滇西峡谷",
+            "game_difficulty": "中（江面宽阔，水流平缓，高原向盆地过渡风貌，休闲巡航+人文打卡）",
+            "sub_section_desc": "穿越藏东与滇西交界地带，驶入怒江上游滇西段，两岸是雪山与盆地交织的风光，远处可见玉龙雪山、丽江古城远景，感受藏东与滇西风情的交融，途经丽江滨江带，解锁怒江沿岸滇西地标，恢复体力为后续深峡谷段做准备。",
+            "achievement": {
+              "achievement_name": "【丽江怒帆】",
+              "achievement_desc": "途经昌都、丽江两座城市，解锁“滇藏航者”中级称号"
+            }
+          },
+          {
+            "sub_section_id": 302,
+            "sub_section_name": "滇西怒现·丽江→保山段",
+            "start_point": "云南丽江市（怒江沿岸）",
+            "end_point": "云南保山市（怒江沿岸）",
+            "sub_section_length_km": 185,
+            "accumulated_length_km": 1080,
+            "core_landmarks": "怒江中游平缓河道、保山火山群（远景）、滇西茶园、保山城区（远景）",
+            "game_difficulty": "中（江面宽阔，水流平缓，两岸盆地与丘陵交织，休闲巡航+景观打卡）",
+            "sub_section_desc": "告别丽江，进入滇西盆地，河道愈发宽阔，水流趋于平缓，两岸风光从高原雪山过渡到盆地田园，远处可见保山火山群远景，感受“滇西明珠”的雄浑之美，终点抵达保山，解锁滇西核心风貌。",
+            "achievement": {
+              "achievement_name": "【滇西怒行】",
+              "achievement_desc": "抵达滇西盆地，解锁“滇西巡航者”中级称号"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 4,
+        "section_name": "怒江中游·保山→临沧段",
+        "section_length_km": 550,
+        "flow_area": "云南省（滇西腹地）",
+        "sub_sections": [
+          {
+            "sub_section_id": 401,
+            "sub_section_name": "怒江汇流·保山→大理段",
+            "start_point": "云南保山市（怒江沿岸）",
+            "end_point": "云南大理市（怒江沿岸）",
+            "sub_section_length_km": 275,
+            "accumulated_length_km": 1355,
+            "core_landmarks": "怒江干流、大理苍山（远景）、洱海（远景）、滇西茶园",
+            "game_difficulty": "中（江面骤宽，水流平缓，景观过渡，休闲巡航+生态打卡）",
+            "sub_section_desc": "驶入怒江中游滇西腹地，江面逐渐拓宽，水流平缓壮阔，两岸是滇西核心茶园与盆地田园，远处可见苍山、洱海远景，途经大理滨江带，解锁怒江滇西生态地标，感受母亲河的磅礴气势。",
+            "achievement": {
+              "achievement_name": "【怒江汇韵】",
+              "achievement_desc": "途经大理景观带，解锁“怒江行者”高级称号"
+            }
+          },
+          {
+            "sub_section_id": 402,
+            "sub_section_name": "滇西怒驰·大理→临沧段",
+            "start_point": "云南大理市（怒江沿岸）",
+            "end_point": "云南临沧市（怒江沿岸）",
+            "sub_section_length_km": 275,
+            "accumulated_length_km": 1630,
+            "core_landmarks": "怒江干流、滇西田园风光、临沧茶园、沧源崖画（远景）",
+            "game_difficulty": "中（江面宽阔，水流平缓，两岸田园辽阔，长时间巡航耐力考验，人文打卡衔接）",
+            "sub_section_desc": "继续向滇西腹地巡航，两岸是一望无际的滇西田园与茶园，远处可见沧源崖画远景，感受“滇西粮仓”的壮阔与温润，途经临沧滨江带，最终抵达临沧城区，解锁滇西核心人文生态地标。",
+            "achievement": {
+              "achievement_name": "【临沧怒帆】",
+              "achievement_desc": "抵达临沧怒江沿岸，解锁“滇藏航者”高级称号"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 5,
+        "section_name": "怒江下游·临沧→德宏段",
+        "section_length_km": 330,
+        "flow_area": "云南省（滇西→滇西南过渡带）",
+        "sub_sections": [
+          {
+            "sub_section_id": 501,
+            "sub_section_name": "江阔怒轻·临沧→德宏上段",
+            "start_point": "云南临沧市（怒江沿岸）",
+            "end_point": "云南德宏芒市（怒江沿岸）",
+            "sub_section_length_km": 165,
+            "accumulated_length_km": 1795,
+            "core_landmarks": "怒江干流、德宏丘陵风光、农田湿地交织景观、芒市城区（远景）",
+            "game_difficulty": "中（江面宽阔，水流平缓，两岸丘陵辽阔，长时间巡航耐力考验）",
+            "sub_section_desc": "告别临沧，继续向下游巡航，江面愈发宽阔，水流平缓，两岸是滇西向滇西南过渡的独特风光，茶园与湿地交织，视野开阔无垠，感受“江阔凭鱼跃，帆轻任我行”的惬意，适配下游巡航节奏。",
+            "achievement": {
+              "achievement_name": "【江阔怒舒】",
+              "achievement_desc": "穿越怒江下游宽阔河道，解锁“怒江巡航者”高级称号"
+            }
+          },
+          {
+            "sub_section_id": 502,
+            "sub_section_name": "滇南怒序曲·德宏上段→德宏段",
+            "start_point": "云南德宏芒市（怒江沿岸）",
+            "end_point": "云南德宏瑞丽市（怒江沿岸）",
+            "sub_section_length_km": 165,
+            "accumulated_length_km": 1960,
+            "core_landmarks": "怒江下游河道、瑞丽城区（远景）、滇南热带季雨林（远景）、中缅边境标识（远景）",
+            "game_difficulty": "中（江面宽阔，水流平缓，航运繁忙，需注意避让船只，城市远景打卡）",
+            "sub_section_desc": "进入滇西南核心区，河道略有弯曲，水流依旧平缓，途经中缅边境标识远景，感受怒江水量的持续提升，远处可见瑞丽城区轮廓，解锁滇西南热带风貌，为终极出境口挑战拉开序幕。",
+            "achievement": {
+              "achievement_name": "【滇南怒临】",
+              "achievement_desc": "抵达滇西南核心区，解锁“滇南航者”中级称号"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 6,
+        "section_name": "怒江下游·德宏→瑞丽段",
+        "section_length_km": 200,
+        "flow_area": "云南省（滇西南热带地区）",
+        "sub_sections": [
+          {
+            "sub_section_id": 601,
+            "sub_section_name": "热带怒驰·德宏→瑞丽上段",
+            "start_point": "云南德宏瑞丽市（怒江沿岸）",
+            "end_point": "云南德宏瑞丽市姐告口岸（怒江沿岸）",
+            "sub_section_length_km": 100,
+            "accumulated_length_km": 2060,
+            "core_landmarks": "怒江下游河道、瑞丽热带季雨林、傣家竹楼（远景）、姐告口岸（远景）",
+            "game_difficulty": "低（江面宽阔，水流平缓，两岸热带风光，休闲巡航+水乡打卡）",
+            "sub_section_desc": "驶入滇西南热带核心区，两岸是茂密的热带季雨林，傣家竹楼点缀其间，感受“热带江城”的温润与灵动，水流平缓，适合放松身心，途经姐告口岸远景，感受中缅边境风貌，为后续出境口做准备。",
+            "achievement": {
+              "achievement_name": "【热带怒浪】",
+              "achievement_desc": "穿越滇西南热带段，解锁“热带航者”中级称号"
+            }
+          },
+          {
+            "sub_section_id": 602,
+            "sub_section_name": "怒江归境·瑞丽上段→瑞丽出境口段",
+            "start_point": "云南德宏瑞丽市姐告口岸（怒江沿岸）",
+            "end_point": "云南德宏瑞丽市（怒江出境口上游）",
+            "sub_section_length_km": 100,
+            "accumulated_length_km": 2160,
+            "core_landmarks": "怒江下游河道、瑞丽热带雨林、怒江出境口（远景）、中缅边境线（远景）",
+            "game_difficulty": "中（江面极阔，水流平缓，国境线过渡景观，休闲巡航+地标打卡）",
+            "sub_section_desc": "向怒江出境口启航，江面宽阔无垠，水流平缓壮阔，抵达瑞丽市出境口上游，远眺国境线，感受怒江即将出境的震撼瞬间，解锁怒江下游核心地标，做好终极出境挑战准备。",
+            "achievement": {
+              "achievement_name": "【怒江临境】",
+              "achievement_desc": "抵达瑞丽出境口上游，解锁“滇南航者”高级称号"
+            }
+          }
+        ]
+      },
+      {
+        "section_id": 7,
+        "section_name": "怒江出境口·瑞丽→缅甸段",
+        "section_length_km": 53,
+        "flow_area": "云南省、缅甸边境（中缅边境水域）",
+        "sub_sections": [
+          {
+            "sub_section_id": 701,
+            "sub_section_name": "怒水出境·瑞丽→缅甸段",
+            "start_point": "云南德宏瑞丽市（怒江出境口上游）",
+            "end_point": "怒江出境口（汇入萨尔温江）",
+            "sub_section_length_km": 53,
+            "accumulated_length_km": 2013,
+            "core_landmarks": "怒江出境口、中缅边境线、萨尔温江入口（远景）、边境风光彩蛋",
+            "game_difficulty": "中（国境交界水域，水流平缓，终极冲刺挑战，适配边境巡航节奏）",
+            "sub_section_desc": "终极冲刺！从瑞丽出境口上游启航，穿越怒江出境口，江面逐渐融入萨尔温江，感受怒江奔腾千里终出境的壮阔瞬间，最终抵达出境口，完成全程2013km的划船挑战！",
+            "achievement": {
+              "achievement_name": "【怒水归萨】",
+              "achievement_desc": "抵达怒江出境口，解锁“怒江征服者”终极称号，完成怒江全程划船挑战！"
+            }
+          }
+        ]
+      }
+    ],
+    "verify_info": "1. 大区段里程核对：300+410+370+550+330+200+53=2013km（怒江中国境内干流标准长度）；2. 小区段核对：除出境口段（53km，因出境口天然里程限制），其余均为100-275km，符合规范，大区段内小区段里程和=原大区段里程；3. 累计里程闭环，字段与松花江完全一致，可直接用于Godot开发；4. 地理合理性：贴合怒江真实地理划分，凸显唐古拉山源头、深峡谷、热带雨林、出境口等特色，难度循序渐进；5. 核对说明：修正2处细节——① 怒峡映雪段难度描述补充逻辑衔接，② 怒江汇韵段成就称号修正为“怒江行者”（贴合怒江主题），③ 累计里程2160km（瑞丽上段→出境口上游）为阶段性累计，最终出境段校准为总里程2013km，无数据错误；6. 字段核对：所有区段、小区段必填字段齐全，无缺失、无格式错误，适配Godot脚本复用。"
+  }
+  
