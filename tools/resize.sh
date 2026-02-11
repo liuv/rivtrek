@@ -1,1 +1,1 @@
-python3 ./tools/resize_png.py -d /Users/linden/gd-games/WaveChaser/WaveChaser/assets/textures/ui/icons -f "medal_*.png" -w 256 -o /Users/linden/dev/river_meet/assets/icons/
+python3 ./tools/resize_png.py -d /Users/linden/gd-games/WaveChaser/WaveChaser/assets/textures/ui/icons -f "medal_*.png" -w 256 -o /Users/linden/dev/rivtrek/assets/icons/

@@ -37,13 +37,13 @@ void main() async {
           update: (_, challenge, flow) => flow!..updateFromChallenge(challenge),
         ),
       ],
-      child: const RiverMeetApp(),
+      child: const RivtrekApp(),
     ),
   );
 }
 
-class RiverMeetApp extends StatelessWidget {
-  const RiverMeetApp({super.key});
+class RivtrekApp extends StatelessWidget {
+  const RivtrekApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
