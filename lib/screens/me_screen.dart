@@ -73,6 +73,63 @@ class MeScreen extends StatelessWidget {
                   _buildStatItem("解锁河段", "${challenge.allSubSections.indexWhere((s) => s.name == challenge.currentSubSection?.name) + 1} / ${challenge.allSubSections.length}", Icons.waves_rounded),
                   _buildStatItem("收集物件", "12 个", Icons.inventory_2_outlined),
                   const SizedBox(height: 40),
+                  
+                  // 勋章成就墙
+                  const Text(
+                    "江河勋章",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, letterSpacing: 0.5),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: challenge.allSubSections.length,
+                      itemBuilder: (context, index) {
+                        final sub = challenge.allSubSections[index];
+                        final isUnlocked = challenge.currentDistance >= sub.accumulatedLength;
+                        final medalIcon = sub.medalIcon;
+
+                        return Container(
+                          width: 80,
+                          margin: const EdgeInsets.only(right: 15),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.02),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              if (medalIcon != null)
+                                Opacity(
+                                  opacity: isUnlocked ? 1.0 : 0.15,
+                                  child: Image.asset(
+                                    'assets/$medalIcon',
+                                    width: 50,
+                                    height: 50,
+                                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                                  ),
+                                )
+                              else
+                                const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                              
+                              if (!isUnlocked)
+                                const Icon(Icons.lock_outline_rounded, size: 16, color: Colors.black26),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
                   const Divider(color: Color(0xFFEEEEEE)),
                   const SizedBox(height: 20),
                   // Settings/Menu

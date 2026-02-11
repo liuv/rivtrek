@@ -451,7 +451,7 @@
             "achievement_name": "【金陵飞渡】",
             "achievement_desc": "抵达南京秦淮河入江口，解锁“古都行者”高级称号",
             "medal_id": "medal_yangtze_801",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yangtze_801.png"
           }
         }
       ]
@@ -482,7 +482,7 @@
             "achievement_name": "【江南长途徒步】",
             "achievement_desc": "完成扬子江下游段挑战，解锁“江南行者”高级称号",
             "medal_id": "medal_yangtze_901",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yangtze_901.png"
           }
         }
       ]
@@ -513,7 +513,7 @@
             "achievement_name": "【向海而行】",
             "achievement_desc": "抵达上海陆家嘴，解锁“入海挑战者”高级称号+“都市行者”终极称号",
             "medal_id": "medal_yangtze_1001",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yangtze_1001.png"
           }
         },
         {
@@ -535,7 +535,7 @@
             "achievement_name": "【入海抵达】",
             "achievement_desc": "抵达长江入海口，解锁“长江征服者”终极称号，完成长江全程徒步挑战！",
             "medal_id": "medal_yangtze_1002",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yangtze_1002.png"
           }
         }
       ]

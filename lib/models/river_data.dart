@@ -65,7 +65,7 @@ class SubSection {
   final double subSectionLengthKm;
   final double accumulatedLengthKm;
   final String subSectionDesc;
-  final Achievement achievement;
+  final Achievement? achievement;
 
   SubSection({
     required this.subSectionId,
@@ -75,7 +75,7 @@ class SubSection {
     required this.subSectionLengthKm,
     required this.accumulatedLengthKm,
     required this.subSectionDesc,
-    required this.achievement,
+    this.achievement,
   });
 
   factory SubSection.fromJson(Map<String, dynamic> json) {
@@ -87,7 +87,7 @@ class SubSection {
       subSectionLengthKm: (json['sub_section_length_km'] as num).toDouble(),
       accumulatedLengthKm: (json['accumulated_length_km'] as num).toDouble(),
       subSectionDesc: json['sub_section_desc'],
-      achievement: Achievement.fromJson(json['achievement']),
+      achievement: json['achievement'] != null ? Achievement.fromJson(json['achievement']) : null,
     );
   }
 }
@@ -95,18 +95,18 @@ class SubSection {
 class Achievement {
   final String achievementName;
   final String achievementDesc;
-  final String medalIcon;
+  final String? medalIcon;
 
   Achievement({
     required this.achievementName,
     required this.achievementDesc,
-    required this.medalIcon,
+    this.medalIcon,
   });
 
   factory Achievement.fromJson(Map<String, dynamic> json) {
     return Achievement(
-      achievementName: json['achievement_name'],
-      achievementDesc: json['achievement_desc'],
+      achievementName: json['achievement_name'] ?? '',
+      achievementDesc: json['achievement_desc'] ?? '',
       medalIcon: json['medal_icon'],
     );
   }

@@ -45,9 +45,21 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
     <key>NSHealthShareUsageDescription</key>
     <string>徒步江河需要读取步数数据以同步你的行进进度</string>
     <key>NSHealthUpdateUsageDescription</key>
     <string>徒步江河需要记录你的行走成就</string>
+    <key>NSMotionUsageDescription</key>
+    <string>徒步江河需要访问运动传感器以追踪你的实时步数</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>徒步江河需要你的位置信息以计算行进路线和天气</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>徒步江河需要在后台同步你的行进进度</string>
 </dict>
 </plist>

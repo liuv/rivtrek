@@ -16,7 +16,7 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final String tiandituKey = '1e3ac648e1213f4c6ebc1248e9c8ba0d';
   bool isSatellite = false;
   
@@ -30,10 +30,23 @@ class _MapScreenState extends State<MapScreen> {
   CacheStore? _cacheStore;
   int selectedSubSectionIdx = -1;
 
+  late AnimationController _pulseController;
+
   @override
   void initState() {
     super.initState();
     _cacheStore = MemCacheStore();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _cacheStore?.close();
+    _pulseController.dispose();
+    super.dispose();
   }
 
   Future<void> _initMapData(ChallengeProvider challenge) async {
@@ -54,6 +67,8 @@ class _MapScreenState extends State<MapScreen> {
           pointsData = pd;
           currentUserPos = posInfo['position'];
           currentSubSectionIdx = posInfo['subSectionIndex'];
+          // 默认选中当前进度所在的河段
+          selectedSubSectionIdx = currentSubSectionIdx;
           _loadedRiverId = challenge.activeRiver!.id;
           isLoading = false;
         });
@@ -77,7 +92,6 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final challenge = context.watch<ChallengeProvider>();
     
-    // 异步触发数据加载
     if (_loadedRiverId != challenge.activeRiver?.id) {
       _initMapData(challenge);
     }
@@ -91,12 +105,78 @@ class _MapScreenState extends State<MapScreen> {
     }
 
     List<Polyline> polylines = [];
+    List<Marker> markers = [];
+
+    LatLng? sectionStart;
+    LatLng? sectionEnd;
+
     for (int i = 0; i < pointsData!.sectionsPoints.length; i++) {
       final points = pointsData!.sectionsPoints[i].map((p) => LatLng(p[1], p[0])).toList();
       polylines.add(Polyline(
         points: points,
         strokeWidth: i == selectedSubSectionIdx ? 8 : 5,
         color: _getSectionColor(i),
+      ));
+
+      if (i == selectedSubSectionIdx && points.isNotEmpty) {
+        sectionStart = points.first;
+        sectionEnd = points.last;
+      }
+    }
+
+    // 1. 当前位置 Marker
+    if (currentUserPos != null) {
+      markers.add(Marker(
+        point: currentUserPos!,
+        width: 60,
+        height: 60,
+        child: AnimatedBuilder(
+          animation: _pulseController,
+          builder: (context, child) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 20 + (20 * _pulseController.value),
+                  height: 20 + (20 * _pulseController.value),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: (challenge.activeRiver?.color ?? Colors.blue).withOpacity(0.4 * (1 - _pulseController.value)),
+                  ),
+                ),
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    border: Border.all(color: challenge.activeRiver?.color ?? Colors.blue, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (challenge.activeRiver?.color ?? Colors.blue).withOpacity(0.5),
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ));
+    }
+
+    // 2. 起终点 Marker
+    if (sectionStart != null && sectionEnd != null) {
+      markers.add(Marker(
+        point: sectionStart,
+        width: 40, height: 40,
+        child: _buildLocationMarker(challenge.activeRiver?.color ?? Colors.blue),
+      ));
+      markers.add(Marker(
+        point: sectionEnd,
+        width: 40, height: 40,
+        child: _buildLocationMarker(Colors.orange),
       ));
     }
 
@@ -127,17 +207,7 @@ class _MapScreenState extends State<MapScreen> {
                 tileProvider: CachedTileProvider(store: _cacheStore!),
               ),
               PolylineLayer(polylines: polylines),
-              if (currentUserPos != null)
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: currentUserPos!,
-                      width: 40,
-                      height: 40,
-                      child: const Icon(Icons.location_on, color: Colors.red, size: 40),
-                    ),
-                  ],
-                ),
+              MarkerLayer(markers: markers),
             ],
           ),
           
@@ -159,15 +229,20 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  Widget _buildLocationMarker(Color color) {
+    return Icon(Icons.location_on, color: color, size: 36);
+  }
+
   void _handleMapTap(LatLng point) {
     int closestIdx = -1;
-    double minDistance = 20.0; 
+    double minDistance = 30.0; // 扩大感应范围到 30km
     
     for (int i = 0; i < pointsData!.sectionsPoints.length; i++) {
       var sPoints = pointsData!.sectionsPoints[i];
-      var checkIndices = [0, sPoints.length ~/ 2, sPoints.length - 1];
-      for (var idx in checkIndices) {
-        if (idx >= sPoints.length) continue;
+      // 增加采样密度：每段路径采样 10 个点进行检测，而不仅仅是 3 个
+      int sampleCount = 10;
+      for (int s = 0; s < sampleCount; s++) {
+        int idx = ((sPoints.length - 1) * (s / (sampleCount - 1))).round();
         var p = sPoints[idx];
         double dist = GeoService.calculateDistance(point, LatLng(p[1], p[0]));
         if (dist < minDistance) {
@@ -183,12 +258,15 @@ class _MapScreenState extends State<MapScreen> {
     int subIdx = selectedSubSectionIdx;
     SubSection? target;
     int currentTotal = 0;
+    
+    // 扁平化所有子路段以便索引
+    List<SubSection> allFlattened = [];
     for (var section in fullData!.challengeSections) {
-      if (subIdx < currentTotal + section.subSections.length) {
-        target = section.subSections[subIdx - currentTotal];
-        break;
-      }
-      currentTotal += section.subSections.length;
+      allFlattened.addAll(section.subSections);
+    }
+
+    if (subIdx >= 0 && subIdx < allFlattened.length) {
+      target = allFlattened[subIdx];
     }
 
     if (target == null) return const SizedBox();
@@ -203,17 +281,14 @@ class _MapScreenState extends State<MapScreen> {
         builder: (context, value, child) {
           return Transform.translate(
             offset: Offset(0, -20 * (1 - value)),
-            child: Opacity(
-              opacity: value,
-              child: child,
-            ),
+            child: Opacity(opacity: value, child: child),
           );
         },
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.9),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -223,54 +298,97 @@ class _MapScreenState extends State<MapScreen> {
             ],
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildBadgeIcon(target),
+                  const SizedBox(width: 16),
                   Expanded(
-                    child: Text(
-                      target.subSectionName, 
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 0.5)
-                    )
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: const Icon(Icons.close, size: 20, color: Colors.black38),
-                    onPressed: () => setState(() => selectedSubSectionIdx = -1),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(child: Text(target.subSectionName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600))),
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: const Icon(Icons.close, size: 18, color: Colors.black26),
+                              onPressed: () => setState(() => selectedSubSectionIdx = -1),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text("${target.startPoint} → ${target.endPoint}", style: const TextStyle(fontSize: 12, color: Colors.black45)),
+                        const SizedBox(height: 8),
+                        Text(target.subSectionDesc, style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.6), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.location_on_outlined, size: 14, color: Colors.black45),
-                  const SizedBox(width: 4),
-                  Text(
-                    "${target.startPoint} → ${target.endPoint}", 
-                    style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w300)
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                target.subSectionDesc, 
-                style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.7), height: 1.5), 
-                maxLines: 3, 
-                overflow: TextOverflow.ellipsis
-              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1, color: Colors.black12),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfoTag("里程: ${target.subSectionLengthKm} km", Colors.blue),
-                  _buildInfoTag("全线累积: ${target.accumulatedLengthKm} km", Colors.green),
+                  // 上一段按钮
+                  IconButton(
+                    onPressed: subIdx > 0 ? () => setState(() => selectedSubSectionIdx--) : null,
+                    icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: subIdx > 0 ? Colors.black87 : Colors.black12),
+                  ),
+                  Row(
+                    children: [
+                      _buildInfoTag("${target.subSectionLengthKm}km", Colors.blue),
+                      const SizedBox(width: 8),
+                      _buildInfoTag("累计 ${target.accumulatedLengthKm}km", Colors.green),
+                    ],
+                  ),
+                  // 下一段按钮
+                  IconButton(
+                    onPressed: subIdx < allFlattened.length - 1 ? () => setState(() => selectedSubSectionIdx++) : null,
+                    icon: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: subIdx < allFlattened.length - 1 ? Colors.black87 : Colors.black12),
+                  ),
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildBadgeIcon(SubSection target) {
+    final medalIcon = target.achievement?.medalIcon;
+    final isUnlocked = selectedSubSectionIdx <= currentSubSectionIdx;
+
+    return Container(
+      width: 80, height: 80,
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          if (medalIcon != null)
+            Opacity(
+              opacity: isUnlocked ? 1.0 : 0.2,
+              child: Image.asset(
+                'assets/$medalIcon',
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.military_tech_outlined, size: 40, color: Colors.black12),
+              ),
+            )
+          else
+            const Icon(Icons.military_tech_outlined, size: 40, color: Colors.black12),
+          
+          if (!isUnlocked)
+            const Icon(Icons.lock_outline_rounded, size: 20, color: Colors.black26),
+        ],
       ),
     );
   }
@@ -283,7 +401,7 @@ class _MapScreenState extends State<MapScreen> {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: color.withOpacity(0.5)),
       ),
-      child: Text(text, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500)),
+      child: Text(text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w500)),
     );
   }
 
@@ -302,11 +420,5 @@ class _MapScreenState extends State<MapScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _cacheStore?.close();
-    super.dispose();
   }
 }

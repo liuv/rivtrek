@@ -1,6 +1,10 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:workmanager/workmanager.dart';
 import 'screens/flow_screen.dart';
 import 'screens/map_screen.dart';
@@ -13,8 +17,15 @@ void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async => Future.value(true));
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // 启动时仅请求基础权限，避开复杂的健康授权
+  if (Platform.isIOS) {
+    await Geolocator.requestPermission();
+    await Permission.sensors.request();
+  }
+  
   Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
   
   runApp(
@@ -144,6 +155,13 @@ class _MainContainerState extends State<MainContainer> {
             curve: Curves.easeInOut,
           );
         });
+      },
+      onDoubleTap: () {
+        if (index == 0) {
+          // 双击 Flow 按钮，回归真实进度
+          context.read<ChallengeProvider>().resetToRealDistance();
+          HapticFeedback.mediumImpact();
+        }
       },
       child: Container(
         color: Colors.transparent,

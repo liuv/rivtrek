@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -31,6 +32,7 @@ class FlowController extends ChangeNotifier {
   double _windSpeed = 0.0;
 
   // 数据引用 (通过 ChallengeProvider 同步)
+  ChallengeProvider? _challengeProvider;
   List<SubSection> _allSubSections = [];
   SubSection? _currentSubSection;
   String? _activeRiverId;
@@ -58,6 +60,7 @@ class FlowController extends ChangeNotifier {
 
   // 被 ChallengeProvider 调用，实现状态同步
   void updateFromChallenge(ChallengeProvider challenge) {
+    _challengeProvider = challenge;
     if (challenge.isLoading) return;
     
     bool riverChanged = _activeRiverId != challenge.activeRiver?.id;
@@ -77,6 +80,14 @@ class FlowController extends ChangeNotifier {
   }
 
   void startStepListening() {
+    if (Platform.isIOS) {
+      _startHealthKitSync();
+    } else {
+      _startPedometerListening();
+    }
+  }
+
+  void _startPedometerListening() {
     _pedometerSubscription = Pedometer.stepCountStream.listen((event) async {
       final prefs = await SharedPreferences.getInstance();
       final String today = DateTime.now().toString().split(' ')[0];
@@ -84,24 +95,86 @@ class FlowController extends ChangeNotifier {
       int base = prefs.getInt('base_steps_value') ?? hardwareTotal;
       
       if (prefs.getString('last_sync_date') != today || hardwareTotal < base) {
+        if (prefs.getString('last_sync_date') != null) {
+          final activeId = prefs.getString('active_river_id') ?? 'yangtze';
+          double historyDist = prefs.getDouble('history_distance_$activeId') ?? 0.0;
+          int lastDaySteps = prefs.getInt('last_day_steps') ?? 0;
+          await prefs.setDouble('history_distance_$activeId', historyDist + (lastDaySteps * _stepLengthKm));
+        }
         await prefs.setString('last_sync_date', today);
         await prefs.setInt('base_steps_value', hardwareTotal);
         base = hardwareTotal;
       }
-      
+      await prefs.setInt('last_day_steps', hardwareTotal - base);
       _displaySteps = hardwareTotal - base;
-      _currentDistance = _displaySteps * _stepLengthKm;
-      
-      // 注意：这里需要通知 ChallengeProvider 更新其持有的距离
-      // 但在 ProxyProvider 模式下，通常是 ChallengeProvider 驱动 FlowController
-      // 为了避免循环依赖，我们可以在这里直接保存进度到 SharedPreferences
-      // 或者提供一个回调。这里选择直接保存进度，ChallengeProvider 监听存储或通过 UI 触发更新。
-      
-      final activeId = prefs.getString('active_river_id') ?? 'yangtze';
-      await prefs.setDouble('progress_$activeId', _currentDistance);
-      
-      notifyListeners();
+      await _updateDistancesAndSync();
     });
+  }
+
+  Timer? _healthTimer;
+  void _startHealthKitSync() async {
+    // 延迟 3 秒同步，避开启动时的定位弹窗冲突
+    await Future.delayed(const Duration(seconds: 3));
+    // 首次立即同步
+    await syncHealthSteps();
+    // 之后每 30 秒轮询一次 Apple Health (Apple Health 数据更新有延迟)
+    _healthTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      await syncHealthSteps();
+    });
+  }
+
+  Future<void> syncHealthSteps() async {
+    if (!Platform.isIOS) return;
+
+    try {
+      // 定义需要读取的数据类型
+      final types = [HealthDataType.STEPS];
+      // 定义权限（只读）
+      final permissions = [HealthDataAccess.READ];
+      
+      // 请求授权 - 这会弹出那个带有开关的系统页面
+      bool authorized = await health.requestAuthorization(types, permissions: permissions);
+      
+      if (!authorized) {
+        debugPrint("HealthKit Authorization denied by user.");
+        return;
+      }
+
+      // 获取今日步数（从今日凌晨到现在）
+      final now = DateTime.now();
+      final midnight = DateTime(now.year, now.month, now.day);
+      
+      int? steps = await health.getTotalStepsInInterval(midnight, now);
+      
+      if (steps != null) {
+        _displaySteps = steps;
+        await _updateDistancesAndSync();
+      }
+    } catch (e) {
+      debugPrint("HealthKit Sync Error: $e");
+    }
+  }
+
+  Future<void> _updateDistancesAndSync() async {
+    final String today = DateTime.now().toString().split(' ')[0];
+    
+    // 计算今日真实里程
+    double todayDistance = _displaySteps * _stepLengthKm;
+    
+    // 从数据库重新汇总总里程（历史 + 今日）
+    final allActivities = await DatabaseService.instance.getAllActivities();
+    double totalHistory = allActivities
+        .where((a) => a.date != today) 
+        .fold(0.0, (sum, item) => sum + item.distanceKm);
+    
+    _currentDistance = totalHistory + todayDistance;
+    
+    // 同步给 ChallengeProvider
+    _challengeProvider?.syncRealDistance(_currentDistance);
+    
+    // 保存今日进度到数据库
+    await saveToDatabase();
+    notifyListeners();
   }
 
   Future<void> saveToDatabase({bool force = false}) async {
@@ -187,6 +260,7 @@ class FlowController extends ChangeNotifier {
   @override
   void dispose() {
     _pedometerSubscription?.cancel();
+    _healthTimer?.cancel();
     super.dispose();
   }
 }

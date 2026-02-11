@@ -119,4 +119,10 @@ class DatabaseService {
       extraData: json['extra_data'] as String,
     )).toList();
   }
+
+  Future<List<DailyActivity>> getAllActivities() async {
+    final db = await instance.database;
+    final result = await db.query('daily_activities');
+    return result.map((map) => DailyActivity.fromMap(map)).toList();
+  }
 }

@@ -29,6 +29,10 @@ class _FlowScreenState extends State<FlowScreen>
         WidgetsBindingObserver,
         AutomaticKeepAliveClientMixin {
   
+  // 视觉距离（用于动画过渡）
+  double _visualDistance = 0.0;
+  late AnimationController _distanceController;
+
   // 渲染专用
   ui.FragmentShader? _proceduralShader;
   ui.FragmentShader? _inkShader;
@@ -55,6 +59,11 @@ class _FlowScreenState extends State<FlowScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    _distanceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
     _timeController = AnimationController(
         vsync: this, duration: const Duration(seconds: 10))
       ..repeat();
@@ -73,7 +82,6 @@ class _FlowScreenState extends State<FlowScreen>
 
     _stopwatch = Stopwatch()..start();
     
-    // 初始化 Controller 并刷新天气
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = context.read<FlowController>();
       controller.init();
@@ -88,18 +96,47 @@ class _FlowScreenState extends State<FlowScreen>
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     
-    // 检查是否需要切换路径数据
+    // 同步视觉距离：检测跳变并执行动画
+    if (!_distanceController.isAnimating) {
+      if ((_visualDistance - challenge.currentDistance).abs() > 5.0) {
+        _animateTo(challenge.currentDistance);
+      } else {
+        _visualDistance = challenge.currentDistance;
+      }
+    }
+
     if (challenge.activeRiver != null && _loadedPointsRiverId != challenge.activeRiver!.id) {
       _loadRealRiverPath(challenge.activeRiver!.pointsJsonPath, challenge.activeRiver!.id);
     }
 
-    _updateLanterns(controller.currentSubSection);
+    _updateLanterns(challenge.currentSubSection);
+  }
+
+  void _animateTo(double target) {
+    final start = _visualDistance;
+    _distanceController.reset();
+    final Animation<double> animation = Tween<double>(begin: start, end: target).animate(
+      CurvedAnimation(parent: _distanceController, curve: Curves.easeInOutCubic)
+    );
+    
+    animation.addListener(() {
+      if (mounted) {
+        setState(() {
+          _visualDistance = animation.value;
+          if (RiverSettings.instance.pathMode == RiverPathMode.realPath) {
+            _updatePathOffsets(_visualDistance);
+          }
+        });
+      }
+    });
+    _distanceController.forward();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timeController.dispose();
+    _distanceController.dispose();
     _pulseController.dispose();
     _stopwatch.stop();
     super.dispose();
@@ -244,7 +281,7 @@ class _FlowScreenState extends State<FlowScreen>
           _cumulativeDistances = dists; 
           _loadedPointsRiverId = riverId;
         });
-        _updatePathOffsets(context.read<ChallengeProvider>().currentDistance);
+        _updatePathOffsets(_visualDistance);
       }
     } catch (e) { debugPrint("Path Error: $e"); }
   }
@@ -328,6 +365,11 @@ class _FlowScreenState extends State<FlowScreen>
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     
+    // 初始化视觉距离
+    if (_visualDistance == 0 && challenge.currentDistance != 0) {
+      _visualDistance = challenge.currentDistance;
+    }
+
     final sub = challenge.currentSubSection;
 
     return ListenableBuilder(
@@ -348,9 +390,11 @@ class _FlowScreenState extends State<FlowScreen>
               onPointerUp: (e) => setState(() => _pointers.remove(e.pointer)),
               onPointerMove: (e) {
                 if (_pointers.length == 2) {
-                  challenge.updateDistance(challenge.currentDistance - e.delta.dy * 0.5);
+                  if (_distanceController.isAnimating) _distanceController.stop();
+                  challenge.updateVirtualDistance(challenge.currentDistance - e.delta.dy * 0.5);
+                  _visualDistance = challenge.currentDistance;
                   if (settings.pathMode == RiverPathMode.realPath) {
-                    _updatePathOffsets(challenge.currentDistance);
+                    _updatePathOffsets(_visualDistance);
                   }
                 }
               },
@@ -364,18 +408,18 @@ class _FlowScreenState extends State<FlowScreen>
                   width: settings.width + ((sub?.baseFlowSpeed ?? 0.5) * 0.02),
                   speed: settings.speed + ((sub?.baseFlowSpeed ?? 0.5) * 0.1),
                   themeColor: sub?.color ?? Colors.blue,
-                  offset: challenge.currentDistance / 10.0,
+                  offset: _visualDistance / 10.0,
                   pulse: _pulseController.value,
                   pulseX: _pulseCenter.dx,
                   pulseY: _pulseCenter.dy,
                 ))),
-                ..._blessings.map((b) => _buildBlessingWidget(b, settings, sub, challenge.currentDistance)),
-                ..._lanterns.map((l) => _buildLanternWidget(l, settings, sub, challenge.currentDistance)),
+                ..._blessings.map((b) => _buildBlessingWidget(b, settings, sub, _visualDistance)),
+                ..._lanterns.map((l) => _buildLanternWidget(l, settings, sub, _visualDistance)),
                 SafeArea(child: Column(children: [
                   const SizedBox(height: 25),
                   _buildHeader(sub, controller),
                   const Spacer(flex: 3),
-                  _buildStepsAndProgress(controller, challenge),
+                  _buildStepsAndProgress(controller, challenge, _visualDistance),
                   const Spacer(flex: 4),
                 ])),
               ]),
@@ -441,11 +485,11 @@ class _FlowScreenState extends State<FlowScreen>
     ]));
   }
 
-  Widget _buildStepsAndProgress(FlowController controller, ChallengeProvider challenge) {
+  Widget _buildStepsAndProgress(FlowController controller, ChallengeProvider challenge, double visualDistance) {
     String steps = controller.displaySteps.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     return Column(children: [
       Text(steps, style: TextStyle(color: const Color(0xFF222222), fontSize: steps.length > 7 ? 82 : 105, fontWeight: FontWeight.w100, letterSpacing: -2)),
-      Text("已行至 ${challenge.currentDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, letterSpacing: 1.2)),
+      Text("已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, letterSpacing: 1.2)),
     ]);
   }
 }

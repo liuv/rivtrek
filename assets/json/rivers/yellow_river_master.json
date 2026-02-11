@@ -36,7 +36,7 @@
             "achievement_name": "【河源出发】",
             "achievement_desc": "完成黄河源头第一段挑战，解锁“河源探索者”初级称号",
             "medal_id": "medal_yellow_101",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_101.png"
           }
         },
         {
@@ -58,7 +58,7 @@
             "achievement_name": "【河源逐水】",
             "achievement_desc": "完成黄河正源全段挑战，解锁“黄河开拓者”中级称号，开启下一大区段",
             "medal_id": "medal_yellow_102",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_102.png"
           }
         }
       ]
@@ -89,7 +89,7 @@
             "achievement_name": "【高原明珠】",
             "achievement_desc": "穿越扎陵湖、鄂陵湖，解锁“高原行进者”初级称号",
             "medal_id": "medal_yellow_201",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_201.png"
           }
         },
         {
@@ -111,7 +111,7 @@
             "achievement_name": "【丹霞逐浪】",
             "achievement_desc": "途经贵德丹霞地貌，解锁“峡谷挑战者”初级称号",
             "medal_id": "medal_yellow_202",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_202.png"
           }
         },
         {
@@ -133,7 +133,7 @@
             "achievement_name": "【龙羊惊涛】",
             "achievement_desc": "成功穿越龙羊峡，解锁“峡谷征服者”高级称号",
             "medal_id": "medal_yellow_203",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_203.png"
           }
         }
       ]
@@ -164,7 +164,7 @@
             "achievement_name": "【峡谷连横】",
             "achievement_desc": "穿越龙羊峡、李家峡连续峡谷，解锁“峡谷行进者”高级称号",
             "medal_id": "medal_yellow_301",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_301.png"
           }
         },
         {
@@ -186,7 +186,7 @@
             "achievement_name": "【金城揽胜】",
             "achievement_desc": "抵达兰州黄河母亲雕塑，解锁“黄河行者”中级称号",
             "medal_id": "medal_yellow_302",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_302.png"
           }
         },
         {
@@ -208,7 +208,7 @@
             "achievement_name": "【塞上江南】",
             "achievement_desc": "穿越宁夏平原段，打卡一百零八塔，解锁“塞上行者”高级称号",
             "medal_id": "medal_yellow_303",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_303.png"
           }
         }
       ]
@@ -239,7 +239,7 @@
             "achievement_name": "【贺兰远景】",
             "achievement_desc": "途经贺兰山远景，解锁“草原行者”初级称号",
             "medal_id": "medal_yellow_401",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_401.png"
           }
         },
         {
@@ -261,7 +261,7 @@
             "achievement_name": "【几字启弯】",
             "achievement_desc": "抵达黄河几字弯起点河口镇，解锁“河套行者”高级称号",
             "medal_id": "medal_yellow_402",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_402.png"
           }
         }
       ]
@@ -292,7 +292,7 @@
             "achievement_name": "【几字起步】",
             "achievement_desc": "穿越黄河几字弯北段，解锁“几字行者”初级称号",
             "medal_id": "medal_yellow_501",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_501.png"
           }
         },
         {
@@ -314,7 +314,7 @@
             "achievement_name": "【晋陕初临】",
             "achievement_desc": "抵达晋陕大峡谷入口附近，解锁“峡谷行者”中级称号",
             "medal_id": "medal_yellow_502",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_502.png"
           }
         },
         {
@@ -336,7 +336,7 @@
             "achievement_name": "【壶口惊雷】",
             "achievement_desc": "穿越壶口瀑布下游水域，解锁“黄河勇士”高级称号",
             "medal_id": "medal_yellow_503",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_503.png"
           }
         }
       ]
@@ -367,7 +367,7 @@
             "achievement_name": "【潼关雄关】",
             "achievement_desc": "打卡潼关古城，解锁“历史行者”高级称号",
             "medal_id": "medal_yellow_601",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_601.png"
           }
         },
         {
@@ -389,7 +389,7 @@
             "achievement_name": "【三门锁河】",
             "achievement_desc": "打卡三门峡大坝，解锁“水利行者”中级称号",
             "medal_id": "medal_yellow_602",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_602.png"
           }
         }
       ]
@@ -420,7 +420,7 @@
             "achievement_name": "【洛河汇黄】",
             "achievement_desc": "见证洛河汇入黄河，解锁“古都行者”初级称号",
             "medal_id": "medal_yellow_701",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_701.png"
           }
         },
         {
@@ -442,7 +442,7 @@
             "achievement_name": "【炎黄寻踪】",
             "achievement_desc": "打卡炎黄二帝雕塑，解锁“母亲河守护者”中级称号",
             "medal_id": "medal_yellow_702",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_702.png"
           }
         }
       ]
@@ -473,7 +473,7 @@
             "achievement_name": "【牡丹映黄】",
             "achievement_desc": "打卡黄河牡丹园，解锁“平原行者”高级称号",
             "medal_id": "medal_yellow_801",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_801.png"
           }
         },
         {
@@ -495,7 +495,7 @@
             "achievement_name": "【泉城揽胜】",
             "achievement_desc": "抵达济南黄河岸边，解锁“都市行者”高级称号",
             "medal_id": "medal_yellow_802",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_802.png"
           }
         }
       ]
@@ -526,7 +526,7 @@
             "achievement_name": "【芦苇寻踪】",
             "achievement_desc": "穿越黄河芦苇湿地，解锁“生态行者”高级称号",
             "medal_id": "medal_yellow_901",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_901.png"
           }
         },
         {
@@ -548,7 +548,7 @@
             "achievement_name": "【向海出发】",
             "achievement_desc": "抵达黄河入海口景区上游，解锁“入海挑战者”高级称号",
             "medal_id": "medal_yellow_902",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_902.png"
           }
         }
       ]
@@ -579,7 +579,7 @@
             "achievement_name": "【红蓝交汇】",
             "achievement_desc": "打卡黄河入海口红海滩，解锁“生态守护者”终极称号+“入海行者”高级称号",
             "medal_id": "medal_yellow_1001",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_1001.png"
           }
         },
         {
@@ -601,7 +601,7 @@
             "achievement_name": "【黄河归海】",
             "achievement_desc": "抵达黄河入海口，解锁“黄河征服者”终极称号，完成黄河全程徒步挑战！",
             "medal_id": "medal_yellow_1002",
-            "medal_icon": "icons/marker_milestone.png"
+            "medal_icon": "icons/medal_yellow_1002.png"
           }
         }
       ]
