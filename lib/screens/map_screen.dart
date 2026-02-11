@@ -195,7 +195,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ? 'https://t{s}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey'
                   : 'https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey',
                 subdomains: const ['0', '1', '2', '3', '4', '5', '6', '7'],
-                userAgentPackageName: 'cn.lindenliu.river_meet',
+                userAgentPackageName: 'cn.lindenliu.rivtrek',
                 tileProvider: CachedTileProvider(store: _cacheStore!),
               ),
               TileLayer(
@@ -203,7 +203,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ? 'https://t{s}.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey'
                   : 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey',
                 subdomains: const ['0', '1', '2', '3', '4', '5', '6', '7'],
-                userAgentPackageName: 'cn.lindenliu.river_meet',
+                userAgentPackageName: 'cn.lindenliu.rivtrek',
                 tileProvider: CachedTileProvider(store: _cacheStore!),
               ),
               PolylineLayer(polylines: polylines),

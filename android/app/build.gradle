@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "cn.lindenliu.river_meet"
+    namespace = "cn.lindenliu.rivtrek"
     // 强制与全局 ext 挂钩
     compileSdk = rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId = "cn.lindenliu.river_meet"
+        applicationId = "cn.lindenliu.rivtrek"
         minSdk = rootProject.ext.minSdkVersion
         targetSdk = rootProject.ext.targetSdkVersion
         versionCode = flutter.versionCode

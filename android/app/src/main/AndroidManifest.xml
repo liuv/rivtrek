@@ -17,7 +17,7 @@
     </queries>
 
     <application
-        android:label="徒步江河"
+        android:label="涉川"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         

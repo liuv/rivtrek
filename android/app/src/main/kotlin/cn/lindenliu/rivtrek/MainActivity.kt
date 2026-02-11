@@ -1,4 +1,4 @@
-package cn.lindenliu.river_meet
+package cn.lindenliu.rivtrek
 
 import io.flutter.embedding.android.FlutterActivity
 

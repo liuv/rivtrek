@@ -10,7 +10,7 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('river_meet_v4.db');
+    _database = await _initDB('rivtrek_v1.db');
     return _database!;
   }
 
