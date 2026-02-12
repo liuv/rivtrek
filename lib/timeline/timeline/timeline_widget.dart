@@ -29,7 +29,7 @@ class TimelineWidget extends StatefulWidget {
 }
 
 class _TimelineWidgetState extends State<TimelineWidget> {
-  static const String DefaultEraName = "Birth of the Universe";
+  static const String DefaultEraName = "挑战记录";
   static const double TopOverlap = 56.0;
 
   /// These variables are used to calculate the correct viewport for the timeline

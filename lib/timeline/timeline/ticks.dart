@@ -1,8 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
 import 'package:rivtrek/timeline/timeline/timeline_utils.dart';
@@ -36,19 +34,32 @@ class Ticks {
     /// by pressing the button on the top-right corner of the timeline.
     double gutterWidth = timeline.gutterWidth;
 
-    /// Calculate spacing based on current scale
-    double scaledTickDistance = tickDistance * scale;
-    if (scaledTickDistance > 2 * TickDistance) {
-      while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
-        scaledTickDistance /= 2.0;
-        tickDistance /= 2.0;
-        textTickDistance /= 2.0;
-      }
+    /// Calculate spacing based on current scale.
+    double scaledTickDistance;
+    if (timeline.isCalendarMode) {
+      const List<int> minorCandidates = <int>[1, 2, 7, 14, 30, 90, 180, 365, 730];
+      const List<int> majorCandidates = <int>[7, 14, 30, 90, 180, 365, 730, 1825];
+      tickDistance =
+          _pickTickStep(scale, minorCandidates, TickDistance.toDouble())
+              .toDouble();
+      textTickDistance =
+          _pickTickStep(scale, majorCandidates, TextTickDistance.toDouble())
+              .toDouble();
+      scaledTickDistance = tickDistance * scale;
     } else {
-      while (scaledTickDistance < TickDistance) {
-        scaledTickDistance *= 2.0;
-        tickDistance *= 2.0;
-        textTickDistance *= 2.0;
+      scaledTickDistance = tickDistance * scale;
+      if (scaledTickDistance > 2 * TickDistance) {
+        while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
+          scaledTickDistance /= 2.0;
+          tickDistance /= 2.0;
+          textTickDistance /= 2.0;
+        }
+      } else {
+        while (scaledTickDistance < TickDistance) {
+          scaledTickDistance *= 2.0;
+          tickDistance *= 2.0;
+          textTickDistance *= 2.0;
+        }
       }
     }
     /// The number of ticks to draw.
@@ -70,7 +81,7 @@ class Ticks {
     /// depending on the current era. The [TickColors] object, in `timeline_utils.dart`,
     /// wraps this information.
     List<TickColors> tickColors = timeline.tickColors;
-    if (tickColors != null && tickColors.isNotEmpty) {
+    if (tickColors.isNotEmpty) {
       /// Build up the color stops for the linear gradient.
       double rangeStart = (tickColors.first.start ?? 0.0);
       double rangeEnd = (tickColors.last.start ?? 0.0);
@@ -143,7 +154,18 @@ class Ticks {
               color: colors.text ?? Colors.transparent));
 
         int value = tt.round();
-        String label = TimelineEntry.formatYears(value.toDouble());
+        String label;
+        if (timeline.isCalendarMode) {
+          label = _formatCalendarLabel(value.toDouble(), textTickDistance.toInt());
+        } else if (timeline.isDistanceMode) {
+          if (value < 0) {
+            startingTickMarkValue += tickDistance;
+            continue;
+          }
+          label = "$value km";
+        } else {
+          label = TimelineEntry.formatYears(value.toDouble());
+        }
         
         usedValues.add(label);
         builder.addText(label);
@@ -163,5 +185,28 @@ class Ticks {
       }
       startingTickMarkValue += tickDistance;
     }
+  }
+
+  int _pickTickStep(double scale, List<int> candidates, double targetPixelGap) {
+    for (final int step in candidates) {
+      if (step * scale >= targetPixelGap) {
+        return step;
+      }
+    }
+    return candidates.last;
+  }
+
+  String _formatCalendarLabel(double axisDay, int majorStep) {
+    final DateTime dt = Timeline.axisDayToDate(axisDay);
+    final String y = dt.year.toString();
+    final String m = dt.month.toString().padLeft(2, '0');
+    final String d = dt.day.toString().padLeft(2, '0');
+    if (majorStep >= 365) {
+      return y;
+    }
+    if (majorStep >= 30) {
+      return "$y-$m";
+    }
+    return "$m-$d";
   }
 }

@@ -142,4 +142,26 @@ class DatabaseService {
     final result = await db.query('daily_weather');
     return result.map((map) => DailyWeather.fromMap(map)).toList();
   }
+
+  Future<List<RiverEvent>> getAllEvents() async {
+    final db = await instance.database;
+    final result = await db.query('river_events', orderBy: 'timestamp ASC');
+    return result
+        .map((json) => RiverEvent(
+              id: json['id'] as int?,
+              date: json['date'] as String,
+              timestamp: (json['timestamp'] as num).toInt(),
+              type: RiverEventType.values.firstWhere(
+                (e) => e.name == json['type'],
+                orElse: () => RiverEventType.activity,
+              ),
+              name: json['name'] as String,
+              description: json['description'] as String,
+              latitude: (json['latitude'] as num).toDouble(),
+              longitude: (json['longitude'] as num).toDouble(),
+              distanceAtKm: (json['distance_at_km'] as num).toDouble(),
+              extraData: json['extra_data'] as String? ?? "{}",
+            ))
+        .toList();
+  }
 }

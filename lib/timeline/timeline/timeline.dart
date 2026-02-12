@@ -27,6 +27,7 @@ import 'timeline_entry.dart';
 typedef PaintCallback();
 typedef ChangeEraCallback(TimelineEntry? era);
 typedef ChangeHeaderColorCallback(Color background, Color text);
+enum TimelineAxisMode { legacyYear, distanceKm, calendarDate }
 
 class Timeline {
   /// Some aptly named constants for properly aligning the Timeline view.
@@ -90,6 +91,7 @@ class Timeline {
   bool _isScaling = false;
   bool _isActive = false;
   bool _isSteady = false;
+  TimelineAxisMode _axisMode = TimelineAxisMode.legacyYear;
 
   HeaderColors? _currentHeaderColors;
 
@@ -188,6 +190,9 @@ class Timeline {
   bool get isInteracting => _isInteracting;
   bool get showFavorites => _showFavorites;
   bool get isActive => _isActive;
+  bool get isDistanceMode => _axisMode == TimelineAxisMode.distanceKm;
+  bool get isCalendarMode => _axisMode == TimelineAxisMode.calendarDate;
+  TimelineAxisMode get axisMode => _axisMode;
   Color? get headerTextColor => _headerTextColor;
   Color? get headerBackgroundColor => _headerBackgroundColor;
   HeaderColors? get currentHeaderColors => _currentHeaderColors;
@@ -280,16 +285,21 @@ class Timeline {
 
   /// Load all the resources from the database.
   Future<List<TimelineEntry>> loadFromActivities(
-      List<DailyActivity> activities, List<DailyWeather> weathers) async {
+      List<DailyActivity> activities,
+      List<DailyWeather> weathers,
+      List<RiverEvent> events,
+      {TimelineAxisMode axisMode = TimelineAxisMode.distanceKm}) async {
+    _axisMode = axisMode;
+    const Color challengeBg = Color(0xFF16181D);
     List<TimelineEntry> allEntries = <TimelineEntry>[];
     _backgroundColors = <TimelineBackgroundColor>[
       TimelineBackgroundColor()
-        ..color = const Color.fromRGBO(37, 35, 41, 1.0)
+        ..color = challengeBg
         ..start = -1000000000.0
     ];
     _tickColors = <TickColors>[
       TickColors()
-        ..background = const Color.fromRGBO(37, 35, 41, 1.0)
+        ..background = challengeBg
         ..long = const Color.fromRGBO(255, 255, 255, 0.4)
         ..short = const Color.fromRGBO(255, 255, 255, 0.2)
         ..text = const Color.fromRGBO(255, 255, 255, 0.4)
@@ -304,33 +314,34 @@ class Timeline {
         ..screenY = 0.0
     ];
 
+    final List<DailyActivity> sortedActivities = List<DailyActivity>.from(activities);
+    sortedActivities.sort((a, b) {
+      final double av = _axisValueForActivity(a, axisMode);
+      final double bv = _axisValueForActivity(b, axisMode);
+      return av.compareTo(bv);
+    });
+
+    final double minAxis = sortedActivities.isNotEmpty
+        ? _axisValueForActivity(sortedActivities.first, axisMode)
+        : 0.0;
+    final double maxAxis = sortedActivities.isNotEmpty
+        ? _axisValueForActivity(sortedActivities.last, axisMode)
+        : 0.0;
+
     // 为河流创建一个大背景 (Era)
-    if (activities.isNotEmpty) {
+    if (sortedActivities.isNotEmpty) {
       TimelineEntry riverEra = TimelineEntry();
       riverEra.type = TimelineEntryType.Era;
-      riverEra.label = "挑战里程";
-      riverEra.start = 0.0;
-      riverEra.end = activities.last.accumulatedDistanceKm + 10.0; // 稍微多一点空间
+      riverEra.label =
+          axisMode == TimelineAxisMode.calendarDate ? "挑战时间线" : "挑战里程";
+      riverEra.start = axisMode == TimelineAxisMode.distanceKm ? 0.0 : minAxis;
+      riverEra.end = maxAxis + 10.0;
       riverEra.id = "river_challenge";
       allEntries.add(riverEra);
-
-      // 设置背景颜色
-      _backgroundColors.add(TimelineBackgroundColor()
-        ..color = const Color(0xFF1A1A1A)
-        ..start = 0.0);
-
-      // 设置刻度颜色
-      _tickColors.add(TickColors()
-        ..background = const Color(0xFF1A1A1A)
-        ..long = Colors.white24
-        ..short = Colors.white10
-        ..text = Colors.white54
-        ..start = 0.0
-        ..screenY = 0.0);
     }
 
-    // 将每一天的活动转换为 Incident
-    for (var activity in activities) {
+    // 将每一天的活动转换为 Incident。
+    for (var activity in sortedActivities) {
       TimelineEntry entry = TimelineEntry();
       entry.type = TimelineEntryType.Incident;
 
@@ -343,18 +354,41 @@ class Timeline {
       entry.activity = activity;
       entry.weather = weather;
 
-      // 使用累积距离作为时间轴
-      entry.start = activity.accumulatedDistanceKm;
-      entry.end = activity.accumulatedDistanceKm;
+      // 使用累积里程或日期作为时间轴。
+      final double axisValue = _axisValueForActivity(activity, axisMode);
+      entry.start = axisValue;
+      entry.end = axisValue;
 
       // 构建标签内容
-      String weatherStr =
-          weather != null ? "\n${weather.currentTemp} ${weather.cityName}" : "";
+      final String weatherStr =
+          weather != null ? " | ${weather.currentTemp} ${weather.cityName}" : "";
       entry.label =
-          "${activity.date}\n步数: ${activity.steps}\n里程: ${activity.distanceKm.toStringAsFixed(1)}km$weatherStr";
+          "${activity.date}\n${activity.steps} 步  +${activity.distanceKm.toStringAsFixed(1)}km$weatherStr";
 
       entry.accent = Colors.blueAccent;
       allEntries.add(entry);
+    }
+
+    // 事件数据并入挑战记录时间线。
+    for (final RiverEvent event in events) {
+      final TimelineEntry eventEntry = TimelineEntry()
+        ..type = TimelineEntryType.Incident
+        ..start = _axisValueForEvent(event, axisMode)
+        ..end = _axisValueForEvent(event, axisMode);
+
+      final String typeLabel = switch (event.type) {
+        RiverEventType.pickup => "拾遗",
+        RiverEventType.activity => "活动",
+        RiverEventType.achievement => "成就",
+      };
+      eventEntry.label = "${event.date}\n[$typeLabel] ${event.name}\n${event.description}";
+      eventEntry.id = "event_${event.id ?? event.timestamp}";
+      eventEntry.accent = switch (event.type) {
+        RiverEventType.pickup => const Color(0xFF7BC8A4),
+        RiverEventType.activity => const Color(0xFF4FA3FF),
+        RiverEventType.achievement => const Color(0xFFFFC857),
+      };
+      allEntries.add(eventEntry);
     }
 
     /// sort the full list so they are in order of oldest to newest
@@ -362,10 +396,13 @@ class Timeline {
       return a.start.compareTo(b.start);
     });
 
-    _timeMin = 0.0;
-    _timeMax = activities.isNotEmpty
-        ? activities.last.accumulatedDistanceKm + 10.0
-        : 100.0;
+    if (sortedActivities.isNotEmpty) {
+      _timeMin = axisMode == TimelineAxisMode.distanceKm ? 0.0 : minAxis - 3.0;
+      _timeMax = maxAxis + 10.0;
+    } else {
+      _timeMin = 0.0;
+      _timeMax = 100.0;
+    }
 
     _entries = <TimelineEntry>[];
     TimelineEntry? previous;
@@ -404,6 +441,7 @@ class Timeline {
   /// This function will load and decode `timline.json` from disk,
   /// decode the JSON file, and populate all the [TimelineEntry]s.
   Future<List<TimelineEntry>> loadFromBundle(String filename) async {
+    _axisMode = TimelineAxisMode.legacyYear;
     String data = await rootBundle.loadString(filename);
     List jsonEntries = json.decode(data) as List;
 
@@ -1770,5 +1808,37 @@ class Timeline {
       }
     }
     return stillAnimating;
+  }
+
+  static final DateTime _timelineEpoch = DateTime.utc(2000, 1, 1);
+
+  static double dateStringToAxisDay(String raw) {
+    DateTime? dt = DateTime.tryParse(raw);
+    if (dt == null) {
+      final String normalized = raw.replaceAll('/', '-').replaceAll('.', '-');
+      dt = DateTime.tryParse(normalized);
+    }
+    if (dt == null) {
+      return 0.0;
+    }
+    return dt.toUtc().difference(_timelineEpoch).inDays.toDouble();
+  }
+
+  static DateTime axisDayToDate(double axisDay) {
+    return _timelineEpoch.add(Duration(days: axisDay.round())).toLocal();
+  }
+
+  double _axisValueForActivity(DailyActivity activity, TimelineAxisMode axisMode) {
+    if (axisMode == TimelineAxisMode.calendarDate) {
+      return dateStringToAxisDay(activity.date);
+    }
+    return activity.accumulatedDistanceKm;
+  }
+
+  double _axisValueForEvent(RiverEvent event, TimelineAxisMode axisMode) {
+    if (axisMode == TimelineAxisMode.calendarDate) {
+      return dateStringToAxisDay(event.date);
+    }
+    return event.distanceAtKm;
   }
 }

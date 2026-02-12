@@ -12,6 +12,7 @@ class BlocProvider extends InheritedWidget {
   final FavoritesBloc favoritesBloc;
   final Timeline timeline;
   final String? timelineUri;
+  final TimelineAxisMode axisMode;
 
   /// This widget is initialized when the app boots up, and thus loads the resources.
   /// The timeline.json file contains all the entries' data.
@@ -25,13 +26,19 @@ class BlocProvider extends InheritedWidget {
       TargetPlatform platform = TargetPlatform.iOS,
       List<DailyActivity>? activities,
       List<DailyWeather>? weathers,
+      List<RiverEvent>? events,
+      TimelineAxisMode? mode,
       String? uri})
       : timeline = t ?? Timeline(platform),
+        axisMode = mode ?? TimelineAxisMode.distanceKm,
         timelineUri = uri ?? "assets/timeline/timeline.json",
         favoritesBloc = fb ?? FavoritesBloc(),
         super(key: key, child: child) {
     if (activities != null) {
-      timeline.loadFromActivities(activities, weathers ?? []).then((entries) {
+      timeline
+          .loadFromActivities(activities, weathers ?? [], events ?? [],
+              axisMode: axisMode)
+          .then((entries) {
         _initFromEntries(entries);
       });
     } else {

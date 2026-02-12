@@ -224,7 +224,7 @@ class TimelineRenderObject extends RenderBox {
     /// Fetch the background colors from the [Timeline] and compute the fill.
     List<TimelineBackgroundColor> backgroundColors = timeline!.backgroundColors;
     ui.Paint? backgroundPaint;
-    if (backgroundColors != null && backgroundColors.isNotEmpty) {
+    if (backgroundColors.isNotEmpty) {
       double rangeStart = backgroundColors.first.start ?? 0.0;
       double rangeEnd = backgroundColors.last.start ?? 0.0;
       double range = rangeEnd - rangeStart;
@@ -245,6 +245,12 @@ class TimelineRenderObject extends RenderBox {
         ..shader = ui.Gradient.linear(
             ui.Offset(0.0, y1), ui.Offset(0.0, y2), colors, stops)
         ..style = ui.PaintingStyle.fill;
+
+      // 先铺满整屏，避免滚动时出现白底闪烁。
+      canvas.drawRect(
+          Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height),
+          ui.Paint()
+            ..color = (backgroundColors.last.color ?? Colors.transparent));
 
       if (y1 > offset.dy) {
         canvas.drawRect(

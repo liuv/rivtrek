@@ -4,25 +4,17 @@ import 'package:provider/provider.dart';
 import '../providers/challenge_provider.dart';
 import 'settings_screen.dart';
 import 'package:rivtrek/services/database_service.dart';
+import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline_page.dart';
 
 class MeScreen extends StatelessWidget {
   const MeScreen({super.key});
 
-  void _navigateToTimeline(BuildContext context) {
-    if (context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const TimelinePage(),
-        ),
-      );
-    }
-  }
-
-  void _navigateToChallengeRecords(BuildContext context) async {
+  void _navigateToChallengeRecords(
+      BuildContext context, TimelineAxisMode mode) async {
     final activities = await DatabaseService.instance.getAllActivities();
     final weathers = await DatabaseService.instance.getAllWeather();
+    final events = await DatabaseService.instance.getAllEvents();
 
     if (context.mounted) {
       Navigator.push(
@@ -31,6 +23,8 @@ class MeScreen extends StatelessWidget {
           builder: (context) => TimelinePage(
             activities: activities,
             weathers: weathers,
+            events: events,
+            mode: mode,
           ),
         ),
       );
@@ -179,10 +173,12 @@ class MeScreen extends StatelessWidget {
                   const Divider(color: Color(0xFFEEEEEE)),
                   const SizedBox(height: 20),
                   // Settings/Menu
-                  _buildMenuItem("挑战记录", Icons.history_rounded,
-                      onTap: () => _navigateToChallengeRecords(context)),
-                  _buildMenuItem("历史长河 (测试)", Icons.timeline_rounded,
-                      onTap: () => _navigateToTimeline(context)),
+                  _buildMenuItem("挑战记录（公里）", Icons.history_rounded,
+                      onTap: () => _navigateToChallengeRecords(
+                          context, TimelineAxisMode.distanceKm)),
+                  _buildMenuItem("挑战记录（日期）", Icons.calendar_month_rounded,
+                      onTap: () => _navigateToChallengeRecords(
+                          context, TimelineAxisMode.calendarDate)),
                   _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,
