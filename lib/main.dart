@@ -12,21 +12,44 @@ import 'screens/me_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'controllers/flow_controller.dart';
 
+import 'services/step_sync_service.dart';
+
 @pragma('vm:entry-point')
 void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async => Future.value(true));
+  Workmanager().executeTask((task, inputData) async {
+    try {
+      await StepSyncService.syncAll();
+      return Future.value(true);
+    } catch (e) {
+      return Future.value(false);
+    }
+  });
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 启动时仅请求基础权限，避开复杂的健康授权
+  // 启动时请求基础权限
   if (Platform.isIOS) {
     await Geolocator.requestPermission();
     await Permission.sensors.request();
+  } else if (Platform.isAndroid) {
+    await Geolocator.requestPermission();
+    await Permission.activityRecognition.request();
   }
 
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+  // 初始化后台任务
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+  
+  // 注册周期性任务 (每小时同步一次)
+  await Workmanager().registerPeriodicTask(
+    "1",
+    "periodic-sync-task",
+    frequency: const Duration(hours: 1),
+    constraints: Constraints(
+      networkType: NetworkType.connected,
+    ),
+  );
 
   runApp(
     MultiProvider(

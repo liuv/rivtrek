@@ -180,7 +180,7 @@ class _FlowScreenState extends State<FlowScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final controller = context.read<FlowController>();
     if (state == AppLifecycleState.paused) {
-      controller.saveToDatabase(force: true);
+      controller.saveWeatherToDatabase();
       _timeController.stop();
       _stopwatch.stop();
     } else if (state == AppLifecycleState.resumed) {
@@ -195,6 +195,9 @@ class _FlowScreenState extends State<FlowScreen>
   Future<void> _refreshWeather() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
       if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
         Position pos = await Geolocator.getCurrentPosition();
         if (mounted) {
@@ -362,15 +365,47 @@ class _FlowScreenState extends State<FlowScreen>
     showDialog(context: context, builder: (c) => AlertDialog(
       backgroundColor: Colors.white.withOpacity(0.9),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      title: const Text("当前位置与天气", style: TextStyle(fontWeight: FontWeight.w300)),
+      title: const Text("环境详情", style: TextStyle(fontWeight: FontWeight.w300)),
       content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text("位置: ${controller.cityName}", style: const TextStyle(fontSize: 18)),
-        const Divider(),
-        Text("当前温度: ${controller.temp} (${weatherType.label})"),
-        Text("今日温差: ${controller.minTemp} ~ ${controller.maxTemp}"),
+        Row(
+          children: [
+            const Icon(Icons.location_on_outlined, size: 18, color: Colors.blueGrey),
+            const SizedBox(width: 8),
+            Expanded(child: Text("${controller.cityName}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400))),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 26, top: 4),
+          child: Text(
+            "经纬度: ${controller.lat.toStringAsFixed(4)}, ${controller.lon.toStringAsFixed(4)}",
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontFamily: 'monospace'),
+          ),
+        ),
+        const Divider(height: 30),
+        _buildWeatherRow(weatherType.icon, "当前天气", "${controller.temp} (${weatherType.label})"),
+        _buildWeatherRow(Icons.thermostat_outlined, "体感温度", controller.apparentTemp),
+        _buildWeatherRow(Icons.wb_sunny_outlined, "今日温差", "${controller.minTemp} ~ ${controller.maxTemp}"),
+        _buildWeatherRow(Icons.air_rounded, "实时风速", "${controller.windSpeed} km/h"),
+        _buildWeatherRow(Icons.water_drop_outlined, "相对湿度", controller.humidity),
+        _buildWeatherRow(Icons.cloud_circle_outlined, "空气质量", "AQI ${controller.aqi} (PM2.5: ${controller.pm2_5})"),
       ]),
       actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text("确定"))],
     ));
+  }
+
+  Widget _buildWeatherRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.blueGrey.shade700),
+          const SizedBox(width: 12),
+          Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+          const Spacer(),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+        ],
+      ),
+    );
   }
 
   WeatherType _mapWeatherCode(int code) {
