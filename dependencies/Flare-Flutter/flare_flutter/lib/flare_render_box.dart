@@ -13,9 +13,9 @@ import 'flare_cache_asset.dart';
 
 /// A render box for Flare content.
 abstract class FlareRenderBox extends RenderBox {
-  late AssetBundle _assetBundle;
-  late BoxFit _fit;
-  late Alignment _alignment;
+  AssetBundle? _assetBundle;
+  BoxFit _fit = BoxFit.contain;
+  Alignment _alignment = Alignment.center;
   int? _frameCallbackID;
   double _lastFrameTime = 0.0;
   final List<FlareCacheAsset> _assets = [];
@@ -43,14 +43,14 @@ abstract class FlareRenderBox extends RenderBox {
     }
   }
 
-  AssetBundle get assetBundle => _assetBundle;
+  AssetBundle get assetBundle => _assetBundle!;
   set assetBundle(AssetBundle value) {
     if (_assetBundle == value) {
       return;
     }
     _assetBundle = value;
     _load();
-    }
+  }
 
   bool get isPlaying;
 

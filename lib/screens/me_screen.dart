@@ -9,6 +9,17 @@ import 'package:rivtrek/timeline/timeline_page.dart';
 class MeScreen extends StatelessWidget {
   const MeScreen({super.key});
 
+  void _navigateToTimeline(BuildContext context) {
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const TimelinePage(),
+        ),
+      );
+    }
+  }
+
   void _navigateToChallengeRecords(BuildContext context) async {
     final activities = await DatabaseService.instance.getAllActivities();
     final weathers = await DatabaseService.instance.getAllWeather();
@@ -170,6 +181,8 @@ class MeScreen extends StatelessWidget {
                   // Settings/Menu
                   _buildMenuItem("挑战记录", Icons.history_rounded,
                       onTap: () => _navigateToChallengeRecords(context)),
+                  _buildMenuItem("历史长河 (测试)", Icons.timeline_rounded,
+                      onTap: () => _navigateToTimeline(context)),
                   _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,

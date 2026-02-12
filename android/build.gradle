@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.0'
+        classpath 'com.android.tools.build:gradle:8.9.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -17,23 +17,23 @@ allprojects {
     }
 }
 
-// 终极属性注入：解决所有插件找不到 compileSdkVersion 的问题
 rootProject.ext {
     compileSdkVersion = 36
     targetSdkVersion = 36
     minSdkVersion = 26
+    // 注意：我们不再强迫所有插件使用某一个 buildTools，由各项目自行决定
 }
 
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// 修复旧版 Flutter 插件(如 geolocator_android)引用 project.flutter.compileSdkVersion 的兼容性问题
-// 直接在 subprojects 配置阶段注入 flutter 属性（在子项目 build.gradle 执行之前生效）
+// 修复旧版 Flutter 插件引用 project.flutter 属性的兼容性配置
 subprojects {
     ext.flutter = [
         compileSdkVersion: rootProject.ext.compileSdkVersion,

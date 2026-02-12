@@ -46,7 +46,7 @@ class TimelineNima extends TimelineAnimatedAsset {
   nima.FlutterActor? actorStatic;
   nima.FlutterActor? actor;
   nima.ActorAnimation? animation;
-  nima.AABB? setupAABB;
+  nima.AABB? setupAABB = nima.AABB.fromValues(0, 0, 0, 0);
 }
 
 /// A `Flare` Asset.
@@ -63,7 +63,7 @@ class TimelineFlare extends TimelineAnimatedAsset {
   flare.ActorAnimation? intro;
   flare.ActorAnimation? idle;
   List<flare.ActorAnimation>? idleAnimations;
-  flare.AABB? setupAABB;
+  flare.AABB? setupAABB = flare.AABB.fromValues(0, 0, 0, 0);
 }
 
 /// A `Rive` Asset.
@@ -74,7 +74,7 @@ class TimelineRive extends TimelineAnimatedAsset {
   dynamic intro;
   dynamic idle;
   List<dynamic>? idleAnimations;
-  dynamic setupAABB;
+  dynamic setupAABB = [0.0, 0.0, 0.0, 0.0];
 }
 
 /// A label for [TimelineEntry].
@@ -168,28 +168,7 @@ class TimelineEntry {
 
   /// Helper method.
   static String formatYears(double start) {
-    String label;
-    int valueAbs = start.round().abs();
-    if (valueAbs > 1000000000) {
-      double v = (valueAbs / 100000000.0).floorToDouble() / 10.0;
-
-      label = (valueAbs / 1000000000)
-              .toStringAsFixed(v == v.floorToDouble() ? 0 : 1) +
-          " Billion";
-    } else if (valueAbs > 1000000) {
-      double v = (valueAbs / 100000.0).floorToDouble() / 10.0;
-      label =
-          (valueAbs / 1000000).toStringAsFixed(v == v.floorToDouble() ? 0 : 1) +
-              " Million";
-    } else if (valueAbs > 10000) // N.B. < 10,000
-    {
-      double v = (valueAbs / 100.0).floorToDouble() / 10.0;
-      label =
-          (valueAbs / 1000).toStringAsFixed(v == v.floorToDouble() ? 0 : 1) +
-              " Thousand";
-    } else {
-      label = valueAbs.toStringAsFixed(0);
-    }
-    return label + " Years";
+    // 直接显示年份数字，不再区分 BC
+    return start.round().abs().toString();
   }
 }

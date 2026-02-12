@@ -143,7 +143,7 @@ class AboutPage extends StatelessWidget {
                 child: Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 30.0),
                     child: Image.asset(
-                      "assets/twoDimensions_logo.png",
+                      "assets/timeline/twoDimensions_logo.png",
                       height: 16.0,
                     )),
               ),
@@ -162,7 +162,7 @@ class AboutPage extends StatelessWidget {
                     child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset("assets/flutter_logo.png",
+                          Image.asset("assets/timeline/flutter_logo.png",
                               height: 45.0, width: 37.0),
                           Container(
                             margin: const EdgeInsets.only(left: 5.0),

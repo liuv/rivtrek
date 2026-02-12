@@ -17,11 +17,9 @@ import 'package:nima/nima/math/vec2d.dart' as nima;
 
 import 'package:rive/rive.dart' as rive;
 // import 'package:rive/src/rive_core/math/aabb.dart' as rive; // Removed private import
-import 'package:rivtrek/timeline/article/controllers/amelia_controller.dart';
-import 'package:rivtrek/timeline/article/controllers/flare_interaction_controller.dart';
-import 'package:rivtrek/timeline/article/controllers/newton_controller.dart';
-import 'package:rivtrek/timeline/article/controllers/nima_interaction_controller.dart';
 import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
+import 'package:rivtrek/timeline/article/controllers/flare_interaction_controller.dart';
+import 'package:rivtrek/timeline/article/controllers/nima_interaction_controller.dart';
 
 /// This widget renders a single [TimelineEntry]. It relies on a [LeafRenderObjectWidget] 
 /// so it can implement a custom [RenderObject] and update it accordingly.
@@ -102,11 +100,6 @@ class VignetteRenderObject extends RenderBox {
         if (_nimaActor != null && asset.animation != null) {
           asset.animation!.apply(asset.animation!.duration, _nimaActor!, 1.0);
           _nimaActor!.advance(0.0);
-          if (asset.filename == "assets/Newton/Newton_v2.nma") {
-            /// Newton uses a custom controller! =)
-            _nimaController = NewtonController();
-            _nimaController?.initialize(_nimaActor!);
-          }
         }
       } else if (asset is TimelineFlare && asset.actor != null) {
         /// Instance [_flareActor] through the actor reference in the asset
@@ -116,22 +109,13 @@ class VignetteRenderObject extends RenderBox {
           _flareActor!.initializeGraphics();
           asset.animation!.apply(asset.animation!.duration, _flareActor!, 1.0);
           _flareActor!.advance(0.0);
-          if (asset.filename == "assets/Amelia_Earhart/Amelia_Earhart.flr") {
-            /// Amelia Earhart uses a custom controller too..!
-            _flareController = AmeliaController();
-            _flareController?.initialize(_flareActor!);
-          }
         }
       } else if (asset is TimelineRive && asset.actor != null) {
-        /// Instance [_flareActor] through the actor reference in the asset
-        /// and set the initial starting value for its animation.
-        // Rive 1.0 logic is not compatible with Rive 0.14
-        /*
-        _riveActor = asset.actorStatic!.instance();
-        asset.animation?.init(_riveActor!.context);
-        asset.animation?.apply(_riveActor!.context, 0);
+        _riveActor = asset.actorStatic.instance();
+                  if (asset.animation != null) {
+                    asset.animation.apply(0.0, coreContext: _riveActor, mix: 1.0);
+                  }
         _riveActor?.advance(0.0);
-        */
       }
     }
   }
@@ -379,7 +363,7 @@ class VignetteRenderObject extends RenderBox {
       /// 1. Calculate the bounds for the current object.
       /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
       /// We rely on this AABB to perform screen-space calculations.
-      rive.AABB bounds = asset.setupAABB!;
+      dynamic bounds = asset.setupAABB!;
       double contentWidth = bounds[2] - bounds[0];
       double contentHeight = bounds[3] - bounds[1];
       double x =
@@ -667,7 +651,7 @@ class VignetteRenderObject extends RenderBox {
           /// If an [idleAnimation] is set up, the current time is calculated and applied to it.
           double phase = 0.0;
           for (rive.SimpleAnimation animation in asset.idleAnimations!) {
-            animation.apply(_riveActor!.context, elapsed);
+            animation.apply(elapsed, coreContext: _riveActor, mix: 1.0);
             phase += 0.16;
           }
         } else {
@@ -680,7 +664,7 @@ class VignetteRenderObject extends RenderBox {
             asset.animationTime %= asset.animation!.instance!.animation.duration;
           }
           /// Apply the current time to this [ActorAnimation].
-          asset.animation?.apply(_riveActor!.context, elapsed);
+          asset.animation?.apply(elapsed, coreContext: _riveActor, mix: 1.0);
         }
         /// Advance the [FlutterActorArtboard].
         _riveActor?.advance(elapsed);

@@ -142,11 +142,25 @@ class _SectionState extends State<MenuSection>
 
                                 /// Another [FlareActor] widget that
                                 /// you can experiment with here: https://www.2dimensions.com/a/pollux/files/flare/expandcollapse/preview
-                                child: flare.FlareActor(
-                                    "assets/ExpandCollapse.flr",
-                                    color: widget.accentColor,
-                                    animation:
-                                        _isExpanded ? "Collapse" : "Expand"),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: <Widget>[
+                                    flare.FlareActor(
+                                        "assets/timeline/ExpandCollapse.flr",
+                                        alignment: Alignment.center,
+                                        fit: BoxFit.contain,
+                                        color: widget.accentColor,
+                                        animation:
+                                            _isExpanded ? "Collapse" : "Expand"),
+                                    // Fallback for devices where Flare icon fails to render.
+                                    Icon(
+                                        _isExpanded
+                                            ? Icons.remove_circle_outline
+                                            : Icons.add_circle_outline,
+                                        size: 24.0,
+                                        color: widget.accentColor),
+                                  ],
+                                ),
                               ),
                               Text(
                                 widget.title,
@@ -190,7 +204,7 @@ class _SectionState extends State<MenuSection>
                                               Container(
                                                   alignment: Alignment.center,
                                                   child: Image.asset(
-                                                      "assets/right_arrow.png",
+                                                      "assets/timeline/right_arrow.png",
                                                       color: widget.accentColor,
                                                       height: 22.0,
                                                       width: 22.0))

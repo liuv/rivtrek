@@ -7,20 +7,25 @@ import 'flare.dart';
 
 /// A reference counted asset in a cache.
 class FlareCacheAsset extends CacheAsset {
-  late FlutterActor _actor;
-  FlutterActor get actor => _actor;
+  FlutterActor? _actor;
+  FlutterActor? get actor => _actor;
 
   @override
   void load(Cache cache, String filename) {
     super.load(cache, filename);
+    if (filename == "") {
+      return;
+    }
     if (cache is AssetBundleCache) {
       cache.bundle.load(filename).then((ByteData data) {
         compute(FlutterActor.loadFromByteData, data).then((FlutterActor actor) {
           actor.loadImages().then((_) {
             _actor = actor;
             completeLoad();
-                    });
+          });
         });
+      }).catchError((e) {
+        print("Failed to load flare asset $filename: $e");
       });
     }
   }

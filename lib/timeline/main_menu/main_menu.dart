@@ -85,10 +85,10 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
   /// where to scroll to.
   navigateToTimeline(MenuItemData item) {
     _pauseSection();
+    final timeline = BlocProvider.getTimeline(context);
     Navigator.of(context)
         .push(MaterialPageRoute(
-          builder: (BuildContext context) =>
-              TimelineWidget(item, BlocProvider.getTimeline(context)),
+          builder: (BuildContext _) => TimelineWidget(item, timeline),
         ))
         .then(_restoreSection);
   }
@@ -122,10 +122,12 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
 
   initState() {
     super.initState();
-    topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-            parent: widget.animationController!,
-            curve: Interval(0, 0.5, curve: Curves.fastOutSlowIn)));
+    if (widget.animationController != null) {
+      topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(
+              parent: widget.animationController!,
+              curve: Interval(0, 0.5, curve: Curves.fastOutSlowIn)));
+    }
 
     scrollController.addListener(() {
       if (scrollController.offset >= 24) {
@@ -154,7 +156,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
     /// This asset provides all the necessary information for the cards,
     /// such as labels, background colors, the background Flare animation asset,
     /// and for each element in the expanded card, the relative position on the [Timeline].
-    _menu.loadFromBundle("assets/menu.json").then((bool success) {
+    _menu.loadFromBundle("assets/timeline/menu.json").then((bool success) {
       if (success) setState(() {}); // Load the menu.
     });
 
@@ -242,7 +244,7 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(
                 margin: EdgeInsets.only(right: 15.5),
-                child: Image.asset("assets/heart_icon.png",
+                child: Image.asset("assets/timeline/heart_icon.png",
                     height: 20.0,
                     width: 20.0,
                     color: Colors.black.withOpacity(0.65)),
@@ -359,72 +361,80 @@ class _MainMenuWidgetState extends State<MainMenuWidget> {
   }
 
   Widget getAppBarUI() {
-    return Column(
-      children: <Widget>[
-        AnimatedBuilder(
-          animation: widget.animationController!,
-          builder: (BuildContext context, Widget? child) {
-            return FadeTransition(
-              opacity: topBarAnimation!,
-              child: Transform(
-                transform: Matrix4.translationValues(
-                    0.0, 30 * (1.0 - topBarAnimation!.value), 0.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: FitnessAppTheme.white.withOpacity(topBarOpacity),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(12.0),
-                      bottomRight: Radius.circular(12.0),
-                    ),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                          color: FitnessAppTheme.grey
-                              .withOpacity(0.4 * topBarOpacity),
-                          offset: const Offset(1.1, 1.1),
-                          blurRadius: 10.0),
-                    ],
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.top,
+    Widget appBar = Container(
+      decoration: BoxDecoration(
+        color: FitnessAppTheme.white.withOpacity(topBarOpacity),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12.0),
+          bottomRight: Radius.circular(12.0),
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+              color: FitnessAppTheme.grey
+                  .withOpacity(0.4 * topBarOpacity),
+              offset: const Offset(1.1, 1.1),
+              blurRadius: 10.0),
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: MediaQuery.of(context).padding.top,
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16 - 8.0 * topBarOpacity,
+                bottom: 12 - 8.0 * topBarOpacity),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '纪章',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: FitnessAppTheme.fontName,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22 + 6 - 6 * topBarOpacity,
+                        letterSpacing: 1.2,
+                        color: FitnessAppTheme.darkerText,
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 16 - 8.0 * topBarOpacity,
-                            bottom: 12 - 8.0 * topBarOpacity),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  '纪章',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: FitnessAppTheme.fontName,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 22 + 6 - 6 * topBarOpacity,
-                                    letterSpacing: 1.2,
-                                    color: FitnessAppTheme.darkerText,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        )
-      ],
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+
+    if (widget.animationController != null && topBarAnimation != null) {
+      return Column(
+        children: <Widget>[
+          AnimatedBuilder(
+            animation: widget.animationController!,
+            builder: (BuildContext context, Widget? child) {
+              return FadeTransition(
+                opacity: topBarAnimation!,
+                child: Transform(
+                  transform: Matrix4.translationValues(
+                      0.0, 30 * (1.0 - topBarAnimation!.value), 0.0),
+                  child: appBar,
+                ),
+              );
+            },
+          )
+        ],
+      );
+    }
+
+    return Column(
+      children: <Widget>[appBar],
     );
   }
 }

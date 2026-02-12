@@ -71,7 +71,11 @@ class TimelineRenderWidget extends LeafRenderObjectWidget {
 
   @override
   didUnmountRenderObject(covariant TimelineRenderObject renderObject) {
-    renderObject.timeline!.isActive = false;
+    final Timeline? timeline = renderObject.timeline;
+    if (timeline != null) {
+      timeline.onNeedPaint = null;
+      timeline.isActive = false;
+    }
   }
 }
 
@@ -120,6 +124,9 @@ class TimelineRenderObject extends RenderBox {
   set timeline(Timeline? value) {
     if (_timeline == value) {
       return;
+    }
+    if (_timeline != null && _timeline!.onNeedPaint == markNeedsPaint) {
+      _timeline!.onNeedPaint = null;
     }
     _timeline = value;
     updateFocusItem();
@@ -217,19 +224,21 @@ class TimelineRenderObject extends RenderBox {
     /// Fetch the background colors from the [Timeline] and compute the fill.
     List<TimelineBackgroundColor> backgroundColors = timeline!.backgroundColors;
     ui.Paint? backgroundPaint;
-    if (backgroundColors != null && backgroundColors.length > 0) {
-      double? rangeStart = backgroundColors.first.start;
-      double range = backgroundColors.last.start! - backgroundColors.first.start!;
+    if (backgroundColors != null && backgroundColors.isNotEmpty) {
+      double rangeStart = backgroundColors.first.start ?? 0.0;
+      double rangeEnd = backgroundColors.last.start ?? 0.0;
+      double range = rangeEnd - rangeStart;
+      if (range == 0) range = 1.0;
       List<ui.Color> colors = <ui.Color>[];
       List<double> stops = <double>[];
       for (TimelineBackgroundColor bg in backgroundColors) {
-        colors.add(bg.color!);
-        stops.add((bg.start! - rangeStart!) / range);
+        colors.add(bg.color ?? Colors.transparent);
+        stops.add(((bg.start ?? 0.0) - rangeStart) / range);
       }
       double s =
           timeline!.computeScale(timeline!.renderStart, timeline!.renderEnd);
-      double y1 = (backgroundColors.first.start! - timeline!.renderStart) * s;
-      double y2 = (backgroundColors.last.start! - timeline!.renderStart) * s;
+      double y1 = ((backgroundColors.first.start ?? 0.0) - timeline!.renderStart) * s;
+      double y2 = ((backgroundColors.last.start ?? 0.0) - timeline!.renderStart) * s;
 
       /// Fill Background.
       backgroundPaint = ui.Paint()
@@ -241,12 +250,18 @@ class TimelineRenderObject extends RenderBox {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, offset.dy, size.width, y1 - offset.dy + 1.0),
-            ui.Paint()..color = backgroundColors.first.color!);
+            ui.Paint()..color = backgroundColors.first.color ?? Colors.transparent);
       }
 
       /// Draw the background on the canvas.
-      canvas.drawRect(
-          Rect.fromLTWH(offset.dx, y1, size.width, y2 - y1), backgroundPaint);
+      if (y1 == y2 || backgroundColors.length == 1) {
+        canvas.drawRect(
+            Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height),
+            ui.Paint()..color = (backgroundColors.first.color ?? Colors.transparent));
+      } else {
+        canvas.drawRect(
+            Rect.fromLTWH(offset.dx, y1, size.width, y2 - y1), backgroundPaint);
+      }
     }
 
     _tapTargets.clear();
@@ -258,7 +273,7 @@ class TimelineRenderObject extends RenderBox {
       canvas.save();
       canvas.clipRect(offset & size);
       for (TimelineAsset asset in timeline!.renderAssets) {
-        if (asset.opacity > 0) {
+        if (asset.opacity > -0.01) { // 稍微放宽条件
           double rs = 0.2 + asset.scale * 0.8;
 
           double w = asset.width * Timeline.AssetScreenScale;
@@ -275,7 +290,7 @@ class TimelineRenderObject extends RenderBox {
                   ..isAntiAlias = true
                   ..filterQuality = ui.FilterQuality.low
                   ..color = Colors.white.withOpacity(asset.opacity));
-          } else if (asset is TimelineNima && asset.actor != null) {
+          } else if (asset is TimelineNima && asset.actor != null && asset.setupAABB != null) {
             /// If we have a [TimelineNima] asset, set it up properly and paint it.
             ///
             /// 1. Calculate the bounds for the current object.
@@ -284,7 +299,10 @@ class TimelineRenderObject extends RenderBox {
             Alignment alignment = Alignment.center;
             BoxFit fit = BoxFit.cover;
 
-            nima.AABB bounds = asset.setupAABB!;
+            nima.AABB bounds = asset.setupAABB ?? nima.AABB.fromValues(0, 0, 0, 0);
+            if (bounds[0] == 0 && bounds[1] == 0 && bounds[2] == 0 && bounds[3] == 0) {
+              bounds = nima.AABB.fromValues(-asset.width / 2, -asset.height / 2, asset.width / 2, asset.height / 2);
+            }
 
             double contentHeight = bounds[3] - bounds[1];
             double contentWidth = bounds[2] - bounds[0];
@@ -375,7 +393,10 @@ class TimelineRenderObject extends RenderBox {
             Alignment alignment = Alignment.center;
             BoxFit fit = BoxFit.cover;
 
-            flare.AABB bounds = asset.setupAABB!;
+            flare.AABB bounds = asset.setupAABB ?? flare.AABB.fromValues(0, 0, 0, 0);
+            if (bounds[0] == 0 && bounds[1] == 0 && bounds[2] == 0 && bounds[3] == 0) {
+              bounds = flare.AABB.fromValues(-asset.width / 2, -asset.height / 2, asset.width / 2, asset.height / 2);
+            }
             double contentWidth = bounds[2] - bounds[0];
             double contentHeight = bounds[3] - bounds[1];
             double x = -bounds[0] -
@@ -457,9 +478,83 @@ class TimelineRenderObject extends RenderBox {
             _tapTargets.add(TapTarget()
               ..entry = asset.entry
               ..rect = renderOffset & renderSize);
-          }else if (asset is TimelineRive && asset.actor != null) {
+          } else if (asset is TimelineRive && asset.actor != null) {
             /// If we have a [TimelineRive] asset set it up properly and paint it.
-            // Rive painting is temporarily disabled due to API incompatibility
+            ///
+            /// 1. Calculate the bounds for the current object.
+            Alignment alignment = Alignment.center;
+            BoxFit fit = BoxFit.cover;
+
+            dynamic bounds = asset.setupAABB ?? [0.0, 0.0, asset.actor!.width, asset.actor!.height];
+
+            double contentHeight = bounds[3] - bounds[1];
+            double contentWidth = bounds[2] - bounds[0];
+            double x = -bounds[0] -
+                contentWidth / 2.0 -
+                (alignment.x * contentWidth / 2.0) +
+                asset.offset;
+            double y = -bounds[1] -
+                contentHeight / 2.0 +
+                (alignment.y * contentHeight / 2.0);
+
+            Offset renderOffset = Offset(offset.dx + size.width - w, asset.y);
+            Size renderSize = Size(w * rs, h * rs);
+
+            double scaleX = 1.0, scaleY = 1.0;
+
+            canvas.save();
+
+            switch (fit) {
+              case BoxFit.fill:
+                scaleX = renderSize.width / contentWidth;
+                scaleY = renderSize.height / contentHeight;
+                break;
+              case BoxFit.contain:
+                double minScale = min(renderSize.width / contentWidth,
+                    renderSize.height / contentHeight);
+                scaleX = scaleY = minScale;
+                break;
+              case BoxFit.cover:
+                double maxScale = max(renderSize.width / contentWidth,
+                    renderSize.height / contentHeight);
+                scaleX = scaleY = maxScale;
+                break;
+              case BoxFit.fitHeight:
+                double minScale = renderSize.height / contentHeight;
+                scaleX = scaleY = minScale;
+                break;
+              case BoxFit.fitWidth:
+                double minScale = renderSize.width / contentWidth;
+                scaleX = scaleY = minScale;
+                break;
+              case BoxFit.none:
+                scaleX = scaleY = 1.0;
+                break;
+              case BoxFit.scaleDown:
+                double minScale = min(renderSize.width / contentWidth,
+                    renderSize.height / contentHeight);
+                scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
+                break;
+            }
+
+            canvas.translate(
+                renderOffset.dx +
+                    renderSize.width / 2.0 +
+                    (alignment.x * renderSize.width / 2.0),
+                renderOffset.dy +
+                    renderSize.height / 2.0 +
+                    (alignment.y * renderSize.height / 2.0));
+
+            canvas.scale(scaleX, scaleY);
+            canvas.translate(x, y);
+
+            asset.actor?.draw(canvas);
+
+            canvas.restore();
+
+            _tapTargets.add(TapTarget()
+              ..entry = asset.entry
+              ..rect = renderOffset & renderSize);
           }
         }
       }
@@ -479,13 +574,35 @@ class TimelineRenderObject extends RenderBox {
       canvas.save();
       canvas.clipRect(Rect.fromLTWH(offset.dx + _timeline!.gutterWidth,
           offset.dy, size.width - _timeline!.gutterWidth, size.height));
+      final double baseX = _timeline!.gutterWidth +
+          Timeline.LineSpacing -
+          Timeline.DepthOffset * _timeline!.renderOffsetDepth;
+
+      // 当数据里缺少 Era 层级时，补两条辅助竖线，尽量还原旧版“多竖线”视觉。
+      bool hasHierarchy = false;
+      for (final TimelineEntry entry in _timeline!.entries) {
+        if (entry.children != null && entry.children!.isNotEmpty) {
+          hasHierarchy = true;
+          break;
+        }
+      }
+      if (!hasHierarchy) {
+        final Paint aux1 = Paint()
+          ..color = const Color.fromARGB(80, 118, 186, 226)
+          ..strokeWidth = Timeline.LineWidth;
+        final Paint aux2 = Paint()
+          ..color = const Color.fromARGB(70, 201, 124, 185)
+          ..strokeWidth = Timeline.LineWidth;
+        final double yTop = offset.dy + topOverlap;
+        final double yBottom = offset.dy + size.height;
+        canvas.drawLine(Offset(baseX + 14.0, yTop), Offset(baseX + 14.0, yBottom), aux1);
+        canvas.drawLine(Offset(baseX + 28.0, yTop), Offset(baseX + 28.0, yBottom), aux2);
+      }
       drawItems(
           context,
           offset,
           _timeline!.entries,
-          _timeline!.gutterWidth +
-              Timeline.LineSpacing -
-              Timeline.DepthOffset * _timeline!.renderOffsetDepth,
+          baseX,
           scale,
           0);
       canvas.restore();
@@ -885,7 +1002,7 @@ class TimelineRenderObject extends RenderBox {
         }  else if (asset is TimelineRive && asset.actorStatic != null) {
           // Rive 1.0 logic is not compatible with Rive 0.14
           /*
-          dynamic bounds = asset.setupAABB!;
+            dynamic bounds = asset.setupAABB ?? [0.0, 0.0, 0.0, 0.0];
           // ...
           asset.actorStatic?.draw(canvas);
           */

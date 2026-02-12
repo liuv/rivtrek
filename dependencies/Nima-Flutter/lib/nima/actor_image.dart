@@ -141,8 +141,10 @@ class ActorImage extends ActorNode {
         int readIdx = 0;
         int readStride = vertexStride;
         for (int i = 0; i < _vertexCount; i++) {
-          _animationDeformedVertices![writeIdx++] = _vertices[readIdx];
-          _animationDeformedVertices![writeIdx++] = _vertices[readIdx + 1];
+          if (readIdx + 1 < _vertices.length) {
+            _animationDeformedVertices![writeIdx++] = _vertices[readIdx];
+            _animationDeformedVertices![writeIdx++] = _vertices[readIdx + 1];
+          }
           readIdx += readStride;
         }
       }
@@ -420,8 +422,10 @@ class ActorImage extends ActorNode {
 
     Float32List v = _vertices;
     for (int i = 0; i < _vertexCount; i++) {
-      buffer[writeIdx++] = v[readIdx];
-      buffer[writeIdx++] = v[readIdx + 1];
+      if (readIdx + 1 < v.length) {
+        buffer[writeIdx++] = v[readIdx];
+        buffer[writeIdx++] = v[readIdx + 1];
+      }
       readIdx += stride;
     }
   }

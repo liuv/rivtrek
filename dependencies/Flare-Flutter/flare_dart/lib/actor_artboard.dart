@@ -1,39 +1,38 @@
-import "dart:math";
-import "dart:typed_data";
-
-import "actor.dart";
+import "actor_flags.dart";
+import "block_types.dart";
+import "actor_node.dart";
 import "actor_bone.dart";
-import "actor_color.dart";
 import "actor_component.dart";
 import "actor_distance_constraint.dart";
-import "actor_drawable.dart";
-import "actor_ellipse.dart";
 import "actor_event.dart";
-import "actor_flags.dart";
-import "actor_ik_constraint.dart";
-import "actor_image.dart";
-import "actor_jelly_bone.dart";
-import "actor_node.dart";
 import "actor_node_solo.dart";
-import "actor_path.dart";
-import "actor_polygon.dart";
-import "actor_rectangle.dart";
 import "actor_root_bone.dart";
-import "actor_rotation_constraint.dart";
+import "actor_jelly_bone.dart";
 import "actor_scale_constraint.dart";
-import "actor_shape.dart";
 import "actor_skin.dart";
-import "actor_star.dart";
+import "actor_path.dart";
 import "actor_transform_constraint.dart";
 import "actor_translation_constraint.dart";
-import "actor_triangle.dart";
-import "animation/actor_animation.dart";
-import "block_types.dart";
-import "dependency_sorter.dart";
 import "jelly_component.dart";
-import "math/aabb.dart";
-import "math/vec2d.dart";
+import "actor_ik_constraint.dart";
+import "actor_rotation_constraint.dart";
+import "actor_image.dart";
+import "actor_drawable.dart";
+import "actor_shape.dart";
+import "actor_ellipse.dart";
+import "actor_polygon.dart";
+import "actor_rectangle.dart";
+import "actor_star.dart";
+import "actor_triangle.dart";
+import "actor_color.dart";
+import "animation/actor_animation.dart";
+import "dependency_sorter.dart";
+import "actor.dart";
 import "stream_reader.dart";
+import "math/vec2d.dart";
+import "dart:typed_data";
+import "math/aabb.dart";
+import "dart:math";
 
 class ActorArtboard {
   int _flags = ActorFlags.IsDrawOrderDirty;
@@ -43,7 +42,7 @@ class ActorArtboard {
   late ActorNode _root;
   List<ActorComponent?> _components = [];
   List<ActorNode?> _nodes = [];
-  List<ActorDrawable?> _drawableNodes = [];
+  List<ActorDrawable> _drawableNodes = [];
   List<ActorAnimation> _animations = [];
   List<ActorComponent> _dependencyOrder = [];
   late Actor _actor;
@@ -68,19 +67,15 @@ class ActorArtboard {
 
   set overrideColor(Float32List? value) {
     _overrideColor = value;
-    for (final ActorDrawable? drawable in _drawableNodes) {
-      if (drawable != null) {
-        addDirt(drawable, DirtyFlags.PaintDirty, true);
-      }
+    for (final ActorDrawable drawable in _drawableNodes) {
+      addDirt(drawable, DirtyFlags.PaintDirty, true);
     }
   }
 
   set modulateOpacity(double value) {
     _modulateOpacity = value;
-    for (final ActorDrawable? drawable in _drawableNodes) {
-      if (drawable != null) {
-        addDirt(drawable, DirtyFlags.PaintDirty, true);
-      }
+    for (final ActorDrawable drawable in _drawableNodes) {
+      addDirt(drawable, DirtyFlags.PaintDirty, true);
     }
   }
 
@@ -93,7 +88,7 @@ class ActorArtboard {
   List<ActorComponent?> get components => _components;
   List<ActorNode?> get nodes => _nodes;
   List<ActorAnimation> get animations => _animations;
-  List<ActorDrawable?> get drawableNodes => _drawableNodes;
+  List<ActorDrawable> get drawableNodes => _drawableNodes;
   ActorComponent? operator [](int index) {
     return _components[index];
   }
@@ -151,7 +146,7 @@ class ActorArtboard {
     }
     List<ActorComponent>? dependents = component.dependents;
     if (dependents != null) {
-      for (final ActorComponent d in dependents) {
+      for (ActorComponent d in dependents) {
         addDirt(d, value, recurse);
       }
     }
@@ -219,7 +214,7 @@ class ActorArtboard {
       _nodes = List<ActorNode?>.filled(_nodeCount, null);
     }
     if (_drawableNodeCount != 0) {
-      _drawableNodes = List<ActorDrawable?>.filled(_drawableNodeCount, null);
+      _drawableNodes = [];
     }
 
     if (artboard.componentCount != 0) {
@@ -239,7 +234,7 @@ class ActorArtboard {
         }
 
         if (instanceComponent is ActorDrawable) {
-          _drawableNodes[drwIdx++] = instanceComponent;
+          _drawableNodes.add(instanceComponent);
         }
       }
     }
@@ -262,10 +257,9 @@ class ActorArtboard {
 
     sortDependencies();
 
-    _drawableNodes.sort(
-        (a, b) => (a?.drawOrder ?? 0).compareTo(b?.drawOrder ?? 0));
+    _drawableNodes.sort((a, b) => a.drawOrder.compareTo(b.drawOrder));
     for (int i = 0; i < _drawableNodes.length; i++) {
-      _drawableNodes[i]?.drawIndex = i;
+      _drawableNodes[i].drawIndex = i;
     }
   }
 
@@ -298,11 +292,10 @@ class ActorArtboard {
     if ((_flags & ActorFlags.IsDrawOrderDirty) != 0) {
       _flags &= ~ActorFlags.IsDrawOrderDirty;
 
-      _drawableNodes.sort(
-          (a, b) => (a?.drawOrder ?? 0).compareTo(b?.drawOrder ?? 0));
-      for (int i = 0; i < _drawableNodes.length; i++) {
-        _drawableNodes[i]?.drawIndex = i;
-      }
+    _drawableNodes.sort((a, b) => a.drawOrder.compareTo(b.drawOrder));
+    for (int i = 0; i < _drawableNodes.length; i++) {
+      _drawableNodes[i].drawIndex = i;
+    }
     }
   }
 
@@ -373,7 +366,7 @@ class ActorArtboard {
         case BlockTypes.ActorImage:
           component = ActorImage.read(this, nodeBlock, actor.makeImageNode());
           if ((component as ActorImage).textureIndex > actor.maxTextureIndex) {
-            actor.maxTextureIndex = component.textureIndex;
+            actor.maxTextureIndex = (component as ActorImage).textureIndex;
           }
           break;
 
@@ -531,7 +524,7 @@ class ActorArtboard {
       }
     }
 
-    _drawableNodes = List<ActorDrawable?>.filled(_drawableNodeCount, null);
+    _drawableNodes = [];
     _nodes = List<ActorNode?>.filled(_nodeCount, null);
     _nodes[0] = _root;
 
@@ -549,13 +542,15 @@ class ActorArtboard {
       }
 
       if (c is ActorDrawable) {
-        _drawableNodes[drwIdx++] = c;
+        _drawableNodes.add(c);
       }
 
       if (c is ActorNode) {
         ActorNode? an = c;
-        _nodes[anIdx++] = an;
-            }
+        if (an != null) {
+          _nodes[anIdx++] = an;
+        }
+      }
     }
 
     for (int i = 1; i <= componentCount; i++) {
@@ -569,7 +564,7 @@ class ActorArtboard {
   }
 
   void initializeGraphics() {
-    for (final ActorDrawable? drawable in _drawableNodes) {
+    for (final ActorDrawable drawable in _drawableNodes) {
       drawable?.initializeGraphics();
     }
   }
@@ -601,13 +596,16 @@ class ActorArtboard {
 
   AABB? computeAABB() {
     AABB? aabb;
-    for (final ActorDrawable? drawable in _drawableNodes) {
+    for (final ActorDrawable drawable in _drawableNodes) {
       if (drawable == null) {
         continue;
       }
       // This is the axis aligned bounding box in the space
       // of the parent (this case our shape).
       AABB? pathAABB = drawable.computeAABB();
+      if (pathAABB == null) {
+        continue;
+      }
       if (aabb == null) {
         aabb = pathAABB;
       } else {

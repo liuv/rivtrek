@@ -5,7 +5,7 @@ import "../stream_reader.dart";
 import "keyframe.dart";
 import "property_types.dart";
 
-typedef KeyFrame KeyFrameReader(StreamReader reader, ActorComponent component);
+typedef KeyFrame? KeyFrameReader(StreamReader reader, ActorComponent component);
 
 class PropertyAnimation {
   late int _type;
@@ -147,12 +147,14 @@ class PropertyAnimation {
     KeyFrame? lastKeyFrame;
     for (int i = 0; i < keyFrameCount; i++) {
       propertyBlock.openObject("frame");
-      KeyFrame frame = keyFrameReader(propertyBlock, component);
-      propertyAnimation._keyFrames.add(frame);
-      if (lastKeyFrame != null) {
-        lastKeyFrame.setNext(frame);
+      KeyFrame? frame = keyFrameReader(propertyBlock, component);
+      if (frame != null) {
+        propertyAnimation._keyFrames.add(frame);
+        if (lastKeyFrame != null) {
+          lastKeyFrame.setNext(frame);
+        }
+        lastKeyFrame = frame;
       }
-      lastKeyFrame = frame;
       propertyBlock.closeObject();
     }
     propertyBlock.closeArray();

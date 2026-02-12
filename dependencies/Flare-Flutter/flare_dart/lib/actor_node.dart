@@ -9,7 +9,7 @@ import "stream_reader.dart";
 typedef bool NodeWalkCallback(ActorNode node);
 
 class ActorClip {
-  late int clipIdx;
+  int clipIdx = 0;
   ActorNode? node;
 
   ActorClip(int idx) {

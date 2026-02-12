@@ -7,7 +7,7 @@ typedef CacheAsset AssetFactoryMethod();
 abstract class Cache<T extends CacheAsset> {
   final Map<String, T> _assets = {};
   final Set<T> _toPrune = <T>{};
-  late Timer _pruneTimer;
+  Timer? _pruneTimer;
 
   T makeAsset();
 
@@ -21,13 +21,15 @@ abstract class Cache<T extends CacheAsset> {
       });
     }
     _toPrune.clear();
-    // _pruneTimer = <Timer>[];
+    _pruneTimer = null;
   }
 
   void drop(T asset) {
     _toPrune.add(asset);
-    _pruneTimer.cancel();
-      if (isPruningEnabled) {
+    if (_pruneTimer?.isActive ?? false) {
+      _pruneTimer!.cancel();
+    }
+    if (isPruningEnabled) {
       _pruneTimer = Timer(pruneAfter, _prune);
     }
   }

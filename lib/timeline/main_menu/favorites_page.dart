@@ -30,9 +30,9 @@ class FavoritesPage extends StatelessWidget {
       favorites.add(ThumbnailDetailWidget(entry, hasDivider: i != 0,
           tapSearchResult: (TimelineEntry entry) {
         MenuItemData item = MenuItemData.fromEntry(entry);
+        final timeline = BlocProvider.getTimeline(context);
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) =>
-                TimelineWidget(item, BlocProvider.getTimeline(context))));
+            builder: (BuildContext _) => TimelineWidget(item, timeline)));
       }));
     }
 
@@ -80,7 +80,7 @@ class FavoritesPage extends StatelessWidget {
                               width: 128.0,
                               height: 114.0,
                               margin: EdgeInsets.only(bottom: 30),
-                              child: FlareActor("assets/Broken Heart.flr",
+                              child: FlareActor("assets/timeline/Broken Heart.flr",
                                   animation: "Heart Break", shouldClip: false)),
                           Container(
                             padding: EdgeInsets.only(bottom: 21),

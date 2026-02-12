@@ -120,7 +120,7 @@ class FlareActor extends LeafRenderObjectWidget {
 }
 
 class FlareAnimationLayer {
-  late String name;
+  String name = "";
   late ActorAnimation animation;
   double time = 0.0, mix = 0.0, mixSeconds = 0.2;
   void apply(FlutterActorArtboard artboard) {
@@ -132,8 +132,8 @@ class FlareAnimationLayer {
 }
 
 class FlareActorRenderObject extends FlareRenderBox {
-  late Mat2D _lastControllerViewTransform;
-  late String _filename;
+  Mat2D _lastControllerViewTransform = Mat2D();
+  String _filename = "";
   String? _artboardName;
   String? _animationName;
   String? _boundsNodeName;
@@ -164,7 +164,7 @@ class FlareActorRenderObject extends FlareRenderBox {
   final List<FlareAnimationLayer> _animationLayers = [];
   bool shouldClip = true;
   FlutterActorArtboard? _artboard;
-  late AABB _setupAABB;
+  AABB _setupAABB = AABB.fromValues(0, 0, 0, 0);
   Color? _color;
 
   Color? get color => _color;
@@ -292,7 +292,7 @@ class FlareActorRenderObject extends FlareRenderBox {
   @override
   Future<void> load() async {
     _actor = await loadFlare(_filename);
-    if (_actor!.artboard == null) {
+    if (_actor == null || _actor!.artboard == null) {
       return;
     }
     _instanceArtboard();
@@ -382,7 +382,13 @@ class FlareActorRenderObject extends FlareRenderBox {
       _controller?.setViewTransform(viewTransform);
     }
 
-    _artboard?.draw(canvas);
+    if (_artboard != null) {
+      try {
+        _artboard!.draw(canvas);
+      } catch (e) {
+        // 防止渲染中断
+      }
+    }
   }
 
   void _updateAnimation({bool onlyWhenMissing = false}) {

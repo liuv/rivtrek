@@ -92,17 +92,21 @@ class FlutterActorImage extends ActorImage {
     //int uvOffset;
 
     int framesCount = sequenceFrames.length;
-    int currentFrame = sequenceFrame % framesCount;
+    if (framesCount > 0) {
+      int currentFrame = (sequenceFrame % framesCount).toInt();
 
-    SequenceFrame sf = sequenceFrames[currentFrame];
-    //uvOffset = sf.offset;
-    textureIndex = sf.atlasIndex;
+      SequenceFrame sf = sequenceFrames[currentFrame];
+      //uvOffset = sf.offset;
+      textureIndex = sf.atlasIndex;
 
-    int uvStride = 8;
-    int uvRow = currentFrame * uvStride;
-    Iterable<double> it = sequenceUVs.getRange(uvRow, uvRow + uvStride);
-    List<double> uvList = List.from(it);
-    _uvBuffer = Float32List.fromList(uvList);
+      int uvStride = 8;
+      int uvRow = currentFrame * uvStride;
+      if (uvRow + uvStride <= sequenceUVs.length) {
+        Iterable<double> it = sequenceUVs.getRange(uvRow, uvRow + uvStride);
+        List<double> uvList = List.from(it);
+        _uvBuffer = Float32List.fromList(uvList);
+      }
+    }
       _canvasVertices = ui.Vertices.raw(ui.VertexMode.triangles, _vertexBuffer,
         indices: _indices, textureCoordinates: _uvBuffer);
   }

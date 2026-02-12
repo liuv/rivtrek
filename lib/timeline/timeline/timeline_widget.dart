@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -53,6 +52,32 @@ class _TimelineWidgetState extends State<TimelineWidget> {
 
   Color? _headerTextColor;
   Color? _headerBackgroundColor;
+
+  @override
+  void initState() {
+    super.initState();
+    _headerTextColor = timeline.headerTextColor;
+    _headerBackgroundColor = timeline.headerBackgroundColor;
+    timeline.onHeaderColorsChanged = (Color background, Color text) {
+      if (mounted) {
+        setState(() {
+          _headerTextColor = text;
+          _headerBackgroundColor = background;
+        });
+      }
+    };
+    timeline.onEraChanged = (TimelineEntry? entry) {
+      if (mounted) {
+        setState(() {
+          _eraName = entry != null ? entry.label : DefaultEraName;
+        });
+      }
+    };
+    _eraName =
+        timeline.currentEra != null ? timeline.currentEra!.label : DefaultEraName;
+    _showFavorites = timeline.showFavorites;
+    timeline.isActive = true;
+  }
 
   /// This state variable toggles the rendering of the left sidebar
   /// showing the favorite elements already on the timeline.
@@ -171,39 +196,12 @@ class _TimelineWidgetState extends State<TimelineWidget> {
     }
   }
 
-  @override
-  initState() {
-    super.initState();
-    if (timeline != null) {
-      widget.timeline.isActive = true;
-      _eraName = timeline.currentEra != null
-          ? timeline.currentEra!.label
-          : DefaultEraName;
-      timeline.onHeaderColorsChanged = (Color background, Color text) {
-        setState(() {
-          _headerTextColor = text;
-          _headerBackgroundColor = background;
-        });
-      };
-      /// Update the label for the [Timeline] object.
-      timeline.onEraChanged = (TimelineEntry? entry) {
-        setState(() {
-          _eraName = entry != null ? entry.label : DefaultEraName;
-        });
-      };
-
-      _headerTextColor = timeline.headerTextColor;
-      _headerBackgroundColor = timeline.headerBackgroundColor;
-      _showFavorites = timeline.showFavorites;
-    }
-  }
-
   /// Update the current view and change the timeline header, color and background color,
   @override
   void didUpdateWidget(covariant TimelineWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (timeline != oldWidget.timeline && timeline != null) {
+    if (timeline != oldWidget.timeline) {
       setState(() {
         _headerTextColor = timeline.headerTextColor;
         _headerBackgroundColor = timeline.headerBackgroundColor;
@@ -221,7 +219,9 @@ class _TimelineWidgetState extends State<TimelineWidget> {
         });
       };
       setState(() {
-        _eraName = timeline.currentEra != null ? timeline.currentEra!.label : DefaultEraName;
+        _eraName = timeline.currentEra != null
+            ? timeline.currentEra!.label
+            : DefaultEraName;
         _showFavorites = timeline.showFavorites;
       });
     }
@@ -232,10 +232,17 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   @override
   deactivate() {
     super.deactivate();
-    if (timeline != null) {
-      timeline.onHeaderColorsChanged = null;
-      timeline.onEraChanged = null;
-    }
+    timeline.isActive = false;
+    timeline.onHeaderColorsChanged = null;
+    timeline.onEraChanged = null;
+  }
+
+  @override
+  void dispose() {
+    timeline.isActive = false;
+    timeline.onHeaderColorsChanged = null;
+    timeline.onEraChanged = null;
+    super.dispose();
   }
 
   /// This widget is wrapped in a [Scaffold] to have the classic Material Design visual layout structure.
@@ -247,10 +254,13 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   @override
   Widget build(BuildContext context) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
-    if (timeline != null) {
-      timeline.devicePadding = devicePadding;
-    }
-    return Scaffold(
+    timeline.devicePadding = devicePadding;
+    return WillPopScope(
+      onWillPop: () async {
+        timeline.isActive = false;
+        return true;
+      },
+      child: Scaffold(
       backgroundColor: Colors.white,
       body: GestureDetector(
           onLongPress: _longPress,
@@ -341,6 +351,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                           ]))
                 ])
           ])),
-    );
+    ));
   }
 }

@@ -6,8 +6,8 @@ plugins {
 
 android {
     namespace = "cn.lindenliu.rivtrek"
-    // 强制与全局 ext 挂钩
-    compileSdk = rootProject.ext.compileSdkVersion
+    compileSdk = 36
+    buildToolsVersion = "35.0.1"
 
     defaultConfig {
         applicationId = "cn.lindenliu.rivtrek"

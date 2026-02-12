@@ -27,7 +27,7 @@ class BlocProvider extends InheritedWidget {
       List<DailyWeather>? weathers,
       String? uri})
       : timeline = t ?? Timeline(platform),
-        timelineUri = uri ?? "assets/timeline.json",
+        timelineUri = uri ?? "assets/timeline/timeline.json",
         favoritesBloc = fb ?? FavoritesBloc(),
         super(key: key, child: child) {
     if (activities != null) {
@@ -67,8 +67,7 @@ class BlocProvider extends InheritedWidget {
   static FavoritesBloc favorites(BuildContext context) {
     BlocProvider? bp =
         context.dependOnInheritedWidgetOfExactType<BlocProvider>();
-    FavoritesBloc bloc = bp!.favoritesBloc;
-    return bloc;
+    return bp?.favoritesBloc ?? FavoritesBloc();
   }
 
   /// static accessor for the [Timeline]. 
@@ -76,7 +75,6 @@ class BlocProvider extends InheritedWidget {
   static Timeline getTimeline(BuildContext context) {
     BlocProvider? bp =
         context.dependOnInheritedWidgetOfExactType<BlocProvider>();
-    Timeline? bloc = bp!.timeline;
-    return bloc;
+    return bp?.timeline ?? Timeline(TargetPlatform.iOS);
   }
 }

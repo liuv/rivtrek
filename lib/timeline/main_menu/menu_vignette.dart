@@ -1,39 +1,35 @@
 import 'dart:math';
-import 'dart:ui';
 import 'dart:ui' as ui;
 
-import 'package:flare_dart/actor_image.dart' as flare;
+import 'package:flare_flutter/flare.dart' as flare;
+import 'package:flare_dart/animation/actor_animation.dart' as flare;
 import 'package:flare_dart/math/aabb.dart' as flare;
+import 'package:nima/nima.dart' as nima;
+import 'package:nima/nima/math/aabb.dart' as nima;
+import 'package:rive/rive.dart' as rive;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:nima/nima/actor_image.dart' as nima;
-import 'package:nima/nima/math/aabb.dart' as nima;
-
-import 'package:rive/rive.dart' as rive;
-// import 'package:rive/src/rive_core/math/aabb.dart' as rive; // Removed private import
 import 'package:rivtrek/timeline/bloc_provider.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
 
-/// This widget renders a Flare/Nima [FlutterActor]. It relies on a [LeafRenderObjectWidget] 
-/// so it can implement a custom [RenderObject] and update it accordingly.
+/// This is a [LeafRenderObjectWidget]. It's used to render the [FlutterActor]s
+/// that are the background of each [MenuSection] in the [MainMenu].
 class MenuVignette extends LeafRenderObjectWidget {
-  /// A flag is used to animate the widget only when needed.
+  final Color? gradientColor;
   final bool isActive;
-  /// The id of the [FlutterActor] that will be rendered.
   final String assetId;
-  /// A gradient color to give the section background a faded look. 
-  /// Also makes the sub-section more readable.
-  final Color gradientColor;
 
-  const MenuVignette({Key key = const Key(''), required this.gradientColor, required this.isActive, required this.assetId})
+  const MenuVignette(
+      {Key? key,
+      required this.gradientColor,
+      required this.isActive,
+      required this.assetId})
       : super(key: key);
 
   @override
-  RenderObject createRenderObject(BuildContext context) {
-    /// The [BlocProvider] widgets down the tree to access its components
-    /// optimizing memory consumption and simplifying the code-base.
+  MenuVignetteRenderObject createRenderObject(BuildContext context) {
     Timeline t = BlocProvider.getTimeline(context);
     return MenuVignetteRenderObject()
       ..timeline = t
@@ -45,8 +41,6 @@ class MenuVignette extends LeafRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant MenuVignetteRenderObject renderObject) {
-    /// The [BlocProvider] widgets down the tree to access its components
-    /// optimizing memory consumption and simplifying the code-base.
     Timeline t = BlocProvider.getTimeline(context);
     renderObject
       ..timeline = t
@@ -62,13 +56,14 @@ class MenuVignette extends LeafRenderObjectWidget {
 }
 
 /// When extending a [RenderBox] we provide a custom set of instructions for the widget being rendered.
-/// 
+///
 /// In particular this means overriding the [paint()] and [hitTestSelf()] methods to render the loaded
 /// Flare/Nima [FlutterActor] where the widget is being placed.
 class MenuVignetteRenderObject extends RenderBox {
   /// The [_timeline] object is used here to retrieve the asset through [getById()].
   Timeline? _timeline;
   String _assetId = '';
+
   /// If this object is not active, stop playing. This optimizes resource consumption
   /// and makes sure that each [FlutterActor] remains coherent throughout its animation.
   bool _isActive = false;
@@ -100,6 +95,7 @@ class MenuVignetteRenderObject extends RenderBox {
     if (_isActive == value) {
       return;
     }
+
     /// When this [RenderBox] becomes active, start advancing it again.
     _isActive = value;
     updateRendering();
@@ -140,7 +136,8 @@ class MenuVignetteRenderObject extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
-    TimelineAsset? asset = timelineEntry?.asset;
+    TimelineEntry? entry = timelineEntry;
+    TimelineAsset? asset = entry?.asset;
 
     /// Don't paint if not needed.
     if (asset == null) {
@@ -148,129 +145,54 @@ class MenuVignetteRenderObject extends RenderBox {
       return;
     }
 
-    canvas.save();
-
-    double w = asset.width;
-    double h = asset.height;
-
-    /// If the asset is just a static image, draw the image directly to [canvas].
     if (asset is TimelineImage) {
       canvas.drawImageRect(
           asset.image!,
           Rect.fromLTWH(0.0, 0.0, asset.width, asset.height),
-          Rect.fromLTWH(offset.dx + size.width - w, asset.y, w, h),
+          offset & size,
           Paint()
             ..isAntiAlias = true
             ..filterQuality = ui.FilterQuality.low
             ..color = Colors.white.withOpacity(asset.opacity));
-    } else if (asset is TimelineNima && asset.actor != null) {
-      Alignment alignment = Alignment.topRight;
-      BoxFit fit = BoxFit.cover;
-
-      /// If we have a [TimelineNima] actor set it up properly and paint it.
-      
-      /// 1. Calculate the bounds for the current object.
-      /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
-      /// We rely on this AABB to perform screen-space calculations.
-      nima.AABB bounds = asset.setupAABB!;
-
-      double contentHeight = bounds[3] - bounds[1];
-      double contentWidth = bounds[2] - bounds[0];
-      double x =
-          -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
-      double y = -bounds[1] -
-          contentHeight / 2.0 +
-          (alignment.y * contentHeight / 2.0);
-
-      Offset renderOffset = offset;
-      Size renderSize = size;
-
-      double scaleX = 1.0, scaleY = 1.0;
-
-      canvas.save();
-
-      /// This widget is always set up to use [BoxFit.cover].
-      /// But this behavior can be customized according to anyone's needs.
-      /// The following switch/case contains all the various alternatives native to Flutter.
-      switch (fit) {
-        case BoxFit.fill:
-          scaleX = renderSize.width / contentWidth;
-          scaleY = renderSize.height / contentHeight;
-          break;
-        case BoxFit.contain:
-          double minScale = min(renderSize.width / contentWidth,
-              renderSize.height / contentHeight);
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.cover:
-          double maxScale = max(renderSize.width / contentWidth,
-              renderSize.height / contentHeight);
-          scaleX = scaleY = maxScale;
-          break;
-        case BoxFit.fitHeight:
-          double minScale = renderSize.height / contentHeight;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.fitWidth:
-          double minScale = renderSize.width / contentWidth;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.none:
-          scaleX = scaleY = 1.0;
-          break;
-        case BoxFit.scaleDown:
-          double minScale = min(renderSize.width / contentWidth,
-              renderSize.height / contentHeight);
-          scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-          break;
-      }
-
-      /// 2. Move the [canvas] to the right position so that the widget's position
-      /// is center-aligned based on its offset, size and alignment position.
-      canvas.translate(
-          renderOffset.dx +
-              renderSize.width / 2.0 +
-              (alignment.x * renderSize.width / 2.0),
-          renderOffset.dy +
-              renderSize.height / 2.0 +
-              (alignment.y * renderSize.height / 2.0));
-      /// 3. Scale depending on the [fit].
-      canvas.scale(scaleX, -scaleY);
-      /// 4. Move the canvas to the correct [_nimaActor] position calculated above.
-      canvas.translate(x, y);
-      /// 5. perform the drawing operations.
-      asset.actor?.draw(canvas, 1.0);
-
-      /// 6. Restore the canvas' original transform state.
-      canvas.restore();
-
-
-      /// 7. Use the [gradientColor] field to customize the foreground element being rendered,
-      /// and cover it with a linear gradient.
-      double gradientFade = 1.0 - opacity;
-      List<ui.Color> colors = <ui.Color>[
-        gradientColor!.withOpacity(gradientFade),
-        gradientColor!.withOpacity(min(1.0, gradientFade + 0.9))
-      ];
-      List<double> stops = <double>[0.0, 1.0];
-
-      ui.Paint paint = ui.Paint()
-        ..shader = ui.Gradient.linear(ui.Offset(0.0, offset.dy),
-            ui.Offset(0.0, offset.dy + 150.0), colors, stops)
-        ..style = ui.PaintingStyle.fill;
-      canvas.drawRect(offset & size, paint);
-    } else if (asset is TimelineFlare && asset.actor != null) {
+    } else {
+      dynamic bounds;
       Alignment alignment = Alignment.center;
       BoxFit fit = BoxFit.cover;
-      /// If we have a [TimelineFlare]  actor set it up properly and paint it.
-      /// 
-      /// 1. Calculate the bounds for the current object.
-      /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
-      /// We rely on this AABB to perform screen-space calculations.
+      bool isNima = false;
+      bool isFlare = false;
 
-      flare.AABB bounds = asset.setupAABB!;
-      double contentWidth = bounds[2] - bounds[0];
-      double contentHeight = bounds[3] - bounds[1];
+      if (asset is TimelineNima && asset.actor != null) {
+        bounds = asset.setupAABB ?? nima.AABB.fromValues(0, 0, 0, 0);
+        alignment = Alignment.topRight;
+        isNima = true;
+      } else if (asset is TimelineFlare && asset.actor != null) {
+        bounds = asset.setupAABB ?? flare.AABB.fromValues(0, 0, 0, 0);
+        isFlare = true;
+      } else if (asset is TimelineRive && asset.actor != null) {
+        bounds = asset.setupAABB ??
+            [0.0, 0.0, asset.actor!.width, asset.actor!.height];
+      }
+
+      if (bounds == null) return;
+
+      // 容错处理
+      if (bounds[0] == 0 &&
+          bounds[1] == 0 &&
+          bounds[2] == 0 &&
+          bounds[3] == 0) {
+        bounds = [
+          -asset.width / 2,
+          -asset.height / 2,
+          asset.width / 2,
+          asset.height / 2
+        ];
+      }
+
+      double contentWidth = (bounds[2] - bounds[0]).toDouble();
+      double contentHeight = (bounds[3] - bounds[1]).toDouble();
+      if (contentWidth == 0) contentWidth = 1.0;
+      if (contentHeight == 0) contentHeight = 1.0;
+
       double x =
           -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
       double y = -bounds[1] -
@@ -279,14 +201,8 @@ class MenuVignetteRenderObject extends RenderBox {
 
       Offset renderOffset = offset;
       Size renderSize = size;
-
       double scaleX = 1.0, scaleY = 1.0;
 
-      canvas.save();
-
-      /// This widget is always set up to use [BoxFit.cover].
-      /// But this behavior can be customized according to anyone's needs.
-      /// The following switch/case contains all the various alternatives native to Flutter.
       switch (fit) {
         case BoxFit.fill:
           scaleX = renderSize.width / contentWidth;
@@ -303,12 +219,10 @@ class MenuVignetteRenderObject extends RenderBox {
           scaleX = scaleY = maxScale;
           break;
         case BoxFit.fitHeight:
-          double minScale = renderSize.height / contentHeight;
-          scaleX = scaleY = minScale;
+          scaleX = scaleY = renderSize.height / contentHeight;
           break;
         case BoxFit.fitWidth:
-          double minScale = renderSize.width / contentWidth;
-          scaleX = scaleY = minScale;
+          scaleX = scaleY = renderSize.width / contentWidth;
           break;
         case BoxFit.none:
           scaleX = scaleY = 1.0;
@@ -319,104 +233,8 @@ class MenuVignetteRenderObject extends RenderBox {
           scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
           break;
       }
-
-      /// 2. Move the [canvas] to the right position so that the widget's position
-      /// is center-aligned based on its offset, size and alignment position.
-      canvas.translate(
-          renderOffset.dx +
-              renderSize.width / 2.0 +
-              (alignment.x * renderSize.width / 2.0),
-          renderOffset.dy +
-              renderSize.height / 2.0 +
-              (alignment.y * renderSize.height / 2.0));
-      /// 3. Scale depending on the [fit].
-      canvas.scale(scaleX, scaleY);
-      /// 4. Move the canvas to the correct [_flareActor] position calculated above.
-      canvas.translate(x, y);
-
-      /// 5. perform the drawing operations.
-      asset.actor?.draw(canvas);
-
-      /// 6. Restore the canvas' original transform state.
-      canvas.restore();
-
-      /// 7. Use the [gradientColor] field to customize the foreground element being rendered,
-      /// and cover it with a linear gradient.
-      double gradientFade = 1.0 - opacity;
-      List<ui.Color> colors = <ui.Color>[
-        gradientColor!.withOpacity(gradientFade),
-        gradientColor!.withOpacity(min(1.0, gradientFade + 0.9))
-      ];
-      List<double> stops = <double>[0.0, 1.0];
-
-      ui.Paint paint = ui.Paint()
-        ..shader = ui.Gradient.linear(ui.Offset(0.0, offset.dy),
-            ui.Offset(0.0, offset.dy + 150.0), colors, stops)
-        ..style = ui.PaintingStyle.fill;
-      canvas.drawRect(offset & size, paint);
-    } else if (asset is TimelineRive && asset.actor != null) {
-      Alignment alignment = Alignment.center;
-      BoxFit fit = BoxFit.cover;
-      /// If we have a [TimelineFlare]  actor set it up properly and paint it.
-      ///
-      /// 1. Calculate the bounds for the current object.
-      /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
-      /// We rely on this AABB to perform screen-space calculations.
-
-      rive.AABB bounds = asset.setupAABB!;
-      double contentWidth = bounds[2] - bounds[0];
-      double contentHeight = bounds[3] - bounds[1];
-      double x =
-          -bounds[0] - contentWidth / 2.0 - (alignment.x * contentWidth / 2.0);
-      double y = -bounds[1] -
-          contentHeight / 2.0 +
-          (alignment.y * contentHeight / 2.0);
-
-      Offset renderOffset = offset;
-      Size renderSize = size;
-
-      double scaleX = 1.0, scaleY = 1.0;
 
       canvas.save();
-
-      /// This widget is always set up to use [BoxFit.cover].
-      /// But this behavior can be customized according to anyone's needs.
-      /// The following switch/case contains all the various alternatives native to Flutter.
-      switch (fit) {
-        case BoxFit.fill:
-          scaleX = renderSize.width / contentWidth;
-          scaleY = renderSize.height / contentHeight;
-          break;
-        case BoxFit.contain:
-          double minScale = min(renderSize.width / contentWidth,
-              renderSize.height / contentHeight);
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.cover:
-          double maxScale = max(renderSize.width / contentWidth,
-              renderSize.height / contentHeight);
-          scaleX = scaleY = maxScale;
-          break;
-        case BoxFit.fitHeight:
-          double minScale = renderSize.height / contentHeight;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.fitWidth:
-          double minScale = renderSize.width / contentWidth;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.none:
-          scaleX = scaleY = 1.0;
-          break;
-        case BoxFit.scaleDown:
-          double minScale = min(renderSize.width / contentWidth,
-              renderSize.height / contentHeight);
-          scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-          break;
-      }
-
-      /// 2. Move the [canvas] to the right position so that the widget's position
-      /// is center-aligned based on its offset, size and alignment position.
       canvas.translate(
           renderOffset.dx +
               renderSize.width / 2.0 +
@@ -424,18 +242,22 @@ class MenuVignetteRenderObject extends RenderBox {
           renderOffset.dy +
               renderSize.height / 2.0 +
               (alignment.y * renderSize.height / 2.0));
-      /// 3. Scale depending on the [fit].
-      canvas.scale(scaleX, scaleY);
-      /// 4. Move the canvas to the correct [_flareActor] position calculated above.
+
+      canvas.scale(scaleX, isNima ? -scaleY : scaleY);
       canvas.translate(x, y);
 
-      /// 5. perform the drawing operations.
-      // asset.actor?.draw(canvas);
+      if (isFlare) {
+        (asset as TimelineFlare).actor?.modulateOpacity = 1.0;
+        asset.actor?.draw(canvas);
+      } else if (isNima) {
+        (asset as TimelineNima).actor?.draw(canvas, 1.0);
+      } else if (asset is TimelineRive) {
+        asset.actor?.draw(canvas);
+      }
 
-      /// 6. Restore the canvas' original transform state.
       canvas.restore();
-      /// 7. Use the [gradientColor] field to customize the foreground element being rendered,
-      /// and cover it with a linear gradient.
+
+      // 绘制渐变层
       double gradientFade = 1.0 - opacity;
       List<ui.Color> colors = <ui.Color>[
         gradientColor!.withOpacity(gradientFade),
@@ -449,15 +271,11 @@ class MenuVignetteRenderObject extends RenderBox {
         ..style = ui.PaintingStyle.fill;
       canvas.drawRect(offset & size, paint);
     }
-    canvas.restore();
   }
 
-  /// This callback is used by the [SchedulerBinding] in order to advance the Flare/Nima 
+  /// This callback is used by the [SchedulerBinding] in order to advance the Flare/Nima
   /// animations properly, and update the corresponding [FlutterActor]s.
-  /// It is also responsible for advancing any attached components to said Actors,
-  /// such as [_nimaController] or [_flareController].
   void beginFrame(Duration timeStamp) {
-
     _isFrameScheduled = false;
     final double t =
         timeStamp.inMicroseconds / Duration.microsecondsPerMillisecond / 1000.0;
@@ -468,93 +286,112 @@ class MenuVignetteRenderObject extends RenderBox {
       return;
     }
 
-    /// Calculate the elapsed time to [advance()] the animations.
     double elapsed = t - _lastFrameTime;
     _lastFrameTime = t;
     TimelineEntry? entry = timelineEntry;
     if (entry != null) {
       TimelineAsset? asset = entry.asset;
-      if (asset is TimelineNima && asset.actor != null) {
-        /// Modulate the opacity value used by [gradientFade].
+      if (asset != null) {
+        // 更新透明度
         if (opacity < 1.0) {
           opacity = min(opacity + elapsed, 1.0);
         }
-        asset.animationTime += elapsed;
-        if (asset.loop) {
-          asset.animationTime %= asset.animation!.duration;
+        if (asset is TimelineAnimatedAsset) {
+          asset.animationTime += elapsed;
         }
-        /// Apply the current time to the [asset] animation.
-        if (asset.actor != null && asset.animation != null) {
-          asset.animation!.apply(asset.animationTime, asset.actor!, 1.0);
-          /// Use the library function to update the actor's time.
-          asset.actor!.advance(elapsed);
-        }
-      } else if (asset is TimelineFlare && asset.actor != null) {
-        if (opacity < 1.0) {
-          /// Modulate the opacity value used by [gradientFade].
-          opacity = min(opacity + elapsed, 1.0);
-        }
-        /// Some [TimelineFlare] assets have a custom intro that's played
-        /// when they're painted for the first time.
-        if (_firstUpdate) {
-          if (asset.intro != null) {
-            asset.animation = asset.intro;
-            asset.animationTime = -1.0;
+
+        if (asset is TimelineNima && asset.actor != null) {
+          if (asset.loop && asset.animation != null) {
+            asset.animationTime %= asset.animation!.duration;
           }
-          _firstUpdate = false;
-        }
-        asset.animationTime += elapsed;
-        if (asset.intro == asset.animation &&
-            asset.animationTime >= asset.animation!.duration) {
-          asset.animationTime -= asset.animation!.duration;
-          asset.animation = asset.idle;
-        }
-        if (asset.loop && asset.animationTime >= 0 && asset.animation != null) {
-          asset.animationTime %= asset.animation!.duration;
-        }
-        /// Apply the current time to this [ActorAnimation].
-        if (asset.actor != null && asset.animation != null) {
-          asset.animation!.apply(asset.animationTime, asset.actor!, 1.0);
-          /// Use the library function to update the actor's time.
+          asset.animation?.apply(asset.animationTime, asset.actor!, 1.0);
           asset.actor!.advance(elapsed);
-        }
-      } else if (asset is TimelineRive && asset.actor != null) {
-        // Rive 1.0 logic is not compatible with Rive 0.14
-        /*
-        if (opacity < 1.0) {
-          /// Modulate the opacity value used by [gradientFade].
-          opacity = min(opacity + elapsed, 1.0);
-        }
-        /// Some [TimelineFlare] assets have a custom intro that's played
-        /// when they're painted for the first time.
-        if (_firstUpdate) {
-          if (asset.intro != null) {
-            asset.animation = asset.intro;
-            asset.animationTime = -1.0;
+        } else if (asset is TimelineFlare && asset.actor != null) {
+          if (_firstUpdate) {
+            if (asset.intro != null) {
+              asset.animation = asset.intro;
+              asset.animationTime = -0.01;
+            }
+            _firstUpdate = false;
           }
-          _firstUpdate = false;
+
+          if (asset.idleAnimations != null && asset.idleAnimations!.isNotEmpty) {
+            for (flare.ActorAnimation anim in asset.idleAnimations!) {
+              anim.apply(asset.animationTime % anim.duration, asset.actor!, 1.0);
+            }
+          } else {
+            if (asset.intro == asset.animation &&
+                asset.animation != null &&
+                asset.animationTime >= asset.animation!.duration) {
+              asset.animationTime -= asset.animation!.duration;
+              asset.animation = asset.idle;
+            }
+            if (asset.loop && asset.animationTime >= 0 && asset.animation != null) {
+              asset.animationTime %= asset.animation!.duration;
+            }
+            asset.animation?.apply(asset.animationTime, asset.actor!, 1.0);
+          }
+          // 这里的 advance 必须确保参数正确
+          asset.actor!.advance(elapsed > 0.1 ? 0.016 : elapsed); 
+        } else if (asset is TimelineRive && asset.actor != null) {
+          if (_firstUpdate) {
+            if (asset.intro != null) {
+              asset.animation = asset.intro;
+              asset.animationTime = -0.01;
+            }
+            _firstUpdate = false;
+          }
+          if (asset.idleAnimations != null && asset.idleAnimations!.isNotEmpty) {
+            double phase = 0.0;
+            for (final dynamic animation in asset.idleAnimations!) {
+              if (animation is rive.LinearAnimation) {
+                final double duration =
+                    (animation.duration as num).toDouble() /
+                        (animation.fps as num).toDouble();
+                final double time = duration > 0
+                    ? (asset.animationTime + phase) % duration
+                    : asset.animationTime + phase;
+                animation.apply(time, coreContext: asset.actor, mix: 1.0);
+                phase += 0.16;
+              }
+            }
+          } else {
+            rive.LinearAnimation? anim =
+                asset.animation is rive.LinearAnimation
+                    ? asset.animation as rive.LinearAnimation
+                    : null;
+            if (asset.intro == asset.animation &&
+                anim != null &&
+                (anim.fps as num).toDouble() > 0) {
+              final double introDuration =
+                  (anim.duration as num).toDouble() /
+                      (anim.fps as num).toDouble();
+              if (asset.animationTime >= introDuration) {
+                asset.animationTime -= introDuration;
+                asset.animation = asset.idle;
+                anim = asset.animation is rive.LinearAnimation
+                    ? asset.animation as rive.LinearAnimation
+                    : null;
+              }
+            }
+            if (anim != null) {
+              final double duration =
+                  (anim.duration as num).toDouble() /
+                      (anim.fps as num).toDouble();
+              if (asset.loop && duration > 0) {
+                asset.animationTime %= duration;
+              }
+              anim.apply(asset.animationTime,
+                  coreContext: asset.actor, mix: 1.0);
+            }
+          }
+          // 强制刷新所有组件的变换
+          asset.actor!.advance(elapsed > 0.1 ? 0.016 : elapsed);
         }
-        asset.animationTime += elapsed;
-        double duration = asset.animation!.instance!.animation.endTime - asset.animation!.instance!.animation.startTime;
-        if (asset.intro == asset.animation &&
-            asset.animationTime >= duration) {
-          asset.animationTime -= duration;
-          asset.animation = asset.idle;
-        }
-        if (asset.loop && asset.animationTime >= 0) {
-          asset.animationTime %= duration;
-        }
-        /// Apply the current time to this [ActorAnimation].
-        asset.animation!.apply(asset.actor!.context, elapsed);
-        /// Use the library function to update the actor's time.
-        asset.actor!.advance(elapsed);
-        */
       }
     }
 
-    /// Invalidate the current widget visual state and let Flutter paint it again.
     markNeedsPaint();
-    /// Schedule a new frame to update again - but only if needed.
     if (isActive && !_isFrameScheduled) {
       _isFrameScheduled = true;
       SchedulerBinding.instance.scheduleFrameCallback(beginFrame);

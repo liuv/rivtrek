@@ -37,8 +37,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
   /// Triggers a Flare animation upon change.
   bool _isFavorite = false;
 
-  /// This parameter helps control the Amelia Earhart and the Newton animations.
-  /// Test it out yourself! =)
+  /// This parameter helps control the animations.
   Offset? _interactOffset;
 
   /// Set up the markdown style and the local field variables for this page.
@@ -104,18 +103,30 @@ class _ArticleWidgetState extends State<ArticleWidget> {
 
   /// Load the markdown file from the assets and set the contents of the page to its value.
   void loadMarkdown(String filename) async {
-    rootBundle.loadString("assets/Articles/" + filename).then((String data) {
+    final String path = "assets/timeline/Articles/$filename";
+    try {
+      final String data = await rootBundle.loadString(path);
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _articleMarkdown = data;
       });
-    });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _articleMarkdown = "暂无内容";
+      });
+    }
   }
 
   /// This widget is wrapped in a [Scaffold] to have the classic Material Design visual layout structure.
   /// It uses the [BlocProvider] to find out if this element is part of the favorites, to have the icon properly set up.
   /// A [SingleChildScrollView] contains a [Column] that lays out the [TimelineEntryWidget] on top, and the [MarkdownBody] 
   /// right below it. 
-  /// A [GestureDetector] is used to control the [TimelineEntryWidget], if it allows it (...try Amelia Earhart or Newton!)
+  /// A [GestureDetector] is used to control the [TimelineEntryWidget], if it allows it.
   @override
   Widget build(BuildContext context) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
@@ -207,7 +218,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
                                           /// Check out the widget at:
                                           /// https://www.2dimensions.com/a/pollux/files/flare/heart-simple/preview
                                           child: FlareActor(
-                                              "assets/Favorite.flr",
+                                              "assets/timeline/Favorite.flr",
                                               animation: isFav
                                                   ? "Favorite"
                                                   : "Unfavorite",

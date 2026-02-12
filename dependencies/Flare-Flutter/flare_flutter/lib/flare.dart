@@ -33,7 +33,7 @@ export 'package:flare_dart/actor_node.dart';
 export 'package:flare_dart/animation/actor_animation.dart';
 
 abstract class FlutterActorDrawable {
-  late ui.BlendMode _blendMode;
+  ui.BlendMode _blendMode = ui.BlendMode.srcOver;
   int get blendModeId {
     return _blendMode.index;
   }
@@ -571,7 +571,7 @@ class AssetBundleContext {
 }
 
 class FlutterActor extends Actor {
-  late List<ui.Image> _images;
+  List<ui.Image> _images = [];
 
   List<ui.Image> get images {
     return _images;
@@ -670,7 +670,7 @@ class FlutterActor extends Actor {
   }
 
   void dispose() {}
-  late List<Uint8List> _rawAtlasData;
+  List<Uint8List> _rawAtlasData = [];
   @override
   Future<bool> loadAtlases(List<Uint8List> rawAtlases) async {
     _rawAtlasData = rawAtlases;
@@ -703,14 +703,10 @@ class FlutterActor extends Actor {
 class FlutterActorArtboard extends ActorArtboard {
   FlutterActorArtboard(FlutterActor actor) : super(actor);
 
-  @override
   void draw(ui.Canvas canvas) {
-    List<ActorDrawable>? nodes = drawableNodes as List<ActorDrawable>?;
-    if (nodes != null) {
-      for (final ActorDrawable drawable in nodes) {
-        if (drawable is FlutterActorDrawable) {
-          (drawable as FlutterActorDrawable).draw(canvas);
-        }
+    for (final ActorDrawable drawable in drawableNodes) {
+      if (drawable is FlutterActorDrawable) {
+        (drawable as FlutterActorDrawable).draw(canvas);
       }
     }
   }
@@ -915,11 +911,11 @@ abstract class FlutterPathPointsPath implements FlutterPath {
 }
 
 class FlutterActorImage extends ActorImage with FlutterActorDrawable {
-  late Float32List _vertexBuffer;
-  late Float32List _uvBuffer;
+  Float32List _vertexBuffer = Float32List(0);
+  Float32List _uvBuffer = Float32List(0);
   late ui.Paint _paint;
   ui.Vertices? _canvasVertices;
-  late Uint16List _indices;
+  Uint16List _indices = Uint16List(0);
 
   void onPaintUpdated(ui.Paint paint) {}
   final Float64List _identityMatrix = Float64List.fromList(<double>[

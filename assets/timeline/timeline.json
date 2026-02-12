@@ -1,0 +1,118 @@
+[
+	{
+		"date": 1977,
+		"label": "我来了",
+		"article":"fish.txt",
+		"id":"birthday",
+		"accent": [55, 134, 222, 255],
+		"asset":
+		{
+			"source": "Person/plant-parent.riv",
+			"width": 1920,
+			"height": 1080,
+			"scale": 0.40,
+			"idle":"Idle",
+			"offset": -20,
+			"bounds":[0,0,1920,1080]
+		}
+	},
+	{
+		"date": 2021.3,
+		"label": "大连观光塔",
+		"article":"guanguangta.txt",
+		"id":"milky",
+		"accent": [55, 134, 222, 255],
+		"asset":
+		{
+			"source": "Person/大连观光塔-badge.riv",
+			"width": 400,
+			"height": 400,
+			"scale": 2,
+			"offset": 60,
+			"bounds":[0,0,400,400]
+		}
+	},
+	{
+		"date": 2021.9,
+		"label": "大连劳动公园",
+		"article":"guanguangta.txt",
+		"accent": [55, 134, 222, 255],
+		"asset":
+		{
+			"source": "Person/大连劳动公园.riv",
+			"width": 400,
+			"height": 400,
+			"scale": 2,
+			"offset": 60,
+			"bounds":[0,0,400,400]
+		}
+	},
+	{
+		"date": 2022.3,
+		"label": "大连气象山",
+		"article":"qixiangshan.txt",
+		"id":"mlk",
+		"accent": [55, 134, 222, 255],
+		"asset":
+		{
+			"source": "Person/气象山-badge.riv",
+			"width": 400,
+			"height": 400,
+			"scale": 2,
+			"offset": 60,
+			"bounds":[0,0,400,400]
+		}
+	},
+	{
+		"date": 1937,
+		"label": "Flare测试 (Amelia)",
+		"article":"amelia_earhart.txt",
+		"id":"test_flare",
+		"accent": [200, 50, 50, 255],
+		"asset":
+		{
+			"source": "Amelia_Earhart.flr",
+			"width": 600,
+			"height": 600,
+			"scale": 1.5,
+			"idle":"idle",
+			"animations": ["idle", "fly"],
+			"offset": 0,
+			"bounds":[0,0,600,600]
+		}
+	},
+	{
+		"date": 1980,
+		"label": "Nima测试 (Robot)",
+		"article":"history.txt",
+		"id":"test_nima",
+		"accent": [50, 200, 50, 255],
+		"asset":
+		{
+			"source": "Robot.nma",
+			"width": 400,
+			"height": 400,
+			"scale": 2.0,
+			"idle":"idle",
+			"offset": 0,
+			"bounds":[0,0,400,400]
+		}
+	},
+	{
+		"date": -1000,
+		"label": "大爆炸 (Flare背景测试)",
+		"article":"big_bang.txt",
+		"id":"test_flare_bg",
+		"accent": [255, 255, 255, 255],
+		"asset":
+		{
+			"source": "Big_Bang.flr",
+			"width": 1024,
+			"height": 1024,
+			"scale": 1.0,
+			"idle":"idle",
+			"offset": 0,
+			"bounds":[-512,-512,512,512]
+		}
+	}
+]

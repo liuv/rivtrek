@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
+import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
 import 'package:rivtrek/timeline/timeline/timeline_utils.dart';
 
 /// This class is used by the [TimelineRenderWidget] to render the ticks on the left side of the screen.
@@ -69,21 +70,23 @@ class Ticks {
     /// depending on the current era. The [TickColors] object, in `timeline_utils.dart`,
     /// wraps this information.
     List<TickColors> tickColors = timeline.tickColors;
-    if (tickColors != null && tickColors.length > 0) {
+    if (tickColors != null && tickColors.isNotEmpty) {
       /// Build up the color stops for the linear gradient.
-      double rangeStart = tickColors.first.start!;
-      double range = tickColors.last.start! - tickColors.first.start!;
+      double rangeStart = (tickColors.first.start ?? 0.0);
+      double rangeEnd = (tickColors.last.start ?? 0.0);
+      double range = rangeEnd - rangeStart;
+      if (range == 0) range = 1.0;
       List<ui.Color> colors = <ui.Color>[];
       List<double> stops = <double>[];
       for (TickColors bg in tickColors) {
-        colors.add(bg.background!);
-        stops.add((bg.start! - rangeStart) / range);
+        colors.add(bg.background ?? Colors.transparent);
+        stops.add(((bg.start ?? 0.0) - rangeStart) / range);
       }
       double s =
           timeline.computeScale(timeline.renderStart, timeline.renderEnd);
       /// y-coordinate for the starting and ending element.
-      double y1 = (tickColors.first.start! - timeline.renderStart) * s;
-      double y2 = (tickColors.last.start! - timeline.renderStart) * s;
+      double y1 = ((tickColors.first.start ?? 0.0) - timeline.renderStart) * s;
+      double y2 = ((tickColors.last.start ?? 0.0) - timeline.renderStart) * s;
 
       /// Fill Background.
       ui.Paint paint = ui.Paint()
@@ -96,13 +99,13 @@ class Ticks {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, offset.dy, gutterWidth, y1 - offset.dy + 1.0),
-            ui.Paint()..color = tickColors.first.background!);
+            ui.Paint()..color = (tickColors.first.background ?? Colors.transparent));
       }
       if (y2 < offset.dy + height) {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, y2 - 1, gutterWidth, (offset.dy + height) - y2),
-            ui.Paint()..color = tickColors.last.background!);
+            ui.Paint()..color = (tickColors.last.background ?? Colors.transparent));
       }
       /// Draw the gutter.
       canvas.drawRect(
@@ -120,24 +123,27 @@ class Ticks {
       tickOffset += scaledTickDistance;
 
       int tt = startingTickMarkValue.round();
-      // tt = -tt; // 原本是显示“多少年前”，所以取负。我们显示里程，用正数。
+      // tt = -tt; // 原本是显示“多少年前”，所以取负。
       int o = tickOffset.floor();
-      TickColors? colors = timeline.findTickColors(offset.dy + height - o)!;
+      TickColors? colors = timeline.findTickColors(offset.dy + height - o);
+      if (colors == null) {
+        startingTickMarkValue += tickDistance;
+        continue;
+      }
       if (tt % textTickDistance == 0) {
         /// Every `textTickDistance`, draw a wider tick with the a label laid on top.
         canvas.drawRect(
             Rect.fromLTWH(offset.dx + gutterWidth - TickSize,
                 offset.dy + height - o, TickSize, 1.0),
-            Paint()..color = colors.long!);
+            Paint()..color = (colors.long ?? Colors.transparent));
         /// Drawing text to [canvas] is done by using the [ParagraphBuilder] directly.
         ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
             textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
           ..pushStyle(ui.TextStyle(
-              color: colors.text));
+              color: colors.text ?? Colors.transparent));
 
-        int value = tt.round().abs();
-        /// Format the label nicely
-        String label = "${value}km";
+        int value = tt.round();
+        String label = TimelineEntry.formatYears(value.toDouble());
         
         usedValues.add(label);
         builder.addText(label);
@@ -153,7 +159,7 @@ class Ticks {
         canvas.drawRect(
             Rect.fromLTWH(offset.dx + gutterWidth - SmallTickSize,
                 offset.dy + height - o, SmallTickSize, 1.0),
-            Paint()..color = colors.short!);
+            Paint()..color = (colors.short ?? Colors.transparent));
       }
       startingTickMarkValue += tickDistance;
     }

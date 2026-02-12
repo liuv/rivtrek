@@ -139,8 +139,8 @@ abstract class ActorBasePath {
 }
 
 abstract class ActorProceduralPath extends ActorNode with ActorBasePath {
-  late double _width;
-  late double _height;
+  double _width = 0.0;
+  double _height = 0.0;
 
   double get width => _width;
   double get height => _height;
@@ -180,8 +180,8 @@ abstract class ActorProceduralPath extends ActorNode with ActorBasePath {
 }
 
 class ActorPath extends ActorNode with ActorSkinnable, ActorBasePath {
-  late bool _isHidden;
-  late bool _isClosed;
+  bool _isHidden = false;
+  bool _isClosed = false;
   List<PathPoint> _points = [];
   Float32List vertexDeform = Float32List(0);
 
@@ -260,22 +260,27 @@ class ActorPath extends ActorNode with ActorSkinnable, ActorBasePath {
 
   @override
   void update(int dirt) {
-    if ((dirt & VertexDeformDirty) == VertexDeformDirty) {
+    if ((dirt & VertexDeformDirty) == VertexDeformDirty && vertexDeform.isNotEmpty) {
       int readIdx = 0;
       for (final PathPoint point in _points) {
+        if (readIdx + 1 >= vertexDeform.length) break;
         point.translation[0] = vertexDeform[readIdx++];
         point.translation[1] = vertexDeform[readIdx++];
         switch (point.pointType) {
           case PointType.Straight:
-            (point as StraightPathPoint).radius = vertexDeform[readIdx++];
+            if (readIdx < vertexDeform.length) {
+              (point as StraightPathPoint).radius = vertexDeform[readIdx++];
+            }
             break;
 
           default:
-            CubicPathPoint cubicPoint = point as CubicPathPoint;
-            cubicPoint.inPoint[0] = vertexDeform[readIdx++];
-            cubicPoint.inPoint[1] = vertexDeform[readIdx++];
-            cubicPoint.outPoint[0] = vertexDeform[readIdx++];
-            cubicPoint.outPoint[1] = vertexDeform[readIdx++];
+            if (readIdx + 3 < vertexDeform.length) {
+              CubicPathPoint cubicPoint = point as CubicPathPoint;
+              cubicPoint.inPoint[0] = vertexDeform[readIdx++];
+              cubicPoint.inPoint[1] = vertexDeform[readIdx++];
+              cubicPoint.outPoint[0] = vertexDeform[readIdx++];
+              cubicPoint.outPoint[1] = vertexDeform[readIdx++];
+            }
             break;
         }
       }

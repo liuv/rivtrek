@@ -5,7 +5,9 @@ import "stream_reader.dart";
 abstract class ActorComponent {
   String _name = "Unnamed";
   ActorNode? parent;
-  late ActorArtboard artboard;
+  ActorArtboard? _artboard;
+  ActorArtboard get artboard => _artboard!;
+  set artboard(ActorArtboard value) => _artboard = value;
   int _parentIdx = 0;
   int idx = 0;
   int graphOrder = 0;
@@ -14,7 +16,7 @@ abstract class ActorComponent {
 
   ActorComponent();
 
-  ActorComponent.withArtboard(this.artboard);
+  ActorComponent.withArtboard(ActorArtboard artboard) : _artboard = artboard;
 
   String get name {
     return _name;
