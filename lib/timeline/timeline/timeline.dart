@@ -278,6 +278,18 @@ class Timeline {
     return padding / computeScale(start, end);
   }
 
+  double _effectiveViewportTopPaddingPx() {
+    return _axisMode == TimelineAxisMode.legacyYear
+        ? devicePadding.top + ViewportPaddingTop
+        : 0.0;
+  }
+
+  double _effectiveViewportBottomPaddingPx() {
+    return _axisMode == TimelineAxisMode.legacyYear
+        ? devicePadding.bottom + ViewportPaddingBottom
+        : 0.0;
+  }
+
   /// Compute the viewport scale from the start/end times.
   double computeScale(double start, double end) {
     return _height == 0.0 ? 1.0 : _height / (end - start);
@@ -388,6 +400,7 @@ class Timeline {
         RiverEventType.activity => const Color(0xFF4FA3FF),
         RiverEventType.achievement => const Color(0xFFFFC857),
       };
+      await _attachDynamicAssetFromEvent(eventEntry, event);
       allEntries.add(eventEntry);
     }
 
@@ -1047,8 +1060,8 @@ class Timeline {
 
     /// Get measurements values for the current viewport.
     double scale = computeScale(_start, _end);
-    double padTop = (devicePadding.top + ViewportPaddingTop) / scale;
-    double padBottom = (devicePadding.bottom + ViewportPaddingBottom) / scale;
+    double padTop = _effectiveViewportTopPaddingPx() / scale;
+    double padBottom = _effectiveViewportBottomPaddingPx() / scale;
     bool fixStart = _start < _timeMin - padTop;
     bool fixEnd = _end > _timeMax + padBottom;
 
@@ -1057,8 +1070,8 @@ class Timeline {
     /// so we do it in steps approaching the correct answer.
     for (int i = 0; i < 20; i++) {
       double scale = computeScale(_start, _end);
-      double padTop = (devicePadding.top + ViewportPaddingTop) / scale;
-      double padBottom = (devicePadding.bottom + ViewportPaddingBottom) / scale;
+      double padTop = _effectiveViewportTopPaddingPx() / scale;
+      double padBottom = _effectiveViewportBottomPaddingPx() / scale;
       if (fixStart) {
         _start = _timeMin - padTop;
       }
@@ -1122,10 +1135,9 @@ class Timeline {
     /// a simulation and perform scrolling natively to the current platform.
     if (velocity != double.maxFinite) {
       double scale = computeScale(_start, _end);
-      double padTop =
-          (devicePadding.top + ViewportPaddingTop) / computeScale(_start, _end);
-      double padBottom = (devicePadding.bottom + ViewportPaddingBottom) /
-          computeScale(_start, _end);
+      double padTop = _effectiveViewportTopPaddingPx() / computeScale(_start, _end);
+      double padBottom =
+          _effectiveViewportBottomPaddingPx() / computeScale(_start, _end);
       double rangeMin = (_timeMin - padTop) * scale;
       double rangeMax = (_timeMax + padBottom) * scale - _height;
       if (rangeMax < rangeMin) {
@@ -1840,5 +1852,133 @@ class Timeline {
       return dateStringToAxisDay(event.date);
     }
     return event.distanceAtKm;
+  }
+
+  Future<void> _attachDynamicAssetFromEvent(
+      TimelineEntry entry, RiverEvent event) async {
+    if (event.extraData.isEmpty) {
+      return;
+    }
+    dynamic raw;
+    try {
+      raw = json.decode(event.extraData);
+    } catch (_) {
+      return;
+    }
+    if (raw is! Map) {
+      return;
+    }
+    final dynamic assetNode = raw["timeline_asset"];
+    if (assetNode is! Map) {
+      return;
+    }
+    final String type = (assetNode["type"] ?? "riv").toString().toLowerCase();
+    if (type != "riv") {
+      return;
+    }
+    final String? source = assetNode["source"] as String?;
+    if (source == null || source.isEmpty) {
+      return;
+    }
+    final String filename =
+        source.startsWith("assets/") ? source : "assets/timeline/$source";
+    final TimelineRive? asset = await _loadRiveAssetFromMap(filename, assetNode);
+    if (asset != null) {
+      asset.entry = entry;
+      asset.filename = filename;
+      entry.asset = asset;
+    }
+  }
+
+  Future<TimelineRive?> _loadRiveAssetFromMap(String filename, Map assetMap) async {
+    final TimelineRive riveAsset = TimelineRive();
+    dynamic actor = _riveResources[filename];
+    if (actor == null) {
+      try {
+        final ByteData data = await rootBundle.load(filename);
+        final rive.RiveFile file = rive.RiveFile.import(data);
+        actor = file.mainArtboard;
+        _riveResources[filename] = actor;
+      } catch (_) {
+        return null;
+      }
+    }
+    if (actor == null) {
+      return null;
+    }
+    riveAsset.actorStatic = actor;
+    riveAsset.actor = actor.instance();
+    if (riveAsset.actor.animations.isNotEmpty) {
+      riveAsset.animation = riveAsset.actor.animations[0];
+    }
+
+    dynamic name = assetMap["idle"];
+    if (name is String) {
+      try {
+        final anim = (riveAsset.actor.animations as Iterable)
+            .firstWhere((a) => a.name == name, orElse: () => null);
+        if (anim != null) {
+          riveAsset.idle = anim;
+          riveAsset.animation = anim;
+        }
+      } catch (_) {}
+    }
+
+    name = assetMap["intro"];
+    if (name is String) {
+      try {
+        final anim = (riveAsset.actor.animations as Iterable)
+            .firstWhere((a) => a.name == name, orElse: () => null);
+        if (anim != null) {
+          riveAsset.intro = anim;
+          riveAsset.animation = anim;
+        }
+      } catch (_) {}
+    }
+
+    riveAsset.animationTime = 0.0;
+    riveAsset.actor.advance(0.0);
+    if (riveAsset.animation != null) {
+      riveAsset.animation.apply(0.0, coreContext: riveAsset.actor, mix: 1.0);
+    }
+    riveAsset.actor.advance(0.0);
+    riveAsset.actorStatic.advance(0.0);
+
+    final dynamic loop = assetMap["loop"];
+    riveAsset.loop = loop is bool ? loop : true;
+    final dynamic offset = assetMap["offset"];
+    riveAsset.offset = offset == null
+        ? 0.0
+        : offset is int
+            ? offset.toDouble()
+            : offset;
+    final dynamic gap = assetMap["gap"];
+    riveAsset.gap = gap == null
+        ? 0.0
+        : gap is int
+            ? gap.toDouble()
+            : gap;
+
+    final dynamic width = assetMap["width"];
+    final dynamic height = assetMap["height"];
+    final double scale = assetMap["scale"] is num
+        ? (assetMap["scale"] as num).toDouble()
+        : 1.0;
+    riveAsset.width = width is num ? width.toDouble() * scale : 300.0 * scale;
+    riveAsset.height =
+        height is num ? height.toDouble() * scale : 300.0 * scale;
+
+    final dynamic bounds = assetMap["bounds"];
+    if (bounds is List && bounds.length >= 4) {
+      riveAsset.setupAABB = [
+        (bounds[0] as num).toDouble(),
+        (bounds[1] as num).toDouble(),
+        (bounds[2] as num).toDouble(),
+        (bounds[3] as num).toDouble()
+      ];
+    } else {
+      riveAsset.setupAABB = [0.0, 0.0, riveAsset.width, riveAsset.height];
+    }
+    return riveAsset;
   }
 }

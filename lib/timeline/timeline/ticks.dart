@@ -26,28 +26,18 @@ class Ticks {
   void paint(PaintingContext context, Offset offset, double translation,
       double scale, double height, Timeline timeline) {
     final Canvas canvas = context.canvas;
-
-    double bottom = height;
     double tickDistance = TickDistance.toDouble();
     double textTickDistance = TextTickDistance.toDouble();
-    /// The width of the left panel can expand and contract if the favorites-view is activated,
-    /// by pressing the button on the top-right corner of the timeline.
     double gutterWidth = timeline.gutterWidth;
 
-    /// Calculate spacing based on current scale.
-    double scaledTickDistance;
     if (timeline.isCalendarMode) {
       const List<int> minorCandidates = <int>[1, 2, 7, 14, 30, 90, 180, 365, 730];
       const List<int> majorCandidates = <int>[7, 14, 30, 90, 180, 365, 730, 1825];
-      tickDistance =
-          _pickTickStep(scale, minorCandidates, TickDistance.toDouble())
-              .toDouble();
+      tickDistance = _pickTickStep(scale, minorCandidates, TickDistance.toDouble()).toDouble();
       textTickDistance =
-          _pickTickStep(scale, majorCandidates, TextTickDistance.toDouble())
-              .toDouble();
-      scaledTickDistance = tickDistance * scale;
+          _pickTickStep(scale, majorCandidates, TextTickDistance.toDouble()).toDouble();
     } else {
-      scaledTickDistance = tickDistance * scale;
+      double scaledTickDistance = tickDistance * scale;
       if (scaledTickDistance > 2 * TickDistance) {
         while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
           scaledTickDistance /= 2.0;
@@ -62,128 +52,84 @@ class Ticks {
         }
       }
     }
-    /// The number of ticks to draw.
-    int numTicks = (height / scaledTickDistance).ceil() + 2;
-    if (scaledTickDistance > TextTickDistance) {
-      textTickDistance = tickDistance;
-    }
-    /// Figure out the position of the top left corner of the screen
-    double tickOffset = 0.0;
-    double startingTickMarkValue = 0.0;
-    double y = ((translation - bottom) / scale);
-    startingTickMarkValue = y - (y % tickDistance);
-    tickOffset = -(y % tickDistance) * scale - scaledTickDistance;
 
-    /// Move back by one tick.
-    tickOffset -= scaledTickDistance;
-    startingTickMarkValue -= tickDistance;
-    /// Ticks can change color because the timeline background will also change color
-    /// depending on the current era. The [TickColors] object, in `timeline_utils.dart`,
-    /// wraps this information.
-    List<TickColors> tickColors = timeline.tickColors;
+    final List<TickColors> tickColors = timeline.tickColors;
     if (tickColors.isNotEmpty) {
-      /// Build up the color stops for the linear gradient.
       double rangeStart = (tickColors.first.start ?? 0.0);
       double rangeEnd = (tickColors.last.start ?? 0.0);
       double range = rangeEnd - rangeStart;
       if (range == 0) range = 1.0;
-      List<ui.Color> colors = <ui.Color>[];
-      List<double> stops = <double>[];
+      final List<ui.Color> colors = <ui.Color>[];
+      final List<double> stops = <double>[];
       for (TickColors bg in tickColors) {
         colors.add(bg.background ?? Colors.transparent);
         stops.add(((bg.start ?? 0.0) - rangeStart) / range);
       }
-      double s =
-          timeline.computeScale(timeline.renderStart, timeline.renderEnd);
-      /// y-coordinate for the starting and ending element.
-      double y1 = ((tickColors.first.start ?? 0.0) - timeline.renderStart) * s;
-      double y2 = ((tickColors.last.start ?? 0.0) - timeline.renderStart) * s;
-
-      /// Fill Background.
-      ui.Paint paint = ui.Paint()
+      final double s = timeline.computeScale(timeline.renderStart, timeline.renderEnd);
+      final double y1 = ((tickColors.first.start ?? 0.0) - timeline.renderStart) * s;
+      final double y2 = ((tickColors.last.start ?? 0.0) - timeline.renderStart) * s;
+      final ui.Paint paint = ui.Paint()
         ..shader = ui.Gradient.linear(
             ui.Offset(0.0, y1), ui.Offset(0.0, y2), colors, stops)
         ..style = ui.PaintingStyle.fill;
-
-      /// Fill in top/bottom if necessary.
-      if (y1 > offset.dy) {
-        canvas.drawRect(
-            Rect.fromLTWH(
-                offset.dx, offset.dy, gutterWidth, y1 - offset.dy + 1.0),
-            ui.Paint()..color = (tickColors.first.background ?? Colors.transparent));
-      }
-      if (y2 < offset.dy + height) {
-        canvas.drawRect(
-            Rect.fromLTWH(
-                offset.dx, y2 - 1, gutterWidth, (offset.dy + height) - y2),
-            ui.Paint()..color = (tickColors.last.background ?? Colors.transparent));
-      }
-      /// Draw the gutter.
-      canvas.drawRect(
-          Rect.fromLTWH(offset.dx, y1, gutterWidth, y2 - y1), paint);
-
+      canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height), paint);
     } else {
       canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height),
-          Paint()..color = Color.fromRGBO(246, 246, 246, 0.95));
+          Paint()..color = const Color.fromRGBO(246, 246, 246, 0.95));
     }
 
-    Set<String> usedValues = Set<String>();
+    final double renderStart = timeline.renderStart;
+    final double renderEnd = timeline.renderEnd;
+    final int firstTick = (renderStart / tickDistance).floor() - 1;
+    final int lastTick = (renderEnd / tickDistance).ceil() + 1;
+    final int majorStep = textTickDistance.round().clamp(1, 1000000);
 
-    /// Draw all the ticks.
-    for (int i = 0; i < numTicks; i++) {
-      tickOffset += scaledTickDistance;
-
-      int tt = startingTickMarkValue.round();
-      // tt = -tt; // 原本是显示“多少年前”，所以取负。
-      int o = tickOffset.floor();
-      TickColors? colors = timeline.findTickColors(offset.dy + height - o);
-      if (colors == null) {
-        startingTickMarkValue += tickDistance;
+    for (int idx = firstTick; idx <= lastTick; idx++) {
+      final double tickValue = idx * tickDistance;
+      if (timeline.isDistanceMode && tickValue < 0) {
         continue;
       }
-      if (tt % textTickDistance == 0) {
-        /// Every `textTickDistance`, draw a wider tick with the a label laid on top.
-        canvas.drawRect(
-            Rect.fromLTWH(offset.dx + gutterWidth - TickSize,
-                offset.dy + height - o, TickSize, 1.0),
-            Paint()..color = (colors.long ?? Colors.transparent));
-        /// Drawing text to [canvas] is done by using the [ParagraphBuilder] directly.
-        ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-            textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
-          ..pushStyle(ui.TextStyle(
-              color: colors.text ?? Colors.transparent));
-
-        int value = tt.round();
-        String label;
-        if (timeline.isCalendarMode) {
-          label = _formatCalendarLabel(value.toDouble(), textTickDistance.toInt());
-        } else if (timeline.isDistanceMode) {
-          if (value < 0) {
-            startingTickMarkValue += tickDistance;
-            continue;
-          }
-          label = "$value km";
-        } else {
-          label = TimelineEntry.formatYears(value.toDouble());
-        }
-        
-        usedValues.add(label);
-        builder.addText(label);
-        ui.Paragraph tickParagraph = builder.build();
-        tickParagraph.layout(ui.ParagraphConstraints(
-            width: gutterWidth - LabelPadLeft - LabelPadRight));
-        canvas.drawParagraph(
-            tickParagraph,
-            Offset(offset.dx + LabelPadLeft - LabelPadRight,
-                offset.dy + height - o - tickParagraph.height - 5));
-      } else {
-        /// If we're within two text-ticks, just draw a smaller line.
-        canvas.drawRect(
-            Rect.fromLTWH(offset.dx + gutterWidth - SmallTickSize,
-                offset.dy + height - o, SmallTickSize, 1.0),
-            Paint()..color = (colors.short ?? Colors.transparent));
+      final double y = offset.dy + (tickValue - renderStart) * scale;
+      if (y < offset.dy - 20 || y > offset.dy + height + 20) {
+        continue;
       }
-      startingTickMarkValue += tickDistance;
+      final int value = tickValue.round();
+      final TickColors? colors = timeline.findTickColors(y);
+      if (colors == null) {
+        continue;
+      }
+      final bool isMajor = value % majorStep == 0;
+      canvas.drawRect(
+          Rect.fromLTWH(
+              offset.dx + gutterWidth - (isMajor ? TickSize : SmallTickSize),
+              y,
+              isMajor ? TickSize : SmallTickSize,
+              1.0),
+          Paint()..color = (isMajor ? colors.long : colors.short) ?? Colors.transparent);
+
+      if (!isMajor) {
+        continue;
+      }
+
+      String label;
+      if (timeline.isCalendarMode) {
+        label = _formatCalendarLabel(tickValue, majorStep);
+      } else if (timeline.isDistanceMode) {
+        label = "${value.abs()} km";
+      } else {
+        label = TimelineEntry.formatYears(tickValue);
+      }
+      final ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+          textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
+        ..pushStyle(ui.TextStyle(color: colors.text ?? Colors.transparent))
+        ..addText(label);
+      final ui.Paragraph tickParagraph = builder.build();
+      tickParagraph.layout(ui.ParagraphConstraints(
+          width: gutterWidth - LabelPadLeft - LabelPadRight));
+      canvas.drawParagraph(
+          tickParagraph,
+          Offset(offset.dx + LabelPadLeft - LabelPadRight,
+              y - tickParagraph.height - 5));
     }
   }
 

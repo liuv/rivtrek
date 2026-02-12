@@ -48,7 +48,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/timeline/
-    - assets/timeline/Person/
     - assets/json/rivers/
     - assets/icons/
     - assets/geo/rivers/yangtze/

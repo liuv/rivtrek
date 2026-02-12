@@ -691,9 +691,16 @@ class TimelineRenderObject extends RenderBox {
       double pages = timeUntil / pageSize;
       NumberFormat formatter = NumberFormat.compact();
       String pagesFormatted = formatter.format(pages);
-      String until = "in " +
-          TimelineEntry.formatYears(timeUntil).toLowerCase() +
-          "\n($pagesFormatted page scrolls)";
+      String until;
+      if (_timeline!.isCalendarMode) {
+        until = "in ${timeUntil.round().abs()} days\n($pagesFormatted page scrolls)";
+      } else if (_timeline!.isDistanceMode) {
+        until = "in ${timeUntil.round().abs()} km\n($pagesFormatted page scrolls)";
+      } else {
+        until = "in " +
+            TimelineEntry.formatYears(timeUntil).toLowerCase() +
+            "\n($pagesFormatted page scrolls)";
+      }
       builder.addText(until);
       labelParagraph = builder.build();
       labelParagraph.layout(ui.ParagraphConstraints(width: size.width));
@@ -773,8 +780,15 @@ class TimelineRenderObject extends RenderBox {
       double pages = timeUntil / pageSize;
       NumberFormat formatter = NumberFormat.compact();
       String pagesFormatted = formatter.format(pages.abs());
-      String until = TimelineEntry.formatYears(timeUntil).toLowerCase() +
-          " ago\n($pagesFormatted page scrolls)";
+      String until;
+      if (_timeline!.isCalendarMode) {
+        until = "${timeUntil.round().abs()} days ago\n($pagesFormatted page scrolls)";
+      } else if (_timeline!.isDistanceMode) {
+        until = "${timeUntil.round().abs()} km ago\n($pagesFormatted page scrolls)";
+      } else {
+        until = TimelineEntry.formatYears(timeUntil).toLowerCase() +
+            " ago\n($pagesFormatted page scrolls)";
+      }
       builder.addText(until);
       labelParagraph = builder.build();
       labelParagraph.layout(ui.ParagraphConstraints(width: size.width));
