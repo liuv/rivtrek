@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
@@ -26,32 +27,28 @@ class Ticks {
   void paint(PaintingContext context, Offset offset, double translation,
       double scale, double height, Timeline timeline) {
     final Canvas canvas = context.canvas;
-    double tickDistance = TickDistance.toDouble();
-    double textTickDistance = TextTickDistance.toDouble();
-    double gutterWidth = timeline.gutterWidth;
+    final double gutterWidth = timeline.gutterWidth;
+    final double renderStart = timeline.renderStart;
+    final double renderEnd = timeline.renderEnd;
 
+    // 按缩放动态选取“次刻度步长”，而不是固定除2/乘2，避免标签稀疏失真。
+    double tickDistance;
     if (timeline.isCalendarMode) {
-      const List<int> minorCandidates = <int>[1, 2, 7, 14, 30, 90, 180, 365, 730];
-      const List<int> majorCandidates = <int>[7, 14, 30, 90, 180, 365, 730, 1825];
-      tickDistance = _pickTickStep(scale, minorCandidates, TickDistance.toDouble()).toDouble();
-      textTickDistance =
-          _pickTickStep(scale, majorCandidates, TextTickDistance.toDouble()).toDouble();
+      tickDistance = _pickDoubleStep(scale, const <double>[
+        1, 2, 3, 7, 14, 30, 60, 90, 180, 365
+      ], 16.0);
+    } else if (timeline.isDistanceMode) {
+      tickDistance = _pickDoubleStep(scale, const <double>[
+        0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100
+      ], 16.0);
     } else {
-      double scaledTickDistance = tickDistance * scale;
-      if (scaledTickDistance > 2 * TickDistance) {
-        while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
-          scaledTickDistance /= 2.0;
-          tickDistance /= 2.0;
-          textTickDistance /= 2.0;
-        }
-      } else {
-        while (scaledTickDistance < TickDistance) {
-          scaledTickDistance *= 2.0;
-          tickDistance *= 2.0;
-          textTickDistance *= 2.0;
-        }
-      }
+      tickDistance = _pickDoubleStep(
+          scale, const <double>[1, 2, 5, 10, 20, 50, 100, 200, 500], 16.0);
     }
+    final double scaledTickDistance = tickDistance * scale;
+    final int majorEvery =
+        math.max(1, (72.0 / math.max(1.0, scaledTickDistance)).round());
+    final double majorDistance = tickDistance * majorEvery;
 
     final List<TickColors> tickColors = timeline.tickColors;
     if (tickColors.isNotEmpty) {
@@ -65,9 +62,9 @@ class Ticks {
         colors.add(bg.background ?? Colors.transparent);
         stops.add(((bg.start ?? 0.0) - rangeStart) / range);
       }
-      final double s = timeline.computeScale(timeline.renderStart, timeline.renderEnd);
-      final double y1 = ((tickColors.first.start ?? 0.0) - timeline.renderStart) * s;
-      final double y2 = ((tickColors.last.start ?? 0.0) - timeline.renderStart) * s;
+      final double s = timeline.computeScale(renderStart, renderEnd);
+      final double y1 = ((tickColors.first.start ?? 0.0) - renderStart) * s;
+      final double y2 = ((tickColors.last.start ?? 0.0) - renderStart) * s;
       final ui.Paint paint = ui.Paint()
         ..shader = ui.Gradient.linear(
             ui.Offset(0.0, y1), ui.Offset(0.0, y2), colors, stops)
@@ -78,11 +75,8 @@ class Ticks {
           Paint()..color = const Color.fromRGBO(246, 246, 246, 0.95));
     }
 
-    final double renderStart = timeline.renderStart;
-    final double renderEnd = timeline.renderEnd;
     final int firstTick = (renderStart / tickDistance).floor() - 1;
     final int lastTick = (renderEnd / tickDistance).ceil() + 1;
-    final int majorStep = textTickDistance.round().clamp(1, 1000000);
 
     for (int idx = firstTick; idx <= lastTick; idx++) {
       final double tickValue = idx * tickDistance;
@@ -93,12 +87,11 @@ class Ticks {
       if (y < offset.dy - 20 || y > offset.dy + height + 20) {
         continue;
       }
-      final int value = tickValue.round();
       final TickColors? colors = timeline.findTickColors(y);
       if (colors == null) {
         continue;
       }
-      final bool isMajor = value % majorStep == 0;
+      final bool isMajor = idx % majorEvery == 0;
       canvas.drawRect(
           Rect.fromLTWH(
               offset.dx + gutterWidth - (isMajor ? TickSize : SmallTickSize),
@@ -113,9 +106,9 @@ class Ticks {
 
       String label;
       if (timeline.isCalendarMode) {
-        label = _formatCalendarLabel(tickValue, majorStep);
+        label = _formatCalendarLabel(tickValue, majorDistance);
       } else if (timeline.isDistanceMode) {
-        label = "${value.abs()} km";
+        label = "${_formatDistance(tickValue.abs())} km";
       } else {
         label = TimelineEntry.formatYears(tickValue);
       }
@@ -133,8 +126,9 @@ class Ticks {
     }
   }
 
-  int _pickTickStep(double scale, List<int> candidates, double targetPixelGap) {
-    for (final int step in candidates) {
+  double _pickDoubleStep(
+      double scale, List<double> candidates, double targetPixelGap) {
+    for (final double step in candidates) {
       if (step * scale >= targetPixelGap) {
         return step;
       }
@@ -142,17 +136,27 @@ class Ticks {
     return candidates.last;
   }
 
-  String _formatCalendarLabel(double axisDay, int majorStep) {
+  String _formatCalendarLabel(double axisDay, double majorDistanceInDays) {
     final DateTime dt = Timeline.axisDayToDate(axisDay);
     final String y = dt.year.toString();
     final String m = dt.month.toString().padLeft(2, '0');
     final String d = dt.day.toString().padLeft(2, '0');
-    if (majorStep >= 365) {
+    if (majorDistanceInDays >= 365) {
       return y;
     }
-    if (majorStep >= 30) {
+    if (majorDistanceInDays >= 30) {
       return "$y-$m";
     }
     return "$m-$d";
+  }
+
+  String _formatDistance(double value) {
+    if (value >= 10) {
+      return value.round().toString();
+    }
+    if (value >= 1) {
+      return value.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '');
+    }
+    return value.toStringAsFixed(1);
   }
 }
