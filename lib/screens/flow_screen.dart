@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -142,7 +143,11 @@ class _FlowScreenState extends State<FlowScreen>
     _milestoneController.reset();
     _milestoneController.forward();
     
-    HapticFeedback.heavyImpact();
+    if (Platform.isAndroid) {
+      HapticFeedback.mediumImpact();
+    } else {
+      HapticFeedback.heavyImpact();
+    }
   }
 
   void _animateTo(double target) {

@@ -72,9 +72,15 @@ class FlowController extends ChangeNotifier {
   /// 从数据库刷新 UI 显示的数据
   Future<void> _updateUIFromDB() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final activity = await DatabaseService.instance.getActivityByDate(today);
+    final riverId = _activeRiverId ?? 'yangtze';
     
-    if (activity != null) {
+    final db = await DatabaseService.instance.database;
+    final maps = await db.query('daily_activities', 
+        where: 'date = ? AND river_id = ?', 
+        whereArgs: [today, riverId]);
+    
+    if (maps.isNotEmpty) {
+      final activity = DailyActivity.fromMap(maps.first);
       _displaySteps = activity.steps;
       _currentDistance = activity.accumulatedDistanceKm;
       _challengeProvider?.syncRealDistance(_currentDistance);
@@ -144,6 +150,7 @@ class FlowController extends ChangeNotifier {
           cityName: _cityName,
           latitude: _lat,
           longitude: _lon,
+          aqi: _aqi,
         ));
       }
     } catch (e) {

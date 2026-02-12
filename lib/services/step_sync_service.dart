@@ -56,10 +56,15 @@ class StepSyncService {
       }
 
       // 更新数据库
+      final prefs = await SharedPreferences.getInstance();
+      final String riverId = prefs.getString('active_river_id') ?? 'yangtze';
+      
       double accumulatedDistance = 0.0;
       final allActivities = await DatabaseService.instance.getAllActivities();
-      // 获取同步起点之前的最后一次累计里程
-      final previousActivities = allActivities.where((a) => a.date.compareTo(DateFormat('yyyy-MM-dd').format(startDate)) < 0).toList();
+      // 获取该河流同步起点之前的最后一次累计里程
+      final previousActivities = allActivities
+          .where((a) => a.riverId == riverId && a.date.compareTo(DateFormat('yyyy-MM-dd').format(startDate)) < 0)
+          .toList();
       if (previousActivities.isNotEmpty) {
         previousActivities.sort((a, b) => b.date.compareTo(a.date));
         accumulatedDistance = previousActivities.first.accumulatedDistanceKm;
@@ -77,6 +82,7 @@ class StepSyncService {
           steps: steps,
           distanceKm: distance,
           accumulatedDistanceKm: accumulatedDistance,
+          riverId: riverId,
         ));
       }
       debugPrint("Health Data Sync Completed for $days days.");
@@ -126,9 +132,10 @@ class StepSyncService {
       }
 
       // 保存到数据库
+      final String riverId = prefs.getString('active_river_id') ?? 'yangtze';
       final allActivities = await DatabaseService.instance.getAllActivities();
       double totalHistory = allActivities
-          .where((a) => a.date != today)
+          .where((a) => a.date != today && a.riverId == riverId)
           .fold(0.0, (sum, item) => sum + item.distanceKm);
 
       await DatabaseService.instance.saveActivity(DailyActivity(
@@ -136,6 +143,7 @@ class StepSyncService {
         steps: todaySteps,
         distanceKm: todaySteps * _stepLengthKm,
         accumulatedDistanceKm: totalHistory + (todaySteps * _stepLengthKm),
+        riverId: riverId,
       ));
 
       debugPrint("Android Sensor Sync: $todaySteps steps.");

@@ -20,8 +20,16 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1, // 这里我们直接把新架构设为 v1，文件名也改了，避免迁移旧坏数据
+      version: 3, 
       onCreate: _createDB,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE daily_weather ADD COLUMN aqi TEXT DEFAULT "--"');
+        }
+        if (oldVersion < 3) {
+          await db.execute('ALTER TABLE daily_activities ADD COLUMN river_id TEXT DEFAULT "yangtze"');
+        }
+      },
     );
   }
 
@@ -29,10 +37,12 @@ class DatabaseService {
     // 1. 每日步数统计 (高频写)
     await db.execute('''
       CREATE TABLE daily_activities (
-        date TEXT PRIMARY KEY,
+        date TEXT,
+        river_id TEXT,
         steps INTEGER,
         distance_km REAL,
-        accumulated_distance_km REAL
+        accumulated_distance_km REAL,
+        PRIMARY KEY (date, river_id)
       )
     ''');
 
@@ -47,7 +57,8 @@ class DatabaseService {
         wind_speed REAL,
         city_name TEXT,
         latitude REAL,
-        longitude REAL
+        longitude REAL,
+        aqi TEXT
       )
     ''');
 

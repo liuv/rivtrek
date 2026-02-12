@@ -3,9 +3,28 @@ import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 import '../providers/challenge_provider.dart';
 import 'settings_screen.dart';
+import 'package:rivtrek/services/database_service.dart';
+import 'package:rivtrek/timeline/timeline_page.dart';
 
 class MeScreen extends StatelessWidget {
   const MeScreen({super.key});
+
+  void _navigateToChallengeRecords(BuildContext context) async {
+    final activities = await DatabaseService.instance.getAllActivities();
+    final weathers = await DatabaseService.instance.getAllWeather();
+
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TimelinePage(
+            activities: activities,
+            weathers: weathers,
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +168,8 @@ class MeScreen extends StatelessWidget {
                   const Divider(color: Color(0xFFEEEEEE)),
                   const SizedBox(height: 20),
                   // Settings/Menu
+                  _buildMenuItem("挑战记录", Icons.history_rounded,
+                      onTap: () => _navigateToChallengeRecords(context)),
                   _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,

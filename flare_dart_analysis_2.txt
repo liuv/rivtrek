@@ -1,0 +1,1068 @@
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  device_info_plus 10.1.2 (12.3.0 available)
+  dio_cache_interceptor 3.5.1 (4.0.5 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  flutter_map 7.0.2 (8.2.2 available)
+  flutter_map_cache 1.5.2 (2.0.0+1 available)
+  geolocator 13.0.4 (14.0.2 available)
+  geolocator_android 4.6.2 (5.0.2 available)
+  health 11.1.1 (13.3.1 available)
+  intl 0.19.0 (0.20.2 available)
+  lints 4.0.0 (6.1.0 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.1 available)
+  mgrs_dart 2.0.0 (3.0.0 available)
+  permission_handler 11.4.0 (12.0.1 available)
+  permission_handler_android 12.1.0 (13.0.1 available)
+  proj4dart 2.1.0 (3.0.0 available)
+  test_api 0.7.7 (0.7.9 available)
+  unicode 0.3.1 (1.1.9 available)
+  win32_registry 1.1.5 (2.1.0 available)
+  workmanager 0.7.0 (0.9.0+3 available)
+Got dependencies!
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing flare_dart...                                         
+
+warning • 'always_require_non_null_named_parameters' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:9:5 • removed_lint
+warning • 'avoid_returning_null' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:25:5 • removed_lint
+warning • 'avoid_returning_null_for_future' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:26:5 • removed_lint
+warning • 'invariant_booleans' was removed in Dart '3.0.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:50:5 • removed_lint
+warning • 'iterable_contains_unrelated_type' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:51:5 • removed_lint
+warning • 'list_remove_unrelated_type' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:56:5 • removed_lint
+warning • 'package_api_docs' was removed in Dart '3.7.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:65:5 • removed_lint
+warning • 'prefer_equal_for_default_values' was removed in Dart '3.0.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:79:5 • removed_lint
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:6:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:11:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:12:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:14:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:15:1 • directives_ordering
+   info • Start the name of the method with 'to' or 'as' • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:56:17 • use_to_and_as_if_applicable
+   info • Unnecessary 'dynamic' type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:106:36 • avoid_annotating_with_dynamic
+   info • Unnecessary constructor invocation • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:125:24 • prefer_collection_literals
+   info • Unnecessary 'dynamic' type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:173:57 • avoid_annotating_with_dynamic
+   info • Unnecessary 'dynamic' type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:176:27 • avoid_annotating_with_dynamic
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:184:81 • lines_longer_than_80_chars
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:4:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:10:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:13:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:17:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:19:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:20:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:22:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:27:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:30:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:32:1 • directives_ordering
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:33:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:34:1 • directives_ordering
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:35:1 • directives_ordering
+   info • The variable 'd' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:153:27 • prefer_final_in_for_each
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:366:81 • lines_longer_than_80_chars
+warning • Unnecessary cast • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:375:38 • unnecessary_cast
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:556:16 • unnecessary_null_comparison
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:582:81 • lines_longer_than_80_chars
+  error • The argument type 'List<ActorComponent?>' can't be assigned to the parameter type 'List<ActorComponent>'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:590:51 • argument_type_not_assignable
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:612:20 • unnecessary_null_comparison
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:4:1 • directives_ordering
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:94:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:98:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:99:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:100:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:101:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:102:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:103:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:104:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:105:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:106:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:107:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:108:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:109:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:110:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:111:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:112:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:113:7 • type_annotate_public_apis
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:2:1 • directives_ordering
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:16:18 • annotate_overrides
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:22:8 • annotate_overrides
+   info • The variable 'node' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:27:20 • prefer_final_in_for_each
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:27:28 • unchecked_use_of_nullable_value
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:35:20 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:37:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:38:7 • parameter_assignments
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:5:1 • directives_ordering
+   info • The variable 'node' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:22:20 • prefer_final_in_for_each
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:22:28 • unchecked_use_of_nullable_value
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:38:24 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:40:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:41:7 • parameter_assignments
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:4:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:6:1 • directives_ordering
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:9:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:11:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:12:1 • directives_ordering
+   info • The constant name 'EvenOdd' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:14:17 • constant_identifier_names
+   info • The constant name 'NonZero' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:14:26 • constant_identifier_names
+   info • The constant name 'Butt' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:15:18 • constant_identifier_names
+   info • The constant name 'Round' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:15:24 • constant_identifier_names
+   info • The constant name 'Square' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:15:31 • constant_identifier_names
+   info • The constant name 'Miter' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:16:19 • constant_identifier_names
+   info • The constant name 'Round' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:16:26 • constant_identifier_names
+   info • The constant name 'Bevel' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:16:33 • constant_identifier_names
+   info • The constant name 'Off' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:17:17 • constant_identifier_names
+   info • The constant name 'Sequential' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:17:22 • constant_identifier_names
+   info • The constant name 'Synced' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:17:34 • constant_identifier_names
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:56:8 • annotate_overrides
+  error • The argument type 'ActorNode?' can't be assigned to the parameter type 'ActorComponent'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:57:34 • argument_type_not_assignable
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:70:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:71:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:71:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:71:8 • missing_identifier
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:75:20 • invalid_null_aware_operator
+   info • The member 'onDirty' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:106:8 • annotate_overrides
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:107:8 • annotate_overrides
+  error • A value of type 'FillRule?' can't be assigned to a variable of type 'FillRule' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:116:27 • invalid_assignment
+  error • A value of type 'StrokeCap?' can't be assigned to a variable of type 'StrokeCap' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:184:24 • invalid_assignment
+  error • A value of type 'StrokeJoin?' can't be assigned to a variable of type 'StrokeJoin' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:185:25 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:211:50 • prefer_mixin
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:224:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:227:28 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:234:52 • prefer_mixin
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:247:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:250:28 • invalid_assignment
+   info • The private field _start could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:259:9 • prefer_final_fields
+   info • The private field _end could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:260:9 • prefer_final_fields
+   info • The private field _renderStart could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:261:9 • prefer_final_fields
+   info • The private field _renderEnd could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:262:9 • prefer_final_fields
+   info • The member 'opacity' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:263:10 • annotate_overrides
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:270:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:271:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:271:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:271:8 • missing_identifier
+   info • The member 'onDirty' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:296:8 • annotate_overrides
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:297:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorShape' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:298:24 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:305:56 • prefer_mixin
+  error • A value of type 'FillRule?' can't be assigned to a variable of type 'FillRule' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:314:27 • invalid_assignment
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:318:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:321:28 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:328:58 • prefer_mixin
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:341:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:344:28 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:370:68 • prefer_mixin
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:384:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:387:28 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:395:10 • prefer_mixin
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:409:8 • annotate_overrides
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:412:28 • invalid_assignment
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_component.dart:2:1 • directives_ordering
+   info • Invalid location for the unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_component.dart:17:3 • sort_unnamed_constructors_first
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:3:1 • directives_ordering
+   info • The member 'onDirty' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:22:8 • annotate_overrides
+   info • The member 'resolveComponentIndices' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:44:8 • annotate_overrides
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:47:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:55:81 • lines_longer_than_80_chars
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:5:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:6:1 • directives_ordering
+   info • The constant name 'Closer' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:9:20 • constant_identifier_names
+   info • The constant name 'Further' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:10:20 • constant_identifier_names
+   info • The constant name 'Exact' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:11:20 • constant_identifier_names
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:20:34 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:22:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:23:7 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:48:3 • type_annotate_public_apis
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:49:19 • unnecessary_this
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:49:19 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:50:11 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:54:19 • unnecessary_this
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:54:19 • invalid_assignment
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:88:8 • annotate_overrides
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:89:8 • annotate_overrides
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:91:7 • type_annotate_public_apis
+  error • The return type of getter 'distance' is 'dynamic' which isn't a subtype of the type 'double' of its setter 'distance' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:91:7 • getter_not_subtype_setter_types
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:92:7 • type_annotate_public_apis
+  error • The return type of getter 'mode' is 'dynamic' which isn't a subtype of the type 'int' of its setter 'mode' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:92:7 • getter_not_subtype_setter_types
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:97:7 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:104:7 • unnecessary_this
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:6:1 • directives_ordering
+   info • The constant name 'Normal' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:19 • constant_identifier_names
+   info • The constant name 'Multiply' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:27 • constant_identifier_names
+   info • The constant name 'Screen' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:37 • constant_identifier_names
+   info • The constant name 'Additive' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:45 • constant_identifier_names
+  error • Non-nullable instance field '_clipShapes' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:11:26 • not_initialized_non_nullable_instance_field
+  error • Non-nullable instance field 'drawIndex' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:26:7 • not_initialized_non_nullable_instance_field
+  error • Non-nullable instance field 'isHidden' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:27:8 • not_initialized_non_nullable_instance_field
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:41:81 • lines_longer_than_80_chars
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:58:8 • annotate_overrides
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:59:19 • new_with_undefined_constructor_default
+   info • The variable 'clips' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:61:26 • prefer_final_in_for_each
+   info • The variable 'clip' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:63:22 • prefer_final_in_for_each
+  error • The method 'all' can't be unconditionally invoked because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:64:19 • unchecked_use_of_nullable_value
+  error • The body might complete normally, causing 'null' to be returned, but the return type, 'bool', is a potentially non-nullable type • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:64:40 • body_might_complete_normally
+   info • Use 'isNotEmpty' instead of 'length' to test whether the collection is empty • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:70:11 • prefer_is_empty
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:6:1 • directives_ordering
+   info • The constant name 'CircleConstant' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:9:14 • constant_identifier_names
+  error • 'ActorComponent.parent' ('ActorNode? Function()') isn't a valid concrete implementation of 'ActorBasePath.parent' ('ActorNode Function()') • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:11:7 • invalid_implementation_override
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:12:18 • annotate_overrides
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:21:23 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:23:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:23:19 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:24:7 • parameter_assignments
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:35:23 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:53:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:53:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:53:8 • missing_identifier
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:59:13 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:62:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:63:25 • unnecessary_this
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:2:1 • directives_ordering
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:8:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:9:7 • parameter_assignments
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:17:18 • annotate_overrides
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:23:8 • annotate_overrides
+   info • The member 'onDirty' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:24:8 • annotate_overrides
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:25:8 • annotate_overrides
+   info • The constant name 'IsDrawOrderDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:2:20 • constant_identifier_names
+   info • The constant name 'IsDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:3:20 • constant_identifier_names
+   info • The constant name 'TransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:7:20 • constant_identifier_names
+   info • The constant name 'WorldTransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:8:20 • constant_identifier_names
+   info • The constant name 'PaintDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:9:20 • constant_identifier_names
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:5:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:7:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:8:1 • directives_ordering
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:10:1 • directives_ordering
+   info • The constant name 'PI2' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:27:23 • constant_identifier_names
+   info • The member 'resolveComponentIndices' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:33:8 • annotate_overrides
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:36:26 • unnecessary_null_comparison
+   info • The variable 'influenced' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:37:27 • prefer_final_in_for_each
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:39:81 • lines_longer_than_80_chars
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:48:8 • annotate_overrides
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:49:26 • unnecessary_null_comparison
+   info • Use 'isEmpty' instead of 'length' to test whether the collection is empty • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:49:37 • prefer_is_empty
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:57:16 • unnecessary_null_comparison
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:59:13 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:66:16 • unnecessary_null_comparison
+  error • A value of type 'ActorNode' can't be assigned to a variable of type 'ActorBone' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:68:17 • invalid_assignment
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:75:13 • invalid_assignment
+   info • The variable 'bone' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:80:25 • prefer_final_in_for_each
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:83:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:84:21 • unnecessary_null_comparison
+   info • The variable 'bone' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:100:25 • prefer_final_in_for_each
+  error • The argument type 'ActorComponent?' can't be assigned to the parameter type 'ActorComponent'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:110:36 • argument_type_not_assignable
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:113:81 • lines_longer_than_80_chars
+   info • The variable 'fk' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:115:20 • prefer_final_in_for_each
+   info • The variable 'node' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:121:22 • prefer_final_in_for_each
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:121:30 • unchecked_use_of_nullable_value
+  error • The returned type 'Null' isn't returnable from a 'BoneChain' function, as required by the closure's context • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:124:27 • return_of_invalid_type_from_closure
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:125:18 • unnecessary_null_comparison
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:136:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:137:7 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:146:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:151:81 • lines_longer_than_80_chars
+   info • The member 'constrain' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:158:8 • annotate_overrides
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:159:24 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:160:16 • unnecessary_null_comparison
+   info • Use 'isEmpty' instead of 'length' to test whether the collection is empty • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:166:9 • prefer_is_empty
+   info • The variable 'item' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:171:20 • prefer_final_in_for_each
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:173:39 • unchecked_use_of_nullable_value
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:192:62 • unchecked_use_of_nullable_value
+   info • The variable 'fk' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:199:22 • prefer_final_in_for_each
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:203:48 • unchecked_use_of_nullable_value
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:222:37 • unchecked_use_of_nullable_value
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:331:44 • unchecked_use_of_nullable_value
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:339:18 • annotate_overrides
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:349:31 • unnecessary_null_comparison
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:359:8 • annotate_overrides
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:5:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:6:1 • directives_ordering
+  error • The return type of getter 'ActorNode.worldTransformOverride' is 'Mat2D?' which isn't a subtype of the type 'Mat2D' of its setter 'ActorSkinnable.worldTransformOverride' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:25:7 • getter_not_subtype_setter_types
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:25:45 • prefer_mixin
+  error • The setter 'ActorSkinnable.worldTransformOverride' ('void Function(Mat2D)') isn't a valid override of 'ActorNode.worldTransformOverride' ('void Function(Mat2D?)') • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:25:45 • invalid_override
+   info • Field overrides a field inherited from 'ActorDrawable' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:27:7 • overridden_fields
+   info • Unnecessary use of getter and setter to wrap a field • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:42:11 • unnecessary_getters_setters
+  error • Non-nullable instance field 'drawIndex' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:120:3 • not_initialized_non_nullable_instance_field
+  error • Non-nullable instance field 'drawOrder' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:120:3 • not_initialized_non_nullable_instance_field
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:132:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:132:14 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:133:7 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:174:81 • lines_longer_than_80_chars
+   info • The member 'resolveComponentIndices' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:202:8 • annotate_overrides
+  error • 'ActorImage.resolveComponentIndices' ('void Function(List<ActorComponent>)') isn't a valid override of 'ActorNode.resolveComponentIndices' ('void Function(List<ActorComponent?>)') • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:202:8 • invalid_override
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:207:18 • annotate_overrides
+  error • The argument type 'Float32List?' can't be assigned to the parameter type 'List<double>'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:224:32 • argument_type_not_assignable
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:250:22 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:288:14 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:289:40 • unnecessary_non_null_assertion
+  error • A value of type 'Mat2D?' can't be returned from the function 'imageTransform' because it has a return type of 'Mat2D' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:385:31 • return_of_invalid_type
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:2:1 • directives_ordering
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:7:18 • annotate_overrides
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:13:25 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:15:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:16:7 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:19:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:20:81 • lines_longer_than_80_chars
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:5:1 • directives_ordering
+   info • The constant name 'TransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:41:20 • constant_identifier_names
+   info • The constant name 'WorldTransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:42:20 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:73:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:193:18 • unnecessary_null_comparison
+  error • The property '_renderCollapsed' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:220:59 • unchecked_use_of_nullable_value
+  error • The property '_renderOpacity' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:221:32 • unchecked_use_of_nullable_value
+  error • The property '_worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:223:48 • unchecked_use_of_nullable_value
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:232:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:233:7 • parameter_assignments
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:260:5 • prefer_conditional_assignment
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:270:18 • annotate_overrides
+   info • The member 'onDirty' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:297:8 • annotate_overrides
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:300:5 • prefer_conditional_assignment
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:311:5 • prefer_conditional_assignment
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:329:8 • annotate_overrides
+   info • The variable 'constraint' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:336:30 • prefer_final_in_for_each
+   info • The member 'resolveComponentIndices' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:345:8 • annotate_overrides
+   info • The variable 'clip' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:352:20 • prefer_final_in_for_each
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:357:8 • annotate_overrides
+   info • The variable 'child' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:363:22 • prefer_final_in_for_each
+   info • The variable 'child' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:382:22 • prefer_final_in_for_each
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:5:1 • directives_ordering
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:11:16 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:12:7 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:17:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:23:7 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:26:26 • unnecessary_this
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:32:18 • annotate_overrides
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:43:24 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:45:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:46:7 • parameter_assignments
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:54:8 • annotate_overrides
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:56:5 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:56:30 • unnecessary_this
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:6:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:8:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:9:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:10:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:11:1 • directives_ordering
+   info • The variable 'p' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:48:16 • prefer_final_in_for_each
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:67:3 • type_annotate_public_apis
+   info • The variable 'point' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:81:20 • prefer_final_in_for_each
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:137:59 • prefer_mixin
+  error • 'ActorComponent.parent' ('ActorNode? Function()') isn't a valid concrete implementation of 'ActorBasePath.parent' ('ActorNode Function()') • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:177:7 • invalid_implementation_override
+  error • The return type of getter 'ActorNode.worldTransformOverride' is 'Mat2D?' which isn't a subtype of the type 'Mat2D' of its setter 'ActorSkinnable.worldTransformOverride' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:177:7 • getter_not_subtype_setter_types
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:177:40 • prefer_mixin
+  error • The setter 'ActorSkinnable.worldTransformOverride' ('void Function(Mat2D)') isn't a valid override of 'ActorNode.worldTransformOverride' ('void Function(Mat2D?)') • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:177:40 • invalid_override
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:177:56 • prefer_mixin
+  error • Non-nullable instance field 'vertexDeform' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:181:15 • not_initialized_non_nullable_instance_field
+  error • A value of type 'Mat2D?' can't be returned from the function 'pathTransform' because it has a return type of 'Mat2D' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:192:30 • return_of_invalid_type
+   info • The constant name 'VertexDeformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:194:20 • constant_identifier_names
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:200:23 • unused_local_variable
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:201:37 • unnecessary_null_comparison
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:202:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:202:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:202:8 • missing_identifier
+   info • The variable 'point' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:207:20 • prefer_final_in_for_each
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:213:12 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:214:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:214:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:214:8 • missing_identifier
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:227:22 • unnecessary_null_comparison
+   info • The variable 'point' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:235:20 • prefer_final_in_for_each
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:254:18 • unnecessary_null_comparison
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:260:8 • annotate_overrides
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:261:22 • unnecessary_null_comparison
+   info • The variable 'point' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:264:22 • prefer_final_in_for_each
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:289:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:289:19 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:290:7 • parameter_assignments
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:300:25 • new_with_undefined_constructor_default
+  error • A value of type 'PointType?' can't be assigned to a variable of type 'PointType' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:304:24 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:317:17 • unnecessary_null_comparison
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:330:18 • annotate_overrides
+  error • 'ActorPath.resolveComponentIndices' ('void Function(List<ActorComponent>)') isn't a valid override of 'ActorNode.resolveComponentIndices' ('void Function(List<ActorComponent?>)') • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:337:8 • invalid_override
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:350:15 • new_with_undefined_constructor_default
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:355:27 • unnecessary_null_comparison
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:6:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:8:1 • directives_ordering
+  error • 'ActorComponent.parent' ('ActorNode? Function()') isn't a valid concrete implementation of 'ActorBasePath.parent' ('ActorNode Function()') • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:10:7 • invalid_implementation_override
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:15:18 • annotate_overrides
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:26:23 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:28:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:28:19 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:29:7 • parameter_assignments
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:41:23 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:51:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:51:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:51:8 • missing_identifier
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:55:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:56:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:57:25 • unnecessary_this
+  error • 'ActorComponent.parent' ('ActorNode? Function()') isn't a valid concrete implementation of 'ActorBasePath.parent' ('ActorNode Function()') • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:11:7 • invalid_implementation_override
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:29:25 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:31:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:31:19 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:32:7 • parameter_assignments
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:44:23 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:57:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:57:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:57:8 • missing_identifier
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:4:1 • directives_ordering
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:14:8 • annotate_overrides
+   info • The variable 'node' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:19:20 • prefer_final_in_for_each
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:19:28 • unchecked_use_of_nullable_value
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:27:18 • annotate_overrides
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:33:24 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:35:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:36:7 • parameter_assignments
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:4:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:6:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:7:1 • directives_ordering
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:8:1 • directives_ordering
+   info • The constant name 'PI2' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:12:23 • constant_identifier_names
+   info • The private field _componentsA could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:24:23 • prefer_final_fields
+   info • The private field _componentsB could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:25:23 • prefer_final_fields
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:27:34 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:29:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:30:7 • parameter_assignments
+   info • The member 'constrain' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:54:8 • annotate_overrides
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:55:24 • invalid_assignment
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:56:29 • invalid_assignment
+  error • The property 'parent' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:56:36 • unchecked_use_of_nullable_value
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:58:31 • unchecked_use_of_nullable_value
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:61:16 • unnecessary_null_comparison
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:72:39 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:73:31 • unnecessary_null_comparison
+  error • The property 'rotation' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:89:43 • unchecked_use_of_nullable_value
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:95:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:96:25 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:105:61 • unnecessary_null_comparison
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:145:26 • unchecked_use_of_nullable_value
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:148:18 • annotate_overrides
+   info • The member 'update' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:171:8 • annotate_overrides
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:172:8 • annotate_overrides
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:4:1 • directives_ordering
+   info • The private field _componentsA could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:10:23 • prefer_final_fields
+   info • The private field _componentsB could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:11:23 • prefer_final_fields
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:15:31 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:17:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:18:7 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:25:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:32:3 • type_annotate_public_apis
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:33:19 • unnecessary_this
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:33:19 • invalid_assignment
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:34:19 • unnecessary_this
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:34:19 • invalid_assignment
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:35:29 • invalid_assignment
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:37:31 • unchecked_use_of_nullable_value
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:40:11 • unnecessary_null_comparison
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:51:39 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:52:31 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:60:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:62:13 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:64:28 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:65:13 • unnecessary_this
+  error • The property 'scaleX' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:66:37 • unchecked_use_of_nullable_value
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:70:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:72:13 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:74:28 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:76:13 • unnecessary_this
+  error • The property 'scaleY' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:77:37 • unchecked_use_of_nullable_value
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:83:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:84:25 • unnecessary_null_comparison
+   info • Unnecessary use of parentheses • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:93:9 • unnecessary_parenthesis
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:93:61 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:102:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:102:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:103:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:105:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:105:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:106:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:108:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:108:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:109:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:111:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:111:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:112:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:121:23 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:126:64 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:127:64 • unnecessary_this
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:130:26 • unchecked_use_of_nullable_value
+  error • A value of type 'ActorFill?' can't be returned from the function 'fill' because it has a return type of 'ActorFill' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:17:25 • return_of_invalid_type
+  error • A value of type 'ActorStroke?' can't be returned from the function 'stroke' because it has a return type of 'ActorStroke' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:18:29 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:52:20 • unnecessary_null_comparison
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:55:13 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:55:18 • unnecessary_null_comparison
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:58:27 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:59:13 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:61:27 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:62:13 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:64:27 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:65:13 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:67:27 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:68:13 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:73:9 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:73:14 • unnecessary_null_comparison
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:74:14 • not_assigned_potentially_non_nullable_local_variable
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:77:34 • unchecked_use_of_nullable_value
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:79:16 • unnecessary_null_comparison
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:86:11 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:86:16 • unnecessary_null_comparison
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:90:9 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:90:23 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:91:9 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:91:23 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:93:9 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:93:23 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:94:9 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:94:23 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:103:9 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:103:14 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:108:18 • unnecessary_null_comparison
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:116:7 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:117:7 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:118:7 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:119:7 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:123:24 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:123:33 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:124:24 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:124:33 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:125:24 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:125:33 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:126:24 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'aabb' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:126:33 • not_assigned_potentially_non_nullable_local_variable
+warning • Unused import: 'actor_path.dart' • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:2:8 • unused_import
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:4:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:7:1 • directives_ordering
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:21:19 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:28:25 • unnecessary_null_comparison
+   info • The variable 'cb' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:43:24 • prefer_final_in_for_each
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:44:21 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:71:19 • unnecessary_null_comparison
+   info • The variable 'skinnedBone' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:78:24 • prefer_final_in_for_each
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:82:25 • unnecessary_null_comparison
+   info • The variable 'constraint' should be final • dependencies/Flare-Flutter/flare_dart/lib/actor_skin.dart:83:32 • prefer_final_in_for_each
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:4:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:6:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:7:1 • directives_ordering
+  error • Non-nullable instance field 'boneIdx' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:10:7 • not_initialized_non_nullable_instance_field
+  error • Non-nullable instance field 'node' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:11:13 • not_initialized_non_nullable_instance_field
+  error • Non-nullable instance field 'skin' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:17:13 • not_initialized_non_nullable_instance_field
+   info • Setter has no corresponding getter • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:19:7 • avoid_setters_without_getters
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:23:23 • unnecessary_null_comparison
+   info • Use 'isNotEmpty' instead of 'length' to test whether the collection is empty • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:23:34 • prefer_is_empty
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:30:30 • new_with_undefined_constructor_default
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:43:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:53:25 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:62:30 • unnecessary_null_comparison
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:63:25 • new_with_undefined_constructor_default
+  error • 'ActorComponent.parent' ('ActorNode? Function()') isn't a valid concrete implementation of 'ActorBasePath.parent' ('ActorNode Function()') • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:10:7 • invalid_implementation_override
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:30:20 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:32:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:32:19 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:33:7 • parameter_assignments
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:46:23 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:61:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:61:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:61:8 • missing_identifier
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_targeted_constraint.dart:3:1 • directives_ordering
+   info • The member 'resolveComponentIndices' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_targeted_constraint.dart:14:8 • annotate_overrides
+  error • The argument type 'ActorNode?' can't be assigned to the parameter type 'ActorComponent'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_targeted_constraint.dart:18:30 • argument_type_not_assignable
+  error • The argument type 'ActorComponent?' can't be assigned to the parameter type 'ActorComponent'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_targeted_constraint.dart:18:38 • argument_type_not_assignable
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:8:1 • directives_ordering
+   info • The private field _componentsA could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:15:23 • prefer_final_fields
+   info • The private field _componentsB could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:16:23 • prefer_final_fields
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:20:35 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:22:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:23:7 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:34:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:40:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:48:3 • type_annotate_public_apis
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:49:19 • unnecessary_this
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:49:19 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:50:11 • unnecessary_null_comparison
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:54:24 • invalid_assignment
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:59:31 • invalid_assignment
+  error • The property 'parent' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:59:38 • unchecked_use_of_nullable_value
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:60:23 • unnecessary_null_comparison
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:67:31 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:68:23 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:84:23 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:86:39 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:87:64 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:88:64 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:89:64 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:90:64 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:91:64 • unnecessary_this
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:5:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:7:1 • directives_ordering
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:12:37 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:14:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:15:7 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:23:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:30:3 • type_annotate_public_apis
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:31:19 • unnecessary_this
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:31:19 • invalid_assignment
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:32:19 • unnecessary_this
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:32:19 • invalid_assignment
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:33:29 • invalid_assignment
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:35:31 • unchecked_use_of_nullable_value
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:39:11 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:43:11 • unnecessary_this
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:44:39 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:45:31 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:54:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:58:28 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:59:13 • unnecessary_this
+  error • The property 'translation' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:60:37 • unchecked_use_of_nullable_value
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:64:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:68:28 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:69:13 • unnecessary_this
+  error • The property 'translation' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:70:37 • unchecked_use_of_nullable_value
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:75:25 • unnecessary_null_comparison
+   info • Unnecessary use of parentheses • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:83:9 • unnecessary_parenthesis
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:83:61 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:91:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:91:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:92:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:94:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:94:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:95:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:97:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:97:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:98:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:100:9 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:100:46 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:101:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:109:23 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:112:62 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:113:62 • unnecessary_this
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:5:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:7:1 • directives_ordering
+  error • 'ActorComponent.parent' ('ActorNode? Function()') isn't a valid concrete implementation of 'ActorBasePath.parent' ('ActorNode Function()') • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:9:7 • invalid_implementation_override
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:13:18 • annotate_overrides
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:19:24 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:21:5 • prefer_conditional_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:21:19 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:22:7 • parameter_assignments
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:33:23 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:41:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:41:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:41:8 • missing_identifier
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:45:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:46:25 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:47:25 • unnecessary_this
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:15:11 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:16:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:16:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:16:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:19:22 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:20:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:20:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:20:8 • missing_identifier
+  error • A value of type 'StreamReader?' can't be assigned to a variable of type 'StreamReader' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:24:34 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:25:23 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'PropertyAnimation' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:26:14 • return_of_invalid_type
+  error • The non-nullable local variable 'keyFrameReader' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:139:9 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:139:24 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'PropertyAnimation' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:140:14 • return_of_invalid_type
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:145:36 • new_with_undefined_constructor_default
+  error • The non-nullable local variable 'keyFrameReader' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:149:24 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'lastKeyFrame' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:151:11 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:151:24 • unnecessary_null_comparison
+  error • The non-nullable local variable 'lastKeyFrame' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:152:9 • not_assigned_potentially_non_nullable_local_variable
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:214:11 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:215:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:215:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:215:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:218:31 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:219:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:219:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:219:8 • missing_identifier
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:229:38 • new_with_undefined_constructor_default
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:241:29 • unnecessary_null_comparison
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:264:14 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:265:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:265:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:265:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:268:22 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:269:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:269:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:269:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:272:11 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:273:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:273:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:273:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:276:14 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:277:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:277:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:277:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:280:14 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:281:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:281:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:281:8 • missing_identifier
+  error • The argument type 'List<ActorComponent?>' can't be assigned to the parameter type 'List<ActorComponent>'.  • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:383:38 • argument_type_not_assignable
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:405:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:410:30 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:413:28 • unnecessary_null_comparison
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:424:29 • new_with_undefined_constructor_default
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:426:9 • new_with_undefined_constructor_default
+  error • A value of type 'ComponentAnimation?' can't be assigned to a variable of type 'ComponentAnimation' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:432:47 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:433:30 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:436:28 • unnecessary_null_comparison
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic.dart:2:1 • directives_ordering
+   info • The member 'getEasedMix' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic.dart:7:10 • annotate_overrides
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic.dart:12:81 • lines_longer_than_80_chars
+   info • The constant name 'NewtonIterations' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:4:11 • constant_identifier_names
+   info • The constant name 'NewtonMinSlope' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:5:14 • constant_identifier_names
+   info • The constant name 'SubdivisionPrecision' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:6:14 • constant_identifier_names
+   info • The constant name 'SubdivisionMaxIterations' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:7:11 • constant_identifier_names
+   info • The constant name 'SplineTableSize' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:9:11 • constant_identifier_names
+   info • The constant name 'SampleStepSize' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:10:14 • constant_identifier_names
+   info • Invalid assignment to the parameter 'aGuessT' • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:33:5 • parameter_assignments
+   info • Unnecessary use of an abstract class • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/interpolator.dart:1:16 • one_member_abstracts
+   info • The constant name 'Hold' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:23:27 • constant_identifier_names
+   info • The constant name 'Linear' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:23:33 • constant_identifier_names
+   info • The constant name 'Cubic' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:23:41 • constant_identifier_names
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:39:14 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:40:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:40:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:40:8 • missing_identifier
+  error • A value of type 'InterpolationTypes?' can't be assigned to a variable of type 'InterpolationTypes' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:68:37 • invalid_assignment
+warning • The left operand can't be null, so the right operand is never executed • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:69:20 • dead_null_aware_expression
+  error • A value of type 'Null' can't be assigned to a variable of type 'Interpolator' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:87:31 • invalid_assignment
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:105:14 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:106:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:106:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:106:8 • missing_identifier
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:122:23 • unnecessary_null_comparison
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:139:14 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:140:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:140:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:140:8 • missing_identifier
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:156:23 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:176:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:193:12 • return_of_invalid_type
+warning • The value of the field '_value' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:205:15 • unused_field
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:209:14 • return_of_invalid_type
+warning • The value of the field '_value' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:233:13 • unused_field
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:237:14 • return_of_invalid_type
+warning • The value of the field '_value' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:261:13 • unused_field
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:265:14 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:295:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:311:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:327:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:343:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:359:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:375:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:391:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:397:14 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:410:12 • return_of_invalid_type
+  error • Non-nullable instance field 'componentIndex' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:421:7 • not_initialized_non_nullable_instance_field
+  error • Non-nullable instance field 'order' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:422:7 • not_initialized_non_nullable_instance_field
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:431:14 • return_of_invalid_type
+  error • The class 'List' doesn't have an unnamed constructor • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:435:27 • new_with_undefined_constructor_default
+  error • A value of type 'ActorComponent?' can't be assigned to a variable of type 'ActorComponent' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:463:34 • invalid_assignment
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:474:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:475:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:475:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:475:8 • missing_identifier
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:481:14 • return_of_invalid_type
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:501:22 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:506:23 • unnecessary_null_comparison
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:531:22 • invalid_assignment
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:551:14 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:575:14 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:604:12 • return_of_invalid_type
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:621:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:622:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:622:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:622:8 • missing_identifier
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:628:14 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:648:23 • unnecessary_null_comparison
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:689:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:690:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:690:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:690:8 • missing_identifier
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:696:14 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:740:23 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:786:12 • return_of_invalid_type
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:799:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:800:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:800:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:800:8 • missing_identifier
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:806:14 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:821:23 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:865:12 • return_of_invalid_type
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:882:14 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:896:23 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:985:14 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:999:23 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1085:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1090:19 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1104:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1109:19 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1123:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1128:19 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1140:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1145:19 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1158:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1163:19 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1176:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1181:19 • unnecessary_null_comparison
+  error • A value of type 'Null' can't be returned from the method 'read' because it has a return type of 'KeyFrame' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1194:12 • return_of_invalid_type
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:1199:19 • unnecessary_null_comparison
+   info • The constant name 'Unknown' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:2:20 • constant_identifier_names
+   info • The constant name 'PosX' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:3:20 • constant_identifier_names
+   info • The constant name 'PosY' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:4:20 • constant_identifier_names
+   info • The constant name 'ScaleX' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:5:20 • constant_identifier_names
+   info • The constant name 'ScaleY' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:6:20 • constant_identifier_names
+   info • The constant name 'Rotation' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:7:20 • constant_identifier_names
+   info • The constant name 'Opacity' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:8:20 • constant_identifier_names
+   info • The constant name 'DrawOrder' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:9:20 • constant_identifier_names
+   info • The constant name 'Length' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:10:20 • constant_identifier_names
+   info • The constant name 'ImageVertices' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:11:20 • constant_identifier_names
+   info • The constant name 'ConstraintStrength' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:12:20 • constant_identifier_names
+   info • The constant name 'Trigger' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:13:20 • constant_identifier_names
+   info • The constant name 'IntProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:14:20 • constant_identifier_names
+   info • The constant name 'FloatProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:15:20 • constant_identifier_names
+   info • The constant name 'StringProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:16:20 • constant_identifier_names
+   info • The constant name 'BooleanProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:17:20 • constant_identifier_names
+   info • The constant name 'CollisionEnabled' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:18:20 • constant_identifier_names
+   info • The constant name 'Sequence' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:19:20 • constant_identifier_names
+   info • The constant name 'ActiveChildIndex' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:20:20 • constant_identifier_names
+   info • The constant name 'PathVertices' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:21:20 • constant_identifier_names
+   info • The constant name 'FillColor' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:22:20 • constant_identifier_names
+   info • The constant name 'FillGradient' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:23:20 • constant_identifier_names
+   info • The constant name 'FillRadial' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:24:20 • constant_identifier_names
+   info • The constant name 'StrokeColor' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:25:20 • constant_identifier_names
+   info • The constant name 'StrokeGradient' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:26:20 • constant_identifier_names
+   info • The constant name 'StrokeRadial' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:27:20 • constant_identifier_names
+   info • The constant name 'StrokeWidth' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:28:20 • constant_identifier_names
+   info • The constant name 'StrokeOpacity' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:29:20 • constant_identifier_names
+   info • The constant name 'FillOpacity' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:30:20 • constant_identifier_names
+   info • The constant name 'ShapeWidth' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:31:20 • constant_identifier_names
+   info • The constant name 'ShapeHeight' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:32:20 • constant_identifier_names
+   info • The constant name 'CornerRadius' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:33:20 • constant_identifier_names
+   info • The constant name 'InnerRadius' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:34:20 • constant_identifier_names
+   info • The constant name 'StrokeStart' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:35:20 • constant_identifier_names
+   info • The constant name 'StrokeEnd' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:36:20 • constant_identifier_names
+   info • The constant name 'StrokeOffset' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:37:20 • constant_identifier_names
+   info • The constant name 'PropertyTypesMap' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:40:24 • constant_identifier_names
+  error • 1 positional argument expected by 'readUint32', but 0 found • dependencies/Flare-Flutter/flare_dart/lib/binary_reader.dart:177:29 • not_enough_positional_arguments
+  error • 2 positional arguments expected by 'readUint8Array', but 1 found • dependencies/Flare-Flutter/flare_dart/lib/binary_reader.dart:178:33 • not_enough_positional_arguments
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/block_reader.dart:2:1 • directives_ordering
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/block_reader.dart:16:81 • lines_longer_than_80_chars
+  error • 1 positional argument expected by 'readUint8', but 0 found • dependencies/Flare-Flutter/flare_dart/lib/block_reader.dart:22:31 • not_enough_positional_arguments
+  error • 1 positional argument expected by 'readUint32', but 0 found • dependencies/Flare-Flutter/flare_dart/lib/block_reader.dart:23:29 • not_enough_positional_arguments
+   info • The constant name 'BlockTypesMap' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:1:24 • constant_identifier_names
+   info • The constant name 'Unknown' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:51:20 • constant_identifier_names
+   info • The constant name 'Components' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:52:20 • constant_identifier_names
+   info • The constant name 'ActorNode' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:53:20 • constant_identifier_names
+   info • The constant name 'ActorBone' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:54:20 • constant_identifier_names
+   info • The constant name 'ActorRootBone' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:55:20 • constant_identifier_names
+   info • The constant name 'ActorImage' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:56:20 • constant_identifier_names
+   info • The constant name 'View' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:57:20 • constant_identifier_names
+   info • The constant name 'Animation' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:58:20 • constant_identifier_names
+   info • The constant name 'Animations' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:59:20 • constant_identifier_names
+   info • The constant name 'Atlases' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:60:20 • constant_identifier_names
+   info • The constant name 'Atlas' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:61:20 • constant_identifier_names
+   info • The constant name 'ActorIKTarget' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:62:20 • constant_identifier_names
+   info • The constant name 'ActorEvent' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:63:20 • constant_identifier_names
+   info • The constant name 'CustomIntProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:64:20 • constant_identifier_names
+   info • The constant name 'CustomFloatProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:65:20 • constant_identifier_names
+   info • The constant name 'CustomStringProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:66:20 • constant_identifier_names
+   info • The constant name 'CustomBooleanProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:67:20 • constant_identifier_names
+   info • The constant name 'ActorColliderRectangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:68:20 • constant_identifier_names
+   info • The constant name 'ActorColliderTriangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:69:20 • constant_identifier_names
+   info • The constant name 'ActorColliderCircle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:70:20 • constant_identifier_names
+   info • The constant name 'ActorColliderPolygon' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:71:20 • constant_identifier_names
+   info • The constant name 'ActorColliderLine' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:72:20 • constant_identifier_names
+   info • The constant name 'ActorImageSequence' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:73:20 • constant_identifier_names
+   info • The constant name 'ActorNodeSolo' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:74:20 • constant_identifier_names
+   info • The constant name 'JellyComponent' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:75:20 • constant_identifier_names
+   info • The constant name 'ActorJellyBone' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:76:20 • constant_identifier_names
+   info • The constant name 'ActorIKConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:77:20 • constant_identifier_names
+   info • The constant name 'ActorDistanceConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:78:20 • constant_identifier_names
+   info • The constant name 'ActorTranslationConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:79:20 • constant_identifier_names
+   info • The constant name 'ActorRotationConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:80:20 • constant_identifier_names
+   info • The constant name 'ActorScaleConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:81:20 • constant_identifier_names
+   info • The constant name 'ActorTransformConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:82:20 • constant_identifier_names
+   info • The constant name 'ActorShape' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:83:20 • constant_identifier_names
+   info • The constant name 'ActorPath' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:84:20 • constant_identifier_names
+   info • The constant name 'ColorFill' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:85:20 • constant_identifier_names
+   info • The constant name 'ColorStroke' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:86:20 • constant_identifier_names
+   info • The constant name 'GradientFill' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:87:20 • constant_identifier_names
+   info • The constant name 'GradientStroke' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:88:20 • constant_identifier_names
+   info • The constant name 'RadialGradientFill' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:89:20 • constant_identifier_names
+   info • The constant name 'RadialGradientStroke' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:90:20 • constant_identifier_names
+   info • The constant name 'ActorEllipse' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:91:20 • constant_identifier_names
+   info • The constant name 'ActorRectangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:92:20 • constant_identifier_names
+   info • The constant name 'ActorTriangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:93:20 • constant_identifier_names
+   info • The constant name 'ActorStar' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:94:20 • constant_identifier_names
+   info • The constant name 'ActorPolygon' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:95:20 • constant_identifier_names
+   info • The constant name 'ActorSkin' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:96:20 • constant_identifier_names
+   info • The constant name 'ActorArtboard' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:97:20 • constant_identifier_names
+   info • The constant name 'Artboards' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:98:20 • constant_identifier_names
+   info • The variable 'd' should be final • dependencies/Flare-Flutter/flare_dart/lib/dependency_sorter.dart:35:27 • prefer_final_in_for_each
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:4:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:6:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:8:1 • directives_ordering
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:9:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:10:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:11:1 • directives_ordering
+   info • The constant name 'JellyMax' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:14:20 • constant_identifier_names
+   info • The variable name 'OptimalDistance' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:15:17 • non_constant_identifier_names
+   info • The variable name 'CurveConstant' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:16:17 • non_constant_identifier_names
+   info • The constant name 'Epsilon' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:17:23 • constant_identifier_names
+   info • Unnecessary use of parentheses • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:22:12 • unnecessary_parenthesis
+   info • Invalid assignment to the parameter 'c0' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:40:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c1' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:41:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c2' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:42:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c3' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:43:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c0' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:47:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c1' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:48:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c2' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:49:7 • parameter_assignments
+  error • The operator '+' can't be unconditionally invoked because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:61:39 • unchecked_use_of_nullable_value
+  error • A value of type 'double?' can't be assigned to a variable of type 'double' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:63:28 • invalid_assignment
+  error • The operator '<' can't be unconditionally invoked because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:71:33 • unchecked_use_of_nullable_value
+  error • A value of type 'double?' can't be assigned to a variable of type 'double' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:75:18 • invalid_assignment
+  error • The argument type 'double?' can't be assigned to the parameter type 'num'.  • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:76:43 • argument_type_not_assignable
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:123:18 • annotate_overrides
+   info • The member 'resolveComponentIndices' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:139:8 • annotate_overrides
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:155:21 • unnecessary_null_comparison
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:159:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:161:24 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:163:39 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:171:66 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:178:19 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:182:20 • unnecessary_null_comparison
+   info • The variable 'constraint' should be final • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:190:26 • prefer_final_in_for_each
+   info • The member 'completeResolve' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:195:8 • annotate_overrides
+   info • The variable 'child' should be final • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:210:20 • prefer_final_in_for_each
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:213:81 • lines_longer_than_80_chars
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:219:25 • prefer_constructors_over_static_methods
+   info • The 'if' statement could be replaced by a null-aware assignment • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:221:5 • prefer_conditional_assignment
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:222:7 • parameter_assignments
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:237:16 • unnecessary_null_comparison
+  error • A value of type 'ActorNode?' can't be assigned to a variable of type 'ActorNode' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:295:28 • invalid_assignment
+  error • A value of type 'JellyComponent?' can't be assigned to a variable of type 'JellyComponent' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:298:25 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:306:19 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:310:27 • unnecessary_null_comparison
+  error • The non-nullable local variable 'firstBone' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:317:11 • not_assigned_potentially_non_nullable_local_variable
+  error • The non-nullable local variable 'parentBoneJelly' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:318:11 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:318:27 • unnecessary_null_comparison
+  error • The non-nullable local variable 'parentBoneJelly' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:319:11 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:319:38 • unnecessary_null_comparison
+  error • The non-nullable local variable 'parentBoneJelly' must be assigned before it can be used • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:321:13 • not_assigned_potentially_non_nullable_local_variable
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:345:20 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:351:31 • unnecessary_null_comparison
+  error • A value of type 'JellyComponent?' can't be assigned to a variable of type 'JellyComponent' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:353:39 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:354:26 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:354:62 • unnecessary_null_comparison
+   info • Field overrides a field inherited from 'JSONReader' • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:5:7 • overridden_fields
+  error • Non-nullable instance field 'blockType' must be initialized • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:11:3 • not_initialized_non_nullable_instance_field
+   info • Unnecessary constructor invocation • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:21:15 • prefer_collection_literals
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:22:24 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:23:16 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:24:13 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:26:16 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:35:16 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:38:15 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:40:28 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:48:26 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:54:18 • unnecessary_this
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:55:9 • prefer_typing_uninitialized_variables
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:57:21 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:64:26 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:34:14 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:42:5 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:47:19 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:57:14 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:63:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:68:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:78:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:83:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:89:5 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:96:5 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:102:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:107:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:112:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:117:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:122:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:127:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:132:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:137:12 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:142:15 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:148:17 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:159:13 • unnecessary_this
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:165:5 • unnecessary_this
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:175:22 • unnecessary_null_comparison
+   info • Use 'const' with the constructor to improve performance • dependencies/Flare-Flutter/flare_dart/lib/json_reader.dart:176:12 • prefer_const_constructors
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/math/aabb.dart:8:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/math/aabb.dart:9:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/math/aabb.dart:9:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/math/aabb.dart:9:8 • missing_identifier
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/math/aabb.dart:36:12 • type_annotate_public_apis
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/math/mat2d.dart:2:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/math/mat2d.dart:4:1 • directives_ordering
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/math/mat2d.dart:9:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/math/mat2d.dart:10:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/math/mat2d.dart:10:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/math/mat2d.dart:10:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/math/transform_components.dart:7:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/math/transform_components.dart:8:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/math/transform_components.dart:8:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/math/transform_components.dart:8:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/math/vec2d.dart:8:19 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/math/vec2d.dart:9:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/math/vec2d.dart:9:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/math/vec2d.dart:9:8 • missing_identifier
+   info • Place 'dart:' imports before other imports • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:3:1 • directives_ordering
+   info • Sort directive sections alphabetically • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:5:1 • directives_ordering
+   info • The constant name 'Straight' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:7:18 • constant_identifier_names
+   info • The constant name 'Mirror' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:7:28 • constant_identifier_names
+   info • The constant name 'Disconnected' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:7:36 • constant_identifier_names
+   info • The constant name 'Asymmetric' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:7:50 • constant_identifier_names
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:31:17 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:32:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:32:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:32:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:35:13 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:36:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:36:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:36:8 • missing_identifier
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:41:3 • type_annotate_public_apis
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:42:5 • unnecessary_this
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:44:23 • unnecessary_null_comparison
+   info • Unnecessary 'this.' qualifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:76:5 • unnecessary_this
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:85:13 • annotate_overrides
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:91:3 • type_annotate_public_apis
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:145:13 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:146:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:146:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:146:8 • missing_identifier
+warning • The value of the local variable '<unnamed>' isn't used • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:149:13 • unused_local_variable
+  error • Expected to find ';' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:150:3 • expected_token
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:150:8 • prefer_typing_uninitialized_variables
+  error • Expected an identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:150:8 • missing_identifier
+   info • The member 'makeInstance' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:160:13 • annotate_overrides
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:166:3 • type_annotate_public_apis
+   info • The member 'readPoint' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:172:7 • annotate_overrides
+   info • The member 'transformed' overrides an inherited member but isn't annotated with '@override' • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:181:13 • annotate_overrides
+   info • Unnecessary 'dynamic' type annotation • dependencies/Flare-Flutter/flare_dart/lib/stream_reader.dart:10:24 • avoid_annotating_with_dynamic
+   info • The constant name 'Local' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/transform_space.dart:2:20 • constant_identifier_names
+   info • The constant name 'World' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/transform_space.dart:3:20 • constant_identifier_names
+warning • The 'author' field is no longer used and can be removed • dependencies/Flare-Flutter/flare_dart/pubspec.yaml:4:1 • deprecated_field
+

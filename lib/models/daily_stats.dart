@@ -82,12 +82,14 @@ class DailyActivity {
   final int steps;
   final double distanceKm;
   final double accumulatedDistanceKm;
+  final String riverId;
 
   DailyActivity({
     required this.date,
     required this.steps,
     required this.distanceKm,
     required this.accumulatedDistanceKm,
+    this.riverId = "yangtze",
   });
 
   Map<String, dynamic> toMap() => {
@@ -95,6 +97,7 @@ class DailyActivity {
     'steps': steps,
     'distance_km': distanceKm,
     'accumulated_distance_km': accumulatedDistanceKm,
+    'river_id': riverId,
   };
 
   factory DailyActivity.fromMap(Map<String, dynamic> map) => DailyActivity(
@@ -102,6 +105,7 @@ class DailyActivity {
     steps: (map['steps'] as int),
     distanceKm: (map['distance_km'] as num).toDouble(),
     accumulatedDistanceKm: (map['accumulated_distance_km'] as num).toDouble(),
+    riverId: map['river_id'] ?? "yangtze",
   );
 }
 
@@ -116,6 +120,7 @@ class DailyWeather {
   final String cityName;
   final double latitude;
   final double longitude;
+  final String aqi;
 
   DailyWeather({
     required this.date,
@@ -127,6 +132,7 @@ class DailyWeather {
     required this.cityName,
     required this.latitude,
     required this.longitude,
+    this.aqi = "--",
   });
 
   Map<String, dynamic> toMap() => {
@@ -139,6 +145,7 @@ class DailyWeather {
     'city_name': cityName,
     'latitude': latitude,
     'longitude': longitude,
+    'aqi': aqi,
   };
 
   factory DailyWeather.fromMap(Map<String, dynamic> map) => DailyWeather(
@@ -151,6 +158,7 @@ class DailyWeather {
     cityName: map['city_name'],
     latitude: (map['latitude'] as num).toDouble(),
     longitude: (map['longitude'] as num).toDouble(),
+    aqi: map['aqi'] ?? "--",
   );
 }
 

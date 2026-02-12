@@ -44,9 +44,11 @@ class ChallengeProvider extends ChangeNotifier {
 
     _activeRiver = river;
     
-    // 1. 从数据库汇总所有历史活动里程作为真实进度
+    // 1. 从数据库汇总当前河流的历史活动里程作为真实进度
     final allActivities = await DatabaseService.instance.getAllActivities();
-    _realDistance = allActivities.fold(0.0, (sum, item) => sum + item.distanceKm);
+    _realDistance = allActivities
+        .where((a) => a.riverId == riverId)
+        .fold(0.0, (sum, item) => sum + item.distanceKm);
     
     // 2. 默认显示真实进度
     _displayDistance = _realDistance;

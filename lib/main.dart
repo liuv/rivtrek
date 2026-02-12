@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'screens/flow_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/me_screen.dart';
@@ -28,6 +29,7 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('zh_CN', null);
 
   // 启动时请求基础权限
   if (Platform.isIOS) {
