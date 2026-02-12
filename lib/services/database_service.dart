@@ -136,4 +136,10 @@ class DatabaseService {
     final result = await db.query('daily_activities');
     return result.map((map) => DailyActivity.fromMap(map)).toList();
   }
+
+  Future<List<DailyWeather>> getAllWeather() async {
+    final db = await instance.database;
+    final result = await db.query('daily_weather');
+    return result.map((map) => DailyWeather.fromMap(map)).toList();
+  }
 }

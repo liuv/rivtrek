@@ -1,6 +1,7 @@
-import 'flare.dart';
 import 'package:flare_dart/math/mat2d.dart';
 import 'package:flutter/foundation.dart';
+
+import 'flare.dart';
 
 ///
 /// [FlareController] is a general-purpose interface for customizing

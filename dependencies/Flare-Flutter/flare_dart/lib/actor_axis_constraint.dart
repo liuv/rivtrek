@@ -1,7 +1,7 @@
 import "actor_artboard.dart";
 import "actor_targeted_constraint.dart";
-import "transform_space.dart";
 import "stream_reader.dart";
+import "transform_space.dart";
 
 abstract class ActorAxisConstraint extends ActorTargetedConstraint {
   bool _copyX = false;

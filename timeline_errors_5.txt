@@ -1,0 +1,216 @@
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  device_info_plus 10.1.2 (12.3.0 available)
+  dio_cache_interceptor 3.5.1 (4.0.5 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  flutter_map 7.0.2 (8.2.2 available)
+  flutter_map_cache 1.5.2 (2.0.0+1 available)
+  flutter_markdown 0.7.7+1 (discontinued replaced by flutter_markdown_plus)
+  geolocator 13.0.4 (14.0.2 available)
+  geolocator_android 4.6.2 (5.0.2 available)
+  health 11.1.1 (13.3.1 available)
+  intl 0.19.0 (0.20.2 available)
+  lints 4.0.0 (6.1.0 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.1 available)
+  mgrs_dart 2.0.0 (3.0.0 available)
+  permission_handler 11.4.0 (12.0.1 available)
+  permission_handler_android 12.1.0 (13.0.1 available)
+  proj4dart 2.1.0 (3.0.0 available)
+  test_api 0.7.7 (0.7.9 available)
+  unicode 0.3.1 (1.1.9 available)
+  win32_registry 1.1.5 (2.1.0 available)
+  workmanager 0.7.0 (0.9.0+3 available)
+Got dependencies!
+1 package is discontinued.
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing timeline...                                           
+
+   info • The import of 'package:flutter/widgets.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/article/article_widget.dart:4:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:50:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:50:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:55:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:55:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:61:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:61:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:67:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:67:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:72:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:72:46 • deprecated_member_use
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/article/article_widget.dart:99:42 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/article/article_widget.dart:100:52 • unnecessary_non_null_assertion
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:138:43 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:183:63 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:184:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:192:65 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:193:62 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:233:53 • deprecated_member_use
+warning • Unused import: 'package:flare_dart/math/mat2d.dart' • lib/timeline/article/controllers/flare_interaction_controller.dart:2:8 • unused_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/article/controllers/newton_controller.dart:41:56 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/article/controllers/newton_controller.dart:41:115 • unnecessary_non_null_assertion
+warning • Unused import: 'package:nima/nima/math/mat2d.dart' • lib/timeline/article/controllers/nima_interaction_controller.dart:2:8 • unused_import
+  error • The method 'instance' isn't defined for the type 'Artboard' • lib/timeline/article/timeline_entry_widget.dart:128:41 • undefined_method
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/article/timeline_entry_widget.dart:129:43 • undefined_getter
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/article/timeline_entry_widget.dart:130:44 • undefined_getter
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/article/timeline_entry_widget.dart:203:41 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/timeline_entry_widget.dart:221:36 • deprecated_member_use
+warning • The value of the local variable 'phase' isn't used • lib/timeline/article/timeline_entry_widget.dart:663:18 • unused_local_variable
+  error • Undefined class 'SimpleAnimation' • lib/timeline/article/timeline_entry_widget.dart:664:16 • undefined_class
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/article/timeline_entry_widget.dart:665:41 • undefined_getter
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/article/timeline_entry_widget.dart:678:46 • undefined_getter
+   info • 'canLaunch' is deprecated and shouldn't be used. Use canLaunchUrl instead • lib/timeline/main_menu/about_page.dart:16:5 • deprecated_member_use
+   info • 'launch' is deprecated and shouldn't be used. Use launchUrl instead • lib/timeline/main_menu/about_page.dart:18:9 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:29:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:35:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:47:35 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:47:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:59:37 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:59:58 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:69:39 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:69:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:78:42 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:78:63 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:139:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:156:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:174:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:174:61 • deprecated_member_use
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/favorites_page.dart:2:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:49:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:57:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:68:35 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/favorites_page.dart:68:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:94:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/favorites_page.dart:94:61 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:108:57 • deprecated_member_use
+  error • Target of URI doesn't exist: 'fitness_app_theme.dart' • lib/timeline/main_menu/main_menu.dart:24:8 • uri_does_not_exist
+warning • The value of the field '_topBarAnimation' isn't used • lib/timeline/main_menu/main_menu.dart:41:11 • unused_field
+   info • 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope. This feature was deprecated after v3.12.0-1.0.pre • lib/timeline/main_menu/main_menu.dart:173:10 • deprecated_member_use
+warning • The value of the local variable 'devicePadding' isn't used • lib/timeline/main_menu/main_menu.dart:195:16 • unused_local_variable
+warning • The left operand can't be null, so the right operand is never executed • lib/timeline/main_menu/main_menu.dart:215:36 • dead_null_aware_expression
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/main_menu.dart:248:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/main_menu.dart:255:41 • deprecated_member_use
+   info • 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope. This feature was deprecated after v3.12.0-1.0.pre • lib/timeline/main_menu/main_menu.dart:324:12 • deprecated_member_use
+  error • Undefined name 'FitnessAppTheme' • lib/timeline/main_menu/main_menu.dart:327:16 • undefined_identifier
+  error • Undefined name 'FitnessAppTheme' • lib/timeline/main_menu/main_menu.dart:374:28 • undefined_identifier
+  error • Undefined name 'FitnessAppTheme' • lib/timeline/main_menu/main_menu.dart:381:34 • undefined_identifier
+  error • Undefined name 'FitnessAppTheme' • lib/timeline/main_menu/main_menu.dart:408:49 • undefined_identifier
+  error • Undefined name 'FitnessAppTheme' • lib/timeline/main_menu/main_menu.dart:412:44 • undefined_identifier
+  error • The type 'AnimationStatus?' isn't exhaustively matched by the switch cases since it doesn't match the pattern 'null' • lib/timeline/main_menu/main_menu_section.dart:89:5 • non_exhaustive_switch_statement
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/main_menu/menu_data.dart:93:15 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/main_menu/menu_data.dart:117:25 • unnecessary_null_comparison
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/menu_vignette.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/actor_image.dart' • lib/timeline/main_menu/menu_vignette.dart:5:8 • unused_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/menu_vignette.dart:8:8 • unnecessary_import
+warning • Unused import: 'package:nima/nima/actor_image.dart' • lib/timeline/main_menu/menu_vignette.dart:10:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:165:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:252:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:253:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:347:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:348:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:441:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:442:24 • deprecated_member_use
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/main_menu/menu_vignette.dart:546:45 • undefined_getter
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/search_widget.dart:32:34 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/search_widget.dart:32:55 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/search_widget.dart:42:33 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/search_widget.dart:42:54 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/search_widget.dart:57:29 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/search_widget.dart:57:50 • deprecated_member_use
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/thumbnail_detail_widget.dart:1:8 • unnecessary_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/main_menu/thumbnail_detail_widget.dart:44:33 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/thumbnail_detail_widget.dart:73:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/thumbnail_detail_widget.dart:73:61 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/thumbnail_detail_widget.dart:79:57 • deprecated_member_use
+warning • Unused import: 'package:intl/intl.dart' • lib/timeline/timeline/ticks.dart:5:8 • unused_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/ticks.dart:72:20 • unnecessary_null_comparison
+warning • The value of the field '_riveResources' isn't used • lib/timeline/timeline/timeline.dart:142:30 • unused_field
+  error • The getter 'temp' isn't defined for the type 'DailyWeather' • lib/timeline/timeline/timeline.dart:309:58 • undefined_getter
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:375:15 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:551:25 • unnecessary_null_comparison
+  error • The method 'makeInstance' can't be unconditionally invoked because the receiver can be 'null' • lib/timeline/timeline/timeline.dart:555:51 • unchecked_use_of_nullable_value
+  error • The property 'animations' can't be unconditionally accessed because the receiver can be 'null' • lib/timeline/timeline/timeline.dart:558:55 • unchecked_use_of_nullable_value
+  error • A value of type 'ActorAnimation?' can't be assigned to a variable of type 'ActorAnimation' • lib/timeline/timeline/timeline.dart:569:25 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:570:35 • unnecessary_null_comparison
+  error • The argument type 'FlutterActorArtboard?' can't be assigned to the parameter type 'ActorArtboard'.  • lib/timeline/timeline/timeline.dart:592:55 • argument_type_not_assignable
+  error • The argument type 'double?' can't be assigned to the parameter type 'double'.  • lib/timeline/timeline/timeline.dart:594:21 • argument_type_not_assignable
+  error • The argument type 'FlutterActorArtboard?' can't be assigned to the parameter type 'ActorArtboard'.  • lib/timeline/timeline/timeline.dart:594:53 • argument_type_not_assignable
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:631:25 • unnecessary_null_comparison
+  error • The argument type 'FlutterActor?' can't be assigned to the parameter type 'Actor'.  • lib/timeline/timeline/timeline.dart:646:54 • argument_type_not_assignable
+  error • The argument type 'double?' can't be assigned to the parameter type 'double'.  • lib/timeline/timeline/timeline.dart:648:21 • argument_type_not_assignable
+  error • The argument type 'FlutterActor?' can't be assigned to the parameter type 'Actor'.  • lib/timeline/timeline/timeline.dart:648:52 • argument_type_not_assignable
+warning • Dead code • lib/timeline/timeline/timeline.dart:758:15 • dead_code
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:900:38 • unnecessary_null_comparison
+  error • The named parameter 'devicePixelRatio' is required, but there's no corresponding argument • lib/timeline/timeline/timeline.dart:950:24 • missing_required_argument
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/timeline/timeline.dart:1001:21 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/timeline/timeline.dart:1016:23 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1036:41 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1036:57 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1076:38 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1077:34 • unnecessary_non_null_assertion
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:1095:21 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:1104:23 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:1157:18 • unnecessary_null_comparison
+  error • The argument type 'FlutterActor?' can't be assigned to the parameter type 'Actor'.  • lib/timeline/timeline/timeline.dart:1518:59 • argument_type_not_assignable
+  error • The argument type 'FlutterActorArtboard?' can't be assigned to the parameter type 'ActorArtboard'.  • lib/timeline/timeline/timeline.dart:1530:23 • argument_type_not_assignable
+  error • The argument type 'FlutterActorArtboard?' can't be assigned to the parameter type 'ActorArtboard'.  • lib/timeline/timeline/timeline.dart:1543:61 • argument_type_not_assignable
+  error • Undefined class 'SimpleAnimation' • lib/timeline/timeline/timeline.dart:1553:22 • undefined_class
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/timeline/timeline.dart:1554:48 • undefined_getter
+  error • The getter 'context' isn't defined for the type 'Artboard' • lib/timeline/timeline/timeline.dart:1566:53 • undefined_getter
+  error • Undefined class 'SimpleAnimation' • lib/timeline/timeline/timeline_entry.dart:72:3 • undefined_class
+  error • Undefined class 'SimpleAnimation' • lib/timeline/timeline/timeline_entry.dart:75:3 • undefined_class
+  error • Undefined class 'SimpleAnimation' • lib/timeline/timeline/timeline_entry.dart:76:3 • undefined_class
+  error • The name 'SimpleAnimation' isn't a type, so it can't be used as a type argument • lib/timeline/timeline/timeline_entry.dart:77:8 • non_type_as_type_argument
+  error • Directives must appear before any declarations • lib/timeline/timeline/timeline_entry.dart:84:1 • directive_after_declaration
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline_render_widget.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/actor_image.dart' • lib/timeline/timeline/timeline_render_widget.dart:5:8 • unused_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline_render_widget.dart:8:8 • unnecessary_import
+warning • Unused import: 'package:nima/nima/actor_image.dart' • lib/timeline/timeline/timeline_render_widget.dart:10:8 • unused_import
+  error • Target of URI doesn't exist: 'package:rive/src/rive_core/math/aabb.dart' • lib/timeline/timeline/timeline_render_widget.dart:19:8 • uri_does_not_exist
+warning • This cast always throws an exception because the expression always evaluates to 'null' • lib/timeline/timeline/timeline_render_widget.dart:178:17 • cast_from_null_always_fails
+warning • This cast always throws an exception because the expression always evaluates to 'null' • lib/timeline/timeline/timeline_render_widget.dart:187:18 • cast_from_null_always_fails
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_render_widget.dart:215:26 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:272:42 • deprecated_member_use
+  error • The argument type 'Canvas' can't be assigned to the parameter type 'Renderer'.  • lib/timeline/timeline/timeline_render_widget.dart:536:31 • argument_type_not_assignable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:638:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:720:36 • deprecated_member_use
+  error • The argument type 'Canvas' can't be assigned to the parameter type 'Renderer'.  • lib/timeline/timeline/timeline_render_widget.dart:1029:35 • argument_type_not_assignable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:1129:14 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:1135:16 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:1182:18 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:10:17 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:10:41 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:12:12 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:14:14 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:17:10 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:17:32 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:19:12 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:21:14 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:24:10 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:24:34 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:26:12 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:28:14 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:31:10 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:31:33 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:33:12 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:35:14 • deprecated_member_use
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/cupertino.dart' • lib/timeline/timeline/timeline_widget.dart:1:8 • unnecessary_import
+warning • Unused import: 'package:flare_flutter/flare_actor.dart' • lib/timeline/timeline/timeline_widget.dart:3:8 • unused_import
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline_widget.dart:4:8 • unnecessary_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/cupertino.dart' • lib/timeline/timeline/timeline_widget.dart:6:8 • unnecessary_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:177:18 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:206:52 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:236:18 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:251:18 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:293:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:310:50 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/timeline/timeline_widget.dart:311:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:322:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:330:62 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/timeline/timeline_widget.dart:331:64 • deprecated_member_use
+warning • Unused import: 'package:rivtrek/timeline/colors.dart' • lib/timeline/timeline_page.dart:5:8 • unused_import
+  error • The method 'MenuItemData' isn't defined for the type 'MenuPage' • lib/timeline/timeline_page.dart:44:25 • undefined_method
+  error • The method 'TimelineWidget' isn't defined for the type 'MenuPage' • lib/timeline/timeline_page.dart:49:14 • undefined_method
+

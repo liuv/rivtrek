@@ -1,6 +1,6 @@
-import "stream_reader.dart";
 import "actor_artboard.dart";
 import "actor_node.dart";
+import "stream_reader.dart";
 
 abstract class ActorComponent {
   String _name = "Unnamed";
@@ -12,9 +12,9 @@ abstract class ActorComponent {
   int dirtMask = 0;
   List<ActorComponent>? dependents;
 
-  ActorComponent.withArtboard(this.artboard);
-
   ActorComponent();
+
+  ActorComponent.withArtboard(this.artboard);
 
   String get name {
     return _name;

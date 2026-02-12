@@ -6,7 +6,7 @@ class Vec2D {
   late Float32List _buffer;
 
   Float32List get values {
-  late return _buffer;
+  return _buffer;
   }
 
   double operator [](int index) {

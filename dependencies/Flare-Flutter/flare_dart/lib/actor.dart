@@ -1,18 +1,19 @@
 import 'dart:async';
-import "dart:typed_data";
 import "dart:convert";
-import "actor_image.dart";
-import "actor_shape.dart";
+import "dart:typed_data";
+
+import "actor_artboard.dart";
+import "actor_color.dart";
 import "actor_ellipse.dart";
+import "actor_image.dart";
+import "actor_path.dart";
 import "actor_polygon.dart";
 import "actor_rectangle.dart";
+import "actor_shape.dart";
 import "actor_star.dart";
 import "actor_triangle.dart";
-import "actor_path.dart";
-import "actor_color.dart";
-import "stream_reader.dart";
 import "block_types.dart";
-import "actor_artboard.dart";
+import "stream_reader.dart";
 
 abstract class Actor {
   int maxTextureIndex = 0;
@@ -103,7 +104,7 @@ abstract class Actor {
 
   Future<bool> loadAtlases(List<Uint8List> rawAtlases);
 
-  Future<bool> load(ByteData data, dynamic context) async {
+  Future<bool> load(ByteData data, context) async {
     if (data.lengthInBytes < 5) {
       throw UnsupportedError("Not a valid Flare file.");
     }
@@ -122,7 +123,7 @@ abstract class Actor {
       Uint8List charCodes = data.buffer.asUint8List();
       String stringData = String.fromCharCodes(charCodes);
       var jsonActor = jsonDecode(stringData);
-      Map jsonObject = Map();
+      Map jsonObject = {};
       jsonObject["container"] = jsonActor;
       inputData = jsonObject;
     }
@@ -170,10 +171,10 @@ abstract class Actor {
     }
   }
 
-  Future<Uint8List> readOutOfBandAsset(String filename, dynamic context);
+  Future<Uint8List> readOutOfBandAsset(String filename, context);
 
   Future<List<Uint8List>> readAtlasesBlock(
-      StreamReader block, dynamic context) {
+      StreamReader block, context) {
     // Determine whether or not the atlas is in or out of band.
     bool isOOB = block.readBool("isOOB");
     block.openArray("data");

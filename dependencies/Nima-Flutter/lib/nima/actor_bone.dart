@@ -6,11 +6,11 @@ import "jelly_component.dart";
 import "readers/stream_reader.dart";
 
 class ActorBone extends ActorBoneBase {
-  late ActorBone _firstBone;
-  JellyComponent jelly;
+  ActorBone? _firstBone;
+  JellyComponent? jelly;
 
-  ActorBone get firstBone {
-  late return _firstBone;
+  ActorBone? get firstBone {
+    return _firstBone;
   }
 
   @override
@@ -23,9 +23,6 @@ class ActorBone extends ActorBoneBase {
   @override
   void completeResolve() {
     super.completeResolve();
-    if (children == null) {
-      return;
-    }
     for (final ActorNode node in children) {
       if (node is ActorBone) {
         _firstBone = node;
@@ -34,7 +31,7 @@ class ActorBone extends ActorBoneBase {
     }
   }
 
-  static ActorBone read(Actor actor, StreamReader reader, ActorBone node) {
+  static ActorBone read(Actor actor, StreamReader reader, ActorBone? node) {
     node ??= ActorBone();
     ActorBoneBase.read(actor, reader, node);
     return node;

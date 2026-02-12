@@ -1,13 +1,13 @@
 import "dart:typed_data";
-import "actor_path.dart";
-import "actor_skinnable.dart";
+
 import "actor_artboard.dart";
 import "actor_component.dart";
-import "math/mat2d.dart";
 import "actor_constraint.dart";
+import "actor_skinnable.dart";
+import "math/mat2d.dart";
 
 class ActorSkin extends ActorComponent {
-  late Float32List _boneMatrices;
+  Float32List _boneMatrices = Float32List(0);
   Float32List get boneMatrices => _boneMatrices;
 
   @override
@@ -17,7 +17,7 @@ class ActorSkin extends ActorComponent {
 
   @override
   void update(int dirt) {
-    ActorSkinnable skinnable = parent as ActorSkinnable;
+    ActorSkinnable? skinnable = parent as ActorSkinnable?;
     if (skinnable == null) {
       return;
     }
@@ -25,7 +25,7 @@ class ActorSkin extends ActorComponent {
     if (skinnable.isConnectedToBones) {
       List<SkinnedBone> connectedBones = skinnable.connectedBones;
       int length = (connectedBones.length + 1) * 6;
-      if (_boneMatrices == null || _boneMatrices.length != length) {
+      if (_boneMatrices.length != length) {
         _boneMatrices = Float32List(length);
         // First bone transform is always identity.
         _boneMatrices[0] = 1.0;
@@ -40,17 +40,7 @@ class ActorSkin extends ActorComponent {
 
       Mat2D mat = Mat2D();
 
-      for (SkinnedBone cb in connectedBones) {
-        if (cb.node == null) {
-          _boneMatrices[bidx++] = 1.0;
-          _boneMatrices[bidx++] = 0.0;
-          _boneMatrices[bidx++] = 0.0;
-          _boneMatrices[bidx++] = 1.0;
-          _boneMatrices[bidx++] = 0.0;
-          _boneMatrices[bidx++] = 0.0;
-          continue;
-        }
-
+      for (final SkinnedBone cb in connectedBones) {
         Mat2D.multiply(mat, cb.node.worldTransform, cb.inverseBind);
 
         _boneMatrices[bidx++] = mat[0];
@@ -67,7 +57,7 @@ class ActorSkin extends ActorComponent {
 
   @override
   void completeResolve() {
-    ActorSkinnable skinnable = parent as ActorSkinnable;
+    ActorSkinnable? skinnable = parent as ActorSkinnable?;
     if (skinnable == null) {
       return;
     }
@@ -75,14 +65,12 @@ class ActorSkin extends ActorComponent {
     artboard.addDependency(this, skinnable as ActorComponent);
     if (skinnable.isConnectedToBones) {
       List<SkinnedBone> connectedBones = skinnable.connectedBones;
-      for (SkinnedBone skinnedBone in connectedBones) {
+      for (final SkinnedBone skinnedBone in connectedBones) {
         artboard.addDependency(this, skinnedBone.node);
         List<ActorConstraint> constraints = skinnedBone.node.allConstraints;
 
-        if (constraints != null) {
-          for (ActorConstraint constraint in constraints) {
-            artboard.addDependency(this, constraint);
-          }
+        for (final ActorConstraint constraint in constraints) {
+          artboard.addDependency(this, constraint);
         }
       }
     }

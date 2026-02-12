@@ -1,15 +1,16 @@
-import "value_time_curve_interpolator.dart";
-import "../readers/stream_reader.dart";
-import "../actor_component.dart";
-import "../actor_node.dart";
-import "../actor_bone_base.dart";
-import "../actor_constraint.dart";
-import "../actor_image.dart";
-import "../actor.dart";
-import "../actor_node_solo.dart";
-import "../math/mat2d.dart";
 import "dart:collection";
 import "dart:typed_data";
+
+import "../actor.dart";
+import "../actor_bone_base.dart";
+import "../actor_component.dart";
+import "../actor_constraint.dart";
+import "../actor_image.dart";
+import "../actor_node.dart";
+import "../actor_node_solo.dart";
+import "../math/mat2d.dart";
+import "../readers/stream_reader.dart";
+import "value_time_curve_interpolator.dart";
 
 abstract class KeyFrameInterpolator {
   bool setNextFrame(KeyFrameWithInterpolation frame, KeyFrame nextFrame);
@@ -17,6 +18,7 @@ abstract class KeyFrameInterpolator {
 
 // TODO: CSS style curve interoplation
 class ProgressionTimeCurveInterpolator extends KeyFrameInterpolator {
+  @override
   bool setNextFrame(KeyFrameWithInterpolation frame, KeyFrame nextFrame) {
     return false;
   }
@@ -49,10 +51,10 @@ HashMap<int, InterpolationTypes> interpolationTypesLookup =
 ]);
 
 abstract class KeyFrame {
-  late double _time;
+  double _time = 0.0;
 
   double get time {
-  late return _time;
+    return _time;
   }
 
   static bool read(StreamReader reader, KeyFrame frame) {
@@ -68,15 +70,15 @@ abstract class KeyFrame {
 }
 
 abstract class KeyFrameWithInterpolation extends KeyFrame {
-  late InterpolationTypes _interpolationType;
-  late KeyFrameInterpolator _interpolator;
+  InterpolationTypes _interpolationType = InterpolationTypes.Hold;
+  KeyFrameInterpolator? _interpolator;
 
   InterpolationTypes get interpolationType {
-  late return _interpolationType;
+    return _interpolationType;
   }
 
-  KeyFrameInterpolator get interpolator {
-  late return _interpolator;
+  KeyFrameInterpolator? get interpolator {
+    return _interpolator;
   }
 
   static bool read(StreamReader reader, KeyFrameWithInterpolation frame) {
@@ -85,10 +87,8 @@ abstract class KeyFrameWithInterpolation extends KeyFrame {
     }
     int type = reader.readUint8("type");
 
-    InterpolationTypes actualType = interpolationTypesLookup[type];
-    if (actualType == null) {
-      actualType = InterpolationTypes.Linear;
-    }
+    InterpolationTypes? actualType = interpolationTypesLookup[type];
+    actualType ??= InterpolationTypes.Linear;
 
     frame._interpolationType = actualType;
     switch (frame._interpolationType) {
@@ -107,19 +107,20 @@ abstract class KeyFrameWithInterpolation extends KeyFrame {
     return true;
   }
 
+  @override
   void setNext(KeyFrame frame) {
     // Null out the interpolator if the next frame doesn't validate.
-    if (_interpolator != null && !_interpolator.setNextFrame(this, frame)) {
+    if (_interpolator != null && !_interpolator!.setNextFrame(this, frame)) {
       _interpolator = null;
     }
   }
 }
 
 abstract class KeyFrameNumeric extends KeyFrameWithInterpolation {
-  late double _value;
+  double _value = 0.0;
 
   double get value {
-  late return _value;
+    return _value;
   }
 
   static bool read(StreamReader reader, KeyFrameNumeric frame) {
@@ -139,9 +140,10 @@ abstract class KeyFrameNumeric extends KeyFrameWithInterpolation {
     return true;
   }
 
+  @override
   void applyInterpolation(
       ActorComponent component, double time, KeyFrame toFrame, double mix) {
-    if (_interpolator != null && _interpolator is ValueTimeCurveInterpolator) {
+    if (_interpolator is ValueTimeCurveInterpolator) {
       double v = (_interpolator as ValueTimeCurveInterpolator).get(time);
       setValue(component, v, mix);
     } else {
@@ -168,6 +170,7 @@ abstract class KeyFrameNumeric extends KeyFrameWithInterpolation {
     }
   }
 
+  @override
   void apply(ActorComponent component, double mix) {
     setValue(component, _value, mix);
   }
@@ -177,8 +180,7 @@ abstract class KeyFrameNumeric extends KeyFrameWithInterpolation {
   @override
   void setNext(KeyFrame frame) {
     // Special case where we are linear but the next frame has in curve values
-    if (frame != null &&
-        _interpolationType == InterpolationTypes.Linear &&
+    if (_interpolationType == InterpolationTypes.Linear &&
         frame is KeyFrameWithInterpolation &&
         frame.interpolator is ValueTimeCurveInterpolator) {
       // Linear cubic interpolator, so that we can set it up with the next frame.
@@ -191,10 +193,10 @@ abstract class KeyFrameNumeric extends KeyFrameWithInterpolation {
 }
 
 abstract class KeyFrameInt extends KeyFrameWithInterpolation {
-  late double _value;
+  double _value = 0.0;
 
   double get value {
-  late return _value;
+    return _value;
   }
 
   static bool read(StreamReader reader, KeyFrameInt frame) {
@@ -205,6 +207,7 @@ abstract class KeyFrameInt extends KeyFrameWithInterpolation {
     return true;
   }
 
+  @override
   void applyInterpolation(
       ActorComponent component, double time, KeyFrame toFrame, double mix) {
     switch (_interpolationType) {
@@ -212,8 +215,8 @@ abstract class KeyFrameInt extends KeyFrameWithInterpolation {
       case InterpolationTypes.Asymmetric:
       case InterpolationTypes.Disconnected:
         {
-          ValueTimeCurveInterpolator interpolator =
-              _interpolator as ValueTimeCurveInterpolator;
+          ValueTimeCurveInterpolator? interpolator =
+              _interpolator as ValueTimeCurveInterpolator?;
           if (interpolator != null) {
             double v = interpolator.get(time);
             setValue(component, v, mix);
@@ -241,6 +244,7 @@ abstract class KeyFrameInt extends KeyFrameWithInterpolation {
     }
   }
 
+  @override
   void apply(ActorComponent component, double mix) {
     setValue(component, _value, mix);
   }
@@ -249,7 +253,7 @@ abstract class KeyFrameInt extends KeyFrameWithInterpolation {
 }
 
 class KeyFrameIntProperty extends KeyFrameInt {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameIntProperty frame = KeyFrameIntProperty();
     if (KeyFrameInt.read(reader, frame)) {
       return frame;
@@ -257,6 +261,7 @@ class KeyFrameIntProperty extends KeyFrameInt {
     return null;
   }
 
+  @override
   void setValue(ActorComponent component, double value, double mix) {
     // TODO
     //CustomIntProperty node = component as CustomIntProperty;
@@ -265,7 +270,7 @@ class KeyFrameIntProperty extends KeyFrameInt {
 }
 
 class KeyFrameFloatProperty extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameFloatProperty frame = KeyFrameFloatProperty();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -273,6 +278,7 @@ class KeyFrameFloatProperty extends KeyFrameNumeric {
     return null;
   }
 
+  @override
   void setValue(ActorComponent component, double value, double mix) {
     // TODO
     // CustomFloatProperty node = component as CustomFloatProperty;
@@ -281,8 +287,8 @@ class KeyFrameFloatProperty extends KeyFrameNumeric {
 }
 
 class KeyFrameStringProperty extends KeyFrame {
-  late String _value;
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  String _value = "";
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameStringProperty frame = KeyFrameStringProperty();
     if (!KeyFrame.read(reader, frame)) {
       return null;
@@ -310,8 +316,8 @@ class KeyFrameStringProperty extends KeyFrame {
 }
 
 class KeyFrameBooleanProperty extends KeyFrame {
-  late bool _value;
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  bool _value = false;
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameBooleanProperty frame = KeyFrameBooleanProperty();
     if (!KeyFrame.read(reader, frame)) {
       return null;
@@ -339,8 +345,8 @@ class KeyFrameBooleanProperty extends KeyFrame {
 }
 
 class KeyFrameCollisionEnabledProperty extends KeyFrame {
-  late bool _value;
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  bool _value = false;
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameCollisionEnabledProperty frame = KeyFrameCollisionEnabledProperty();
     if (!KeyFrame.read(reader, frame)) {
       return null;
@@ -368,7 +374,7 @@ class KeyFrameCollisionEnabledProperty extends KeyFrame {
 }
 
 class KeyFramePosX extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFramePosX frame = KeyFramePosX();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -384,7 +390,7 @@ class KeyFramePosX extends KeyFrameNumeric {
 }
 
 class KeyFramePosY extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFramePosY frame = KeyFramePosY();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -400,7 +406,7 @@ class KeyFramePosY extends KeyFrameNumeric {
 }
 
 class KeyFrameScaleX extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameScaleX frame = KeyFrameScaleX();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -416,7 +422,7 @@ class KeyFrameScaleX extends KeyFrameNumeric {
 }
 
 class KeyFrameScaleY extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameScaleY frame = KeyFrameScaleY();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -432,7 +438,7 @@ class KeyFrameScaleY extends KeyFrameNumeric {
 }
 
 class KeyFrameRotation extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameRotation frame = KeyFrameRotation();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -448,7 +454,7 @@ class KeyFrameRotation extends KeyFrameNumeric {
 }
 
 class KeyFrameOpacity extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameOpacity frame = KeyFrameOpacity();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -464,7 +470,7 @@ class KeyFrameOpacity extends KeyFrameNumeric {
 }
 
 class KeyFrameLength extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameLength frame = KeyFrameLength();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -475,15 +481,12 @@ class KeyFrameLength extends KeyFrameNumeric {
   @override
   void setValue(ActorComponent component, double value, double mix) {
     ActorBoneBase bone = component as ActorBoneBase;
-    if (bone == null) {
-      return;
-    }
     bone.length = bone.length * (1.0 - mix) + value * mix;
   }
 }
 
 class KeyFrameConstraintStrength extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameConstraintStrength frame = KeyFrameConstraintStrength();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;
@@ -499,14 +502,14 @@ class KeyFrameConstraintStrength extends KeyFrameNumeric {
 }
 
 class DrawOrderIndex {
-  int nodeIdx;
-  int order;
+  int nodeIdx = 0;
+  int order = 0;
 }
 
 class KeyFrameDrawOrder extends KeyFrame {
-  late List<DrawOrderIndex> _orderedNodes;
+  List<DrawOrderIndex> _orderedNodes = [];
 
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameDrawOrder frame = KeyFrameDrawOrder();
 
     if (!KeyFrame.read(reader, frame)) {
@@ -515,13 +518,13 @@ class KeyFrameDrawOrder extends KeyFrame {
 
     reader.openArray("drawOrder");
     int numOrderedNodes = reader.readUint16Length();
-    frame._orderedNodes = List<DrawOrderIndex>(numOrderedNodes);
+    frame._orderedNodes =
+        List<DrawOrderIndex>.generate(numOrderedNodes, (i) => DrawOrderIndex());
     for (int i = 0; i < numOrderedNodes; i++) {
-      DrawOrderIndex drawOrder = DrawOrderIndex();
+      DrawOrderIndex drawOrder = frame._orderedNodes[i];
       reader.openObject("frame");
       drawOrder.nodeIdx = reader.readId("component");
       drawOrder.order = reader.readUint16("order");
-      frame._orderedNodes[i] = drawOrder;
       reader.closeObject();
     }
     reader.closeArray();
@@ -545,22 +548,20 @@ class KeyFrameDrawOrder extends KeyFrame {
 
     for (final DrawOrderIndex doi in _orderedNodes) {
       ActorImage actorImage = actor[doi.nodeIdx] as ActorImage;
-      if (actorImage != null) {
-        actorImage.drawOrder = doi.order;
-      }
+      actorImage.drawOrder = doi.order;
     }
     actor.markImageDrawOrderDirty();
   }
 }
 
 class KeyFrameVertexDeform extends KeyFrameWithInterpolation {
-  late Float32List _vertices;
+  Float32List _vertices = Float32List(0);
 
   Float32List get vertices {
-  late return _vertices;
+    return _vertices;
   }
 
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameVertexDeform frame = KeyFrameVertexDeform();
     if (!KeyFrameWithInterpolation.read(reader, frame)) {
       return null;
@@ -601,7 +602,10 @@ class KeyFrameVertexDeform extends KeyFrameWithInterpolation {
   void applyInterpolation(
       ActorComponent component, double time, KeyFrame toFrame, double mix) {
     ActorImage imageNode = component as ActorImage;
-    Float32List wr = imageNode.animationDeformedVertices;
+    Float32List? wr = imageNode.animationDeformedVertices;
+    if (wr == null) {
+      return;
+    }
     Float32List to = (toFrame as KeyFrameVertexDeform)._vertices;
     int l = _vertices.length;
 
@@ -627,7 +631,10 @@ class KeyFrameVertexDeform extends KeyFrameWithInterpolation {
   void apply(ActorComponent component, double mix) {
     ActorImage imageNode = component as ActorImage;
     int l = _vertices.length;
-    Float32List wr = imageNode.animationDeformedVertices;
+    Float32List? wr = imageNode.animationDeformedVertices;
+    if (wr == null) {
+      return;
+    }
     if (mix == 1.0) {
       for (int i = 0; i < l; i++) {
         wr[i] = _vertices[i];
@@ -644,7 +651,7 @@ class KeyFrameVertexDeform extends KeyFrameWithInterpolation {
 }
 
 class KeyFrameTrigger extends KeyFrame {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameTrigger frame = KeyFrameTrigger();
     if (!KeyFrame.read(reader, frame)) {
       return null;
@@ -666,9 +673,9 @@ class KeyFrameTrigger extends KeyFrame {
 }
 
 class KeyFrameActiveChild extends KeyFrame {
-  late int _value;
+  int _value = 0;
 
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameActiveChild frame = KeyFrameActiveChild();
     if (!KeyFrame.read(reader, frame)) {
       return null;
@@ -696,7 +703,7 @@ class KeyFrameActiveChild extends KeyFrame {
 }
 
 class KeyFrameSequence extends KeyFrameNumeric {
-  static KeyFrame read(StreamReader reader, ActorComponent component) {
+  static KeyFrame? read(StreamReader reader, ActorComponent component) {
     KeyFrameSequence frame = KeyFrameSequence();
     if (KeyFrameNumeric.read(reader, frame)) {
       return frame;

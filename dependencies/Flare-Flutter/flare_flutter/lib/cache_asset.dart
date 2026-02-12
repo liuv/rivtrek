@@ -21,14 +21,14 @@ abstract class CacheAsset {
     }
   }
 
-  List<Completer<CacheAsset>> _callbacks;
+  List<Completer<CacheAsset>>? _callbacks;
   Future<CacheAsset> onLoaded() async {
     if (isAvailable) {
       return this;
     }
     _callbacks ??= [];
     Completer<CacheAsset> completer = Completer<CacheAsset>();
-    _callbacks.add(completer);
+    _callbacks!.add(completer);
     return completer.future;
   }
 
@@ -38,10 +38,10 @@ abstract class CacheAsset {
 
   void completeLoad() {
     if (_callbacks != null) {
-      for (final Completer<CacheAsset> callback in _callbacks) {
+      for (final Completer<CacheAsset> callback in _callbacks!) {
         callback.complete(this);
       }
-      _callbacks = [];
+      _callbacks = null;
     }
   }
 }

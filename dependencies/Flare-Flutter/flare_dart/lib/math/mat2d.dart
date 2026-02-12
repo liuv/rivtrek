@@ -1,13 +1,14 @@
-import "dart:typed_data";
 import "dart:math";
-import "vec2d.dart";
+import "dart:typed_data";
+
 import "transform_components.dart";
+import "vec2d.dart";
 
 class Mat2D {
   late Float32List _buffer;
 
   Float32List get values {
-  late return _buffer;
+  return _buffer;
   }
 
   Float64List get mat4 {

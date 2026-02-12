@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import "package:flutter/widgets.dart";
-import 'package:rive/rive.dart';
-import "package:share/share.dart";
+import 'package:rive/rive.dart' as rive hide Animation;
+import "package:share_plus/share_plus.dart";
 import 'package:rivtrek/timeline/bloc_provider.dart';
 import 'package:rivtrek/timeline/main_menu/collapsible.dart';
 
@@ -21,7 +21,7 @@ import "package:rivtrek/timeline/colors.dart";
 import "package:rivtrek/timeline/timeline/timeline_entry.dart";
 import 'package:rivtrek/timeline/timeline/timeline_widget.dart';
 
-import '../../fitness_app_theme.dart';
+import '../fitness_app_theme.dart';
 
 /// The Main Page of the Timeline App.
 ///
@@ -38,6 +38,7 @@ class MainMenuWidget extends StatefulWidget {
 }
 
 class _MainMenuWidgetState extends State<MainMenuWidget> {
+  Widget? _topBarAnimation; // Try changing the name to avoid conflict if necessary, or use prefix
   Animation<double>? topBarAnimation;
 
   final ScrollController scrollController = ScrollController();

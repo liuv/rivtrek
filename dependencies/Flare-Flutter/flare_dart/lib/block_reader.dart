@@ -1,5 +1,6 @@
-import "binary_reader.dart";
 import 'dart:typed_data';
+
+import "binary_reader.dart";
 
 class BlockReader extends BinaryReader {
   @override
@@ -19,8 +20,8 @@ class BlockReader extends BinaryReader {
     if (isEOF()) {
       return null;
     }
-    int blockType = readUint8();
-    int length = readUint32();
+    int blockType = readUint8("");
+    int length = readUint32("");
     return BlockReader.fromBlock(blockType, readBytes(length));
   }
 }

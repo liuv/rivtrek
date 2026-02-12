@@ -1,8 +1,10 @@
 import 'dart:math';
+
+import 'package:flare_dart/math/mat2d.dart';
+
 import 'flare.dart';
 import 'flare_actor.dart';
 import 'flare_controller.dart';
-import 'package:flare_dart/math/mat2d.dart';
 
 /// [FlareControls] is a concrete implementation of the [FlareController].
 ///
@@ -15,13 +17,14 @@ class FlareControls extends FlareController {
 
   /// The current [ActorAnimation].
   late String _animationName;
-  double _mixSeconds = 0.1;
+  final double _mixSeconds = 0.1;
 
   /// The [FlareAnimationLayer]s currently active.
-  List<FlareAnimationLayer> _animationLayers = [];
+  final List<FlareAnimationLayer> _animationLayers = [];
 
   /// Called at initialization time, it stores the reference
   /// to the current [FlutterActorArtboard].
+  @override
   void initialize(FlutterActorArtboard artboard) {
     _artboard = artboard;
   }
@@ -33,19 +36,18 @@ class FlareControls extends FlareController {
   /// to the end of the list of currently playing animation layers.
   void play(String name, {double mix = 1.0, double mixSeconds = 0.2}) {
     _animationName = name;
-    if (_animationName != null && _artboard != null) {
-      ActorAnimation animation = _artboard.getAnimation(_animationName);
-      if (animation != null) {
-        _animationLayers.add(FlareAnimationLayer()
-          ..name = _animationName
-          ..animation = animation
-          ..mix = mix
-          ..mixSeconds = mixSeconds);
-        isActive.value = true;
-      }
+    ActorAnimation? animation = _artboard.getAnimation(_animationName);
+    if (animation != null) {
+      _animationLayers.add(FlareAnimationLayer()
+        ..name = _animationName
+        ..animation = animation
+        ..mix = mix
+        ..mixSeconds = mixSeconds);
+      isActive.value = true;
     }
   }
 
+  @override
   void setViewTransform(Mat2D viewTransform) {}
 
   /// Advance all the [FlareAnimationLayer]s that are currently controlled
@@ -53,6 +55,7 @@ class FlareControls extends FlareController {
   ///
   /// If an animation completes during the current frame (and doesn't loop),
   /// the [onCompleted()] callback will be triggered.
+  @override
   bool advance(FlutterActorArtboard artboard, double elapsed) {
     int lastFullyMixed = -1;
     double lastMix = 0.0;
@@ -68,7 +71,7 @@ class FlareControls extends FlareController {
       layer.mix += elapsed;
       layer.time += elapsed;
 
-      lastMix = (_mixSeconds == null || _mixSeconds == 0.0)
+      lastMix = (_mixSeconds == 0.0)
           ? 1.0
           : min(1.0, layer.mix / _mixSeconds);
 
@@ -108,7 +111,7 @@ class FlareControls extends FlareController {
     }
 
     /// Notify of the completed animations.
-    for (FlareAnimationLayer animation in completed) {
+    for (final FlareAnimationLayer animation in completed) {
       _animationLayers.remove(animation);
       onCompleted(animation.name);
     }

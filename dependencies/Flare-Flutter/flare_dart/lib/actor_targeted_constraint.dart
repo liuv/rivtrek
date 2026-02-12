@@ -1,6 +1,6 @@
+import "actor_artboard.dart";
 import "actor_component.dart";
 import "actor_constraint.dart";
-import "actor_artboard.dart";
 import "stream_reader.dart";
 
 abstract class ActorTargetedConstraint extends ActorConstraint {
@@ -11,11 +11,12 @@ abstract class ActorTargetedConstraint extends ActorConstraint {
     return _target;
   }
 
+  @override
   void resolveComponentIndices(List<ActorComponent?> components) {
     super.resolveComponentIndices(components);
     if (_targetIdx != 0) {
       _target = components[_targetIdx]!;
-      artboard.addDependency(parent, _target);
+      artboard.addDependency(parent!, _target!);
     }
   }
 

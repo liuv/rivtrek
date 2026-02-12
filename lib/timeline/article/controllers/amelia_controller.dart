@@ -22,8 +22,9 @@ class AmeliaController extends FlareInteractionController {
   /// and the original translation position for the face.
   @override
   void initialize(FlutterActorArtboard artboard) {
-    _ctrlFace = artboard.getNode("ctrl_face");
-    if (_ctrlFace != null) {
+    ActorNode? node = artboard.getNode("ctrl_face");
+    if (node != null) {
+      _ctrlFace = node;
       _originalTranslation = Vec2D.clone(_ctrlFace.translation);
     }
   }
@@ -34,12 +35,12 @@ class AmeliaController extends FlareInteractionController {
   @override
   bool advance(
       FlutterActorArtboard artboard, Vec2D touchPosition, double elapsed) {
-    if (touchPosition != null && _lastTouchPosition != null) {
-      Vec2D move = Vec2D.subtract(Vec2D(), touchPosition, _lastTouchPosition);
+    if (_lastTouchPosition != null) {
+      Vec2D move = Vec2D.subtract(Vec2D(), touchPosition, _lastTouchPosition!);
       Mat2D toParentSpace = Mat2D();
       /// Transform world coordinates into object space. Then evaluate the move delta
       /// and apply it to the control.
-      if (Mat2D.invert(toParentSpace, _ctrlFace.parent.worldTransform)) {
+      if (_ctrlFace.parent != null && Mat2D.invert(toParentSpace, _ctrlFace.parent!.worldTransform)) {
         Vec2D localMove = Vec2D.transformMat2(Vec2D(), move, toParentSpace);
         _ctrlFace.translation =
             Vec2D.add(Vec2D(), _ctrlFace.translation, localMove);
@@ -53,7 +54,7 @@ class AmeliaController extends FlareInteractionController {
           Vec2D.scale(
               Vec2D(),
               Vec2D.subtract(
-                  Vec2D(), _originalTranslation, _ctrlFace.translation),
+                  Vec2D(), _originalTranslation!, _ctrlFace.translation),
               (elapsed * 3.0).clamp(0.0, 1.0)));
     }
     _lastTouchPosition = touchPosition;

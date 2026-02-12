@@ -1,11 +1,12 @@
-import "actor_targeted_constraint.dart";
-import "actor_node.dart";
-import "actor_component.dart";
-import "actor_artboard.dart";
-import "stream_reader.dart";
-import "math/transform_components.dart";
-import "math/mat2d.dart";
 import "dart:math";
+
+import "actor_artboard.dart";
+import "actor_component.dart";
+import "actor_node.dart";
+import "actor_targeted_constraint.dart";
+import "math/mat2d.dart";
+import "math/transform_components.dart";
+import "stream_reader.dart";
 import "transform_space.dart";
 
 class ActorRotationConstraint extends ActorTargetedConstraint {
@@ -21,14 +22,12 @@ class ActorRotationConstraint extends ActorTargetedConstraint {
   int _sourceSpace = TransformSpace.World;
   int _destSpace = TransformSpace.World;
   int _minMaxSpace = TransformSpace.World;
-  TransformComponents _componentsA = TransformComponents();
-  TransformComponents _componentsB = TransformComponents();
+  final TransformComponents _componentsA = TransformComponents();
+  final TransformComponents _componentsB = TransformComponents();
 
   static ActorRotationConstraint read(ActorArtboard artboard,
       StreamReader reader, ActorRotationConstraint? component) {
-    if (component == null) {
-      component = ActorRotationConstraint();
-    }
+    component ??= ActorRotationConstraint();
     ActorTargetedConstraint.read(artboard, reader, component);
     component._copy = reader.readBool("copy");
     if (component._copy) {
@@ -51,58 +50,44 @@ class ActorRotationConstraint extends ActorTargetedConstraint {
     return component;
   }
 
+  @override
   void constrain(ActorNode node) {
-    ActorNode target = this.target;
-    ActorNode grandParent = parent.parent;
+    ActorNode target = this.target as ActorNode;
+    ActorNode grandParent = node.parent!;
 
-    Mat2D transformA = parent.worldTransform;
+    Mat2D transformA = node.worldTransform;
     Mat2D transformB = Mat2D();
     Mat2D.decompose(transformA, _componentsA);
-    if (target == null) {
-      Mat2D.copy(transformB, transformA);
-      _componentsB[0] = _componentsA[0];
-      _componentsB[1] = _componentsA[1];
-      _componentsB[2] = _componentsA[2];
-      _componentsB[3] = _componentsA[3];
-      _componentsB[4] = _componentsA[4];
-      _componentsB[5] = _componentsA[5];
+    Mat2D.copy(transformB, target.worldTransform);
+    if (_sourceSpace == TransformSpace.Local) {
+      ActorNode sourceGrandParent = target.parent!;
+      Mat2D inverse = Mat2D();
+      if (!Mat2D.invert(inverse, sourceGrandParent.worldTransform)) {
+        return;
+      }
+      Mat2D.multiply(transformB, inverse, transformB);
+    }
+    Mat2D.decompose(transformB, _componentsB);
+
+    if (!_copy) {
+      _componentsB.rotation =
+          _destSpace == TransformSpace.Local ? 1.0 : _componentsA.rotation;
     } else {
-      Mat2D.copy(transformB, target.worldTransform);
-      if (_sourceSpace == TransformSpace.Local) {
-        ActorNode sourceGrandParent = target.parent;
-        if (sourceGrandParent != null) {
-          Mat2D inverse = Mat2D();
-          if (!Mat2D.invert(inverse, sourceGrandParent.worldTransform)) {
-            return;
-          }
-          Mat2D.multiply(transformB, inverse, transformB);
-        }
-      }
-      Mat2D.decompose(transformB, _componentsB);
-
-      if (!_copy) {
-        _componentsB.rotation =
-            _destSpace == TransformSpace.Local ? 1.0 : _componentsA.rotation;
-      } else {
-        _componentsB.rotation *= _scale;
-        if (_offset) {
-          _componentsB.rotation += parent.rotation;
-        }
-      }
-
-      if (_destSpace == TransformSpace.Local) {
-        // Destination space is in parent transform coordinates.
-        // Recompose the parent local transform and get it in world, then decompose the world for interpolation.
-        if (grandParent != null) {
-          Mat2D.compose(transformB, _componentsB);
-          Mat2D.multiply(transformB, grandParent.worldTransform, transformB);
-          Mat2D.decompose(transformB, _componentsB);
-        }
+      _componentsB.rotation *= _scale;
+      if (_offset) {
+        _componentsB.rotation += node.rotation;
       }
     }
 
-    bool clampLocal =
-        _minMaxSpace == TransformSpace.Local && grandParent != null;
+    if (_destSpace == TransformSpace.Local) {
+      // Destination space is in parent transform coordinates.
+      // Recompose the parent local transform and get it in world, then decompose the world for interpolation.
+      Mat2D.compose(transformB, _componentsB);
+      Mat2D.multiply(transformB, grandParent.worldTransform, transformB);
+      Mat2D.decompose(transformB, _componentsB);
+    }
+
+    bool clampLocal = _minMaxSpace == TransformSpace.Local;
     if (clampLocal) {
       // Apply min max in local space, so transform to local coordinates first.
       Mat2D.compose(transformB, _componentsB);
@@ -142,9 +127,10 @@ class ActorRotationConstraint extends ActorTargetedConstraint {
     _componentsB.scaleY = _componentsA.scaleY;
     _componentsB.skew = _componentsA.skew;
 
-    Mat2D.compose(parent.worldTransform, _componentsB);
+    Mat2D.compose(node.worldTransform, _componentsB);
   }
 
+  @override
   ActorComponent makeInstance(ActorArtboard resetArtboard) {
     ActorRotationConstraint instance = ActorRotationConstraint();
     instance.copyRotationConstraint(this, resetArtboard);
@@ -168,6 +154,8 @@ class ActorRotationConstraint extends ActorTargetedConstraint {
     _minMaxSpace = node._minMaxSpace;
   }
 
+  @override
   void update(int dirt) {}
+  @override
   void completeResolve() {}
 }

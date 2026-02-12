@@ -9,7 +9,8 @@ import 'package:nima/nima.dart' as nima;
 import 'package:nima/nima/animation/actor_animation.dart' as nima;
 import 'package:nima/nima/math/aabb.dart' as nima;
 import 'package:rive/rive.dart' as rive;
-import 'package:rive/src/rive_core/math/aabb.dart' as rive;
+// import 'package:rive/src/rive_core/math/aabb.dart' as rive; // Removed private import
+import 'package:rivtrek/models/daily_stats.dart';
 
 /// An object representing the renderable assets loaded from `timeline.json`.
 /// 
@@ -67,21 +68,17 @@ class TimelineFlare extends TimelineAnimatedAsset {
 
 /// A `Rive` Asset.
 class TimelineRive extends TimelineAnimatedAsset {
-  rive.Artboard ? actorStatic;
-  rive.Artboard ? actor;
-  rive.SimpleAnimation ? animation;
-  // rive. ? animation;
-  //
-  rive.SimpleAnimation? intro;
-  rive.SimpleAnimation? idle;
-  List<rive.SimpleAnimation>? idleAnimations;
-  rive.AABB? setupAABB;
+  dynamic actorStatic;
+  dynamic actor;
+  dynamic animation;
+  dynamic intro;
+  dynamic idle;
+  List<dynamic>? idleAnimations;
+  dynamic setupAABB;
 }
 
 /// A label for [TimelineEntry].
 enum TimelineEntryType { Era, Incident }
-
-import 'package:rivtrek/models/daily_stats.dart';
 
 /// Each entry in the timeline is represented by an instance of this object.
 /// Each favorite, search result and detail page will grab the information from a reference

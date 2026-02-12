@@ -1,9 +1,11 @@
-import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
+
+import 'package:flutter/services.dart' show rootBundle;
+
 import "readers/stream_reader.dart";
 
 class ActorLoader {
-  void load(String filename) async {
+  Future<void> load(String filename) async {
     print("Loading actor filename $filename");
     ByteData data = await rootBundle.load(filename + ".nima");
     StreamReader reader = StreamReader(data);

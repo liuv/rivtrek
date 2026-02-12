@@ -4,22 +4,23 @@ import "block_reader.dart";
 import "json_block_reader.dart";
 
 abstract class StreamReader {
-  int blockType = 0;
+  int get blockType;
+  set blockType(int value);
 
   // Instantiate the right type of Reader based on the input values
-  factory StreamReader(dynamic data) {
-    StreamReader reader;
+  factory StreamReader(data) {
     if (data is ByteData) {
-      reader = BlockReader(data);
+      StreamReader reader = BlockReader(data);
       // Move the readIndex forward for the binary reader.
       reader.readUint8("N");
       reader.readUint8("I");
       reader.readUint8("M");
       reader.readUint8("A");
+      return reader;
     } else if (data is Map) {
-      reader = JSONBlockReader(data);
+      return JSONBlockReader(data);
     }
-    return reader;
+    throw Exception("Unknown data type for StreamReader");
   }
 
   bool isEOF();
@@ -49,7 +50,7 @@ abstract class StreamReader {
 
   int readId(String label);
 
-  StreamReader readNextBlock(Map<String, int> types);
+  StreamReader? readNextBlock(Map<String, int> types);
 
   void openArray(String label);
   void closeArray();

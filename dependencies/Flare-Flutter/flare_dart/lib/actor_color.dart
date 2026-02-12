@@ -1,19 +1,21 @@
+import "dart:collection";
 import "dart:typed_data";
-import 'math/mat2d.dart';
 
+import "actor_artboard.dart";
+import "actor_component.dart";
+import "actor_flags.dart";
 import "actor_node.dart";
 import "actor_shape.dart";
-import "actor_artboard.dart";
-
-import "actor_component.dart";
-import "dart:collection";
-import "stream_reader.dart";
+import 'math/mat2d.dart';
 import "math/vec2d.dart";
-import "actor_flags.dart";
+import "stream_reader.dart";
 
 enum FillRule { EvenOdd, NonZero }
+
 enum StrokeCap { Butt, Round, Square }
+
 enum StrokeJoin { Miter, Round, Bevel }
+
 enum TrimPath { Off, Sequential, Synced }
 
 final HashMap<int, FillRule> fillRuleLookup =
@@ -53,8 +55,9 @@ abstract class ActorPaint extends ActorComponent {
     return component;
   }
 
+  @override
   void completeResolve() {
-    artboard.addDependency(this, parent);
+    artboard.addDependency(this, parent as ActorComponent);
   }
 
   ActorShape get shape => parent as ActorShape;
@@ -68,11 +71,11 @@ abstract class ActorColor extends ActorPaint {
   Float32List _color = Float32List(4);
 
   Float32List get color {
-  late return _color;
+    return _color;
   }
 
   Float32List get displayColor {
-    return artboard?.overrideColor ?? _color;
+    return artboard.overrideColor ?? _color;
   }
 
   set color(Float32List value) {
@@ -103,7 +106,9 @@ abstract class ActorColor extends ActorPaint {
     return component;
   }
 
+  @override
   void onDirty(int dirt) {}
+  @override
   void update(int dirt) {}
 }
 
@@ -113,7 +118,8 @@ abstract class ActorFill {
 
   static void read(
       ActorArtboard artboard, StreamReader reader, ActorFill component) {
-    component._fillRule = fillRuleLookup[reader.readUint8("fillRule")];
+    component._fillRule =
+        fillRuleLookup[reader.readUint8("fillRule")] ?? FillRule.EvenOdd;
   }
 
   void copyFill(ActorFill node, ActorArtboard resetArtboard) {
@@ -181,8 +187,10 @@ abstract class ActorStroke {
       ActorArtboard artboard, StreamReader reader, ActorStroke component) {
     component.width = reader.readFloat32("width");
     if (artboard.actor.version >= 19) {
-      component._cap = strokeCapLookup[reader.readUint8("cap")];
-      component._join = strokeJoinLookup[reader.readUint8("join")];
+      component._cap =
+          strokeCapLookup[reader.readUint8("cap")] ?? StrokeCap.Butt;
+      component._join =
+          strokeJoinLookup[reader.readUint8("join")] ?? StrokeJoin.Miter;
       if (artboard.actor.version >= 20) {
         component._trim =
             trimPathLookup[reader.readUint8("trim")] ?? TrimPath.Off;
@@ -221,10 +229,11 @@ abstract class ColorFill extends ActorColor with ActorFill {
     return component;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
 
-    ActorNode parentNode = parent;
+    ActorNode parentNode = parent as ActorNode;
     if (parentNode is ActorShape) {
       parentNode.addFill(this);
     }
@@ -244,10 +253,11 @@ abstract class ColorStroke extends ActorColor with ActorStroke {
     return component;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
 
-    ActorNode parentNode = parent;
+    ActorNode parentNode = parent as ActorNode;
     if (parentNode is ActorShape) {
       parentNode.addStroke(this);
     }
@@ -256,10 +266,11 @@ abstract class ColorStroke extends ActorColor with ActorStroke {
 
 abstract class GradientColor extends ActorPaint {
   Float32List _colorStops = Float32List(10);
-  Vec2D _start = Vec2D();
-  Vec2D _end = Vec2D();
-  Vec2D _renderStart = Vec2D();
-  Vec2D _renderEnd = Vec2D();
+  final Vec2D _start = Vec2D();
+  final Vec2D _end = Vec2D();
+  final Vec2D _renderStart = Vec2D();
+  final Vec2D _renderEnd = Vec2D();
+  @override
   double opacity = 1.0;
 
   Vec2D get start => _start;
@@ -268,7 +279,7 @@ abstract class GradientColor extends ActorPaint {
   Vec2D get renderEnd => _renderEnd;
 
   Float32List get colorStops {
-  late return _colorStops;
+    return _colorStops;
   }
 
   void copyGradient(GradientColor node, ActorArtboard resetArtboard) {
@@ -293,9 +304,11 @@ abstract class GradientColor extends ActorPaint {
     return component;
   }
 
+  @override
   void onDirty(int dirt) {}
+  @override
   void update(int dirt) {
-    ActorShape shape = parent;
+    ActorShape shape = parent as ActorShape;
     Mat2D world = shape.worldTransform;
     Vec2D.transformMat2D(_renderStart, _start, world);
     Vec2D.transformMat2D(_renderEnd, _end, world);
@@ -311,14 +324,16 @@ abstract class GradientFill extends GradientColor with ActorFill {
   static GradientFill read(
       ActorArtboard artboard, StreamReader reader, GradientFill component) {
     GradientColor.read(artboard, reader, component);
-    component._fillRule = fillRuleLookup[reader.readUint8("fillRule")];
+    component._fillRule =
+        fillRuleLookup[reader.readUint8("fillRule")] ?? FillRule.EvenOdd;
     return component;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
 
-    ActorNode parentNode = parent;
+    ActorNode parentNode = parent as ActorNode;
     if (parentNode is ActorShape) {
       parentNode.addFill(this);
     }
@@ -338,10 +353,11 @@ abstract class GradientStroke extends GradientColor with ActorStroke {
     return component;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
 
-    ActorNode parentNode = parent;
+    ActorNode parentNode = parent as ActorNode;
     if (parentNode is ActorShape) {
       parentNode.addStroke(this);
     }
@@ -381,10 +397,11 @@ abstract class RadialGradientFill extends RadialGradientColor with ActorFill {
     return component;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
 
-    ActorNode parentNode = parent;
+    ActorNode parentNode = parent as ActorNode;
     if (parentNode is ActorShape) {
       parentNode.addFill(this);
     }
@@ -406,10 +423,11 @@ abstract class RadialGradientStroke extends RadialGradientColor
     return component;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
 
-    ActorNode parentNode = parent;
+    ActorNode parentNode = parent as ActorNode;
     if (parentNode is ActorShape) {
       parentNode.addStroke(this);
     }

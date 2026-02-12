@@ -1,0 +1,833 @@
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  device_info_plus 10.1.2 (12.3.0 available)
+  dio_cache_interceptor 3.5.1 (4.0.5 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  flutter_map 7.0.2 (8.2.2 available)
+  flutter_map_cache 1.5.2 (2.0.0+1 available)
+  flutter_markdown 0.7.7+1 (discontinued replaced by flutter_markdown_plus)
+  geolocator 13.0.4 (14.0.2 available)
+  geolocator_android 4.6.2 (5.0.2 available)
+  health 11.1.1 (13.3.1 available)
+  intl 0.19.0 (0.20.2 available)
+  lints 4.0.0 (6.1.0 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.1 available)
+  mgrs_dart 2.0.0 (3.0.0 available)
+  permission_handler 11.4.0 (12.0.1 available)
+  permission_handler_android 12.1.0 (13.0.1 available)
+  proj4dart 2.1.0 (3.0.0 available)
+  test_api 0.7.7 (0.7.9 available)
+  unicode 0.3.1 (1.1.9 available)
+  win32_registry 1.1.5 (2.1.0 available)
+  workmanager 0.7.0 (0.9.0+3 available)
+Got dependencies!
+1 package is discontinued.
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing rivtrek...                                            
+
+warning • 'always_require_non_null_named_parameters' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:9:5 • removed_lint
+warning • 'avoid_returning_null' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:25:5 • removed_lint
+warning • 'avoid_returning_null_for_future' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:26:5 • removed_lint
+warning • 'invariant_booleans' was removed in Dart '3.0.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:50:5 • removed_lint
+warning • 'iterable_contains_unrelated_type' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:51:5 • removed_lint
+warning • 'list_remove_unrelated_type' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:56:5 • removed_lint
+warning • 'package_api_docs' was removed in Dart '3.7.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:65:5 • removed_lint
+warning • 'prefer_equal_for_default_values' was removed in Dart '3.0.0' • dependencies/Flare-Flutter/flare_dart/analysis_options.yaml:79:5 • removed_lint
+   info • Start the name of the method with 'to' or 'as' • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:57:17 • use_to_and_as_if_applicable
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:107:36 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:174:57 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:177:27 • type_annotate_public_apis
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor.dart:185:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:367:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_artboard.dart:581:81 • lines_longer_than_80_chars
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:94:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:98:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:99:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:100:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:101:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:102:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:103:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:104:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:105:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:106:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:107:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:108:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:109:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:110:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:111:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:112:7 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_axis_constraint.dart:113:7 • type_annotate_public_apis
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:37:20 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_bone.dart:39:5 • parameter_assignments
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:38:24 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_bone_base.dart:40:5 • parameter_assignments
+   info • The constant name 'EvenOdd' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:13:17 • constant_identifier_names
+   info • The constant name 'NonZero' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:13:26 • constant_identifier_names
+   info • The constant name 'Butt' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:15:18 • constant_identifier_names
+   info • The constant name 'Round' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:15:24 • constant_identifier_names
+   info • The constant name 'Square' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:15:31 • constant_identifier_names
+   info • The constant name 'Miter' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:17:19 • constant_identifier_names
+   info • The constant name 'Round' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:17:26 • constant_identifier_names
+   info • The constant name 'Bevel' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:17:33 • constant_identifier_names
+   info • The constant name 'Off' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:19:17 • constant_identifier_names
+   info • The constant name 'Sequential' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:19:22 • constant_identifier_names
+   info • The constant name 'Synced' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:19:34 • constant_identifier_names
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:219:50 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:243:52 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:318:56 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:343:58 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:386:68 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_color.dart:412:10 • prefer_mixin
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:49:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_constraint.dart:57:81 • lines_longer_than_80_chars
+   info • The constant name 'Closer' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:9:20 • constant_identifier_names
+   info • The constant name 'Further' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:10:20 • constant_identifier_names
+   info • The constant name 'Exact' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:11:20 • constant_identifier_names
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:20:34 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:22:5 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_distance_constraint.dart:46:3 • type_annotate_public_apis
+   info • The constant name 'Normal' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:19 • constant_identifier_names
+   info • The constant name 'Multiply' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:27 • constant_identifier_names
+   info • The constant name 'Screen' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:37 • constant_identifier_names
+   info • The constant name 'Additive' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:8:45 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_drawable.dart:41:81 • lines_longer_than_80_chars
+   info • The constant name 'CircleConstant' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:9:14 • constant_identifier_names
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:22:23 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_ellipse.dart:24:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_event.dart:8:5 • parameter_assignments
+   info • The constant name 'IsDrawOrderDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:2:20 • constant_identifier_names
+   info • The constant name 'IsDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:3:20 • constant_identifier_names
+   info • The constant name 'TransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:7:20 • constant_identifier_names
+   info • The constant name 'WorldTransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:8:20 • constant_identifier_names
+   info • The constant name 'PaintDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_flags.dart:9:20 • constant_identifier_names
+   info • The constant name 'PI2' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:28:23 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:110:81 • lines_longer_than_80_chars
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:136:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:144:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_ik_constraint.dart:149:81 • lines_longer_than_80_chars
+   info • Field overrides a field inherited from 'ActorDrawable' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:28:7 • overridden_fields
+   info • The private field _sequenceFrames could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:39:23 • prefer_final_fields
+   info • The private field _sequenceUVs could be 'final' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:40:15 • prefer_final_fields
+   info • Unnecessary use of getter and setter to wrap a field • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:43:11 • unnecessary_getters_setters
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:133:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:173:81 • lines_longer_than_80_chars
+  error • The argument type 'Float32List?' can't be assigned to the parameter type 'List<double>'.  • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:225:32 • argument_type_not_assignable
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_dart/lib/actor_image.dart:251:22 • invalid_assignment
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:14:25 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:16:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:18:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_jelly_bone.dart:19:81 • lines_longer_than_80_chars
+   info • The constant name 'TransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:41:20 • constant_identifier_names
+   info • The constant name 'WorldTransformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:42:20 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:73:81 • lines_longer_than_80_chars
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_node.dart:229:5 • parameter_assignments
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:45:24 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_node_solo.dart:47:5 • parameter_assignments
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:44:43 • unchecked_use_of_nullable_value
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:68:3 • type_annotate_public_apis
+  error • The method 'invalidateShape' can't be unconditionally invoked because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:71:14 • unchecked_use_of_nullable_value
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:138:59 • prefer_mixin
+  error • The method 'invalidateShape' can't be unconditionally invoked because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:173:14 • unchecked_use_of_nullable_value
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:178:56 • prefer_mixin
+   info • The constant name 'VertexDeformDirty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:195:20 • constant_identifier_names
+  error • The method 'invalidateShape' can't be unconditionally invoked because the receiver can be 'null' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:223:14 • unchecked_use_of_nullable_value
+warning • Dead code • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:229:7 • dead_code
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:285:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:294:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_path.dart:341:81 • lines_longer_than_80_chars
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:28:23 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_polygon.dart:30:5 • parameter_assignments
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:29:25 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_rectangle.dart:31:5 • parameter_assignments
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:20:34 • unchecked_use_of_nullable_value
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:35:24 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/actor_root_bone.dart:37:5 • parameter_assignments
+   info • The constant name 'PI2' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:13:23 • constant_identifier_names
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:28:34 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:30:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_rotation_constraint.dart:84:81 • lines_longer_than_80_chars
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:15:31 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:17:5 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:23:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:30:3 • type_annotate_public_apis
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_scale_constraint.dart:70:81 • lines_longer_than_80_chars
+  error • A value of type 'ActorNode' can't be assigned to a variable of type 'ActorBasePath' • dependencies/Flare-Flutter/flare_dart/lib/actor_shape.dart:71:32 • invalid_assignment
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:30:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:42:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/actor_skinnable.dart:59:81 • lines_longer_than_80_chars
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:30:20 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_star.dart:32:5 • parameter_assignments
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:21:35 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:23:5 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:33:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:39:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_transform_constraint.dart:47:3 • type_annotate_public_apis
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:12:37 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:14:5 • parameter_assignments
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:21:3 • type_annotate_public_apis
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/actor_translation_constraint.dart:28:3 • type_annotate_public_apis
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:20:24 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Flare-Flutter/flare_dart/lib/actor_triangle.dart:22:5 • parameter_assignments
+  error • Abstract classes can't be instantiated • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:147:9 • instantiate_abstract_class
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:224:29 • prefer_constructors_over_static_methods
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:400:81 • lines_longer_than_80_chars
+warning • The value of the local variable 'animatedComponentCount' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:402:9 • unused_local_variable
+warning • The value of the local variable 'triggerComponentCount' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/actor_animation.dart:403:9 • unused_local_variable
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic.dart:13:81 • lines_longer_than_80_chars
+   info • The constant name 'NewtonIterations' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:4:11 • constant_identifier_names
+   info • The constant name 'NewtonMinSlope' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:5:14 • constant_identifier_names
+   info • The constant name 'SubdivisionPrecision' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:6:14 • constant_identifier_names
+   info • The constant name 'SubdivisionMaxIterations' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:7:11 • constant_identifier_names
+   info • The constant name 'SplineTableSize' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:9:11 • constant_identifier_names
+   info • The constant name 'SampleStepSize' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:10:14 • constant_identifier_names
+   info • Invalid assignment to the parameter 'aGuessT' • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/cubic_ease.dart:33:5 • parameter_assignments
+   info • Unnecessary use of an abstract class • dependencies/Flare-Flutter/flare_dart/lib/animation/interpolation/interpolator.dart:1:16 • one_member_abstracts
+   info • The constant name 'Hold' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:23:27 • constant_identifier_names
+   info • The constant name 'Linear' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:23:33 • constant_identifier_names
+   info • The constant name 'Cubic' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:23:41 • constant_identifier_names
+warning • The value of the field '_value' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:201:15 • unused_field
+warning • The value of the field '_value' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:229:13 • unused_field
+warning • The value of the field '_value' isn't used • dependencies/Flare-Flutter/flare_dart/lib/animation/keyframe.dart:257:13 • unused_field
+   info • The constant name 'Unknown' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:2:20 • constant_identifier_names
+   info • The constant name 'PosX' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:3:20 • constant_identifier_names
+   info • The constant name 'PosY' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:4:20 • constant_identifier_names
+   info • The constant name 'ScaleX' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:5:20 • constant_identifier_names
+   info • The constant name 'ScaleY' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:6:20 • constant_identifier_names
+   info • The constant name 'Rotation' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:7:20 • constant_identifier_names
+   info • The constant name 'Opacity' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:8:20 • constant_identifier_names
+   info • The constant name 'DrawOrder' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:9:20 • constant_identifier_names
+   info • The constant name 'Length' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:10:20 • constant_identifier_names
+   info • The constant name 'ImageVertices' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:11:20 • constant_identifier_names
+   info • The constant name 'ConstraintStrength' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:12:20 • constant_identifier_names
+   info • The constant name 'Trigger' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:13:20 • constant_identifier_names
+   info • The constant name 'IntProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:14:20 • constant_identifier_names
+   info • The constant name 'FloatProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:15:20 • constant_identifier_names
+   info • The constant name 'StringProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:16:20 • constant_identifier_names
+   info • The constant name 'BooleanProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:17:20 • constant_identifier_names
+   info • The constant name 'CollisionEnabled' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:18:20 • constant_identifier_names
+   info • The constant name 'Sequence' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:19:20 • constant_identifier_names
+   info • The constant name 'ActiveChildIndex' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:20:20 • constant_identifier_names
+   info • The constant name 'PathVertices' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:21:20 • constant_identifier_names
+   info • The constant name 'FillColor' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:22:20 • constant_identifier_names
+   info • The constant name 'FillGradient' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:23:20 • constant_identifier_names
+   info • The constant name 'FillRadial' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:24:20 • constant_identifier_names
+   info • The constant name 'StrokeColor' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:25:20 • constant_identifier_names
+   info • The constant name 'StrokeGradient' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:26:20 • constant_identifier_names
+   info • The constant name 'StrokeRadial' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:27:20 • constant_identifier_names
+   info • The constant name 'StrokeWidth' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:28:20 • constant_identifier_names
+   info • The constant name 'StrokeOpacity' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:29:20 • constant_identifier_names
+   info • The constant name 'FillOpacity' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:30:20 • constant_identifier_names
+   info • The constant name 'ShapeWidth' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:31:20 • constant_identifier_names
+   info • The constant name 'ShapeHeight' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:32:20 • constant_identifier_names
+   info • The constant name 'CornerRadius' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:33:20 • constant_identifier_names
+   info • The constant name 'InnerRadius' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:34:20 • constant_identifier_names
+   info • The constant name 'StrokeStart' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:35:20 • constant_identifier_names
+   info • The constant name 'StrokeEnd' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:36:20 • constant_identifier_names
+   info • The constant name 'StrokeOffset' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:37:20 • constant_identifier_names
+   info • The constant name 'PropertyTypesMap' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/animation/property_types.dart:40:24 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/block_reader.dart:17:81 • lines_longer_than_80_chars
+   info • The constant name 'BlockTypesMap' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:1:24 • constant_identifier_names
+   info • The constant name 'Unknown' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:51:20 • constant_identifier_names
+   info • The constant name 'Components' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:52:20 • constant_identifier_names
+   info • The constant name 'ActorNode' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:53:20 • constant_identifier_names
+   info • The constant name 'ActorBone' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:54:20 • constant_identifier_names
+   info • The constant name 'ActorRootBone' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:55:20 • constant_identifier_names
+   info • The constant name 'ActorImage' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:56:20 • constant_identifier_names
+   info • The constant name 'View' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:57:20 • constant_identifier_names
+   info • The constant name 'Animation' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:58:20 • constant_identifier_names
+   info • The constant name 'Animations' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:59:20 • constant_identifier_names
+   info • The constant name 'Atlases' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:60:20 • constant_identifier_names
+   info • The constant name 'Atlas' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:61:20 • constant_identifier_names
+   info • The constant name 'ActorIKTarget' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:62:20 • constant_identifier_names
+   info • The constant name 'ActorEvent' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:63:20 • constant_identifier_names
+   info • The constant name 'CustomIntProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:64:20 • constant_identifier_names
+   info • The constant name 'CustomFloatProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:65:20 • constant_identifier_names
+   info • The constant name 'CustomStringProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:66:20 • constant_identifier_names
+   info • The constant name 'CustomBooleanProperty' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:67:20 • constant_identifier_names
+   info • The constant name 'ActorColliderRectangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:68:20 • constant_identifier_names
+   info • The constant name 'ActorColliderTriangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:69:20 • constant_identifier_names
+   info • The constant name 'ActorColliderCircle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:70:20 • constant_identifier_names
+   info • The constant name 'ActorColliderPolygon' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:71:20 • constant_identifier_names
+   info • The constant name 'ActorColliderLine' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:72:20 • constant_identifier_names
+   info • The constant name 'ActorImageSequence' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:73:20 • constant_identifier_names
+   info • The constant name 'ActorNodeSolo' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:74:20 • constant_identifier_names
+   info • The constant name 'JellyComponent' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:75:20 • constant_identifier_names
+   info • The constant name 'ActorJellyBone' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:76:20 • constant_identifier_names
+   info • The constant name 'ActorIKConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:77:20 • constant_identifier_names
+   info • The constant name 'ActorDistanceConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:78:20 • constant_identifier_names
+   info • The constant name 'ActorTranslationConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:79:20 • constant_identifier_names
+   info • The constant name 'ActorRotationConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:80:20 • constant_identifier_names
+   info • The constant name 'ActorScaleConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:81:20 • constant_identifier_names
+   info • The constant name 'ActorTransformConstraint' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:82:20 • constant_identifier_names
+   info • The constant name 'ActorShape' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:83:20 • constant_identifier_names
+   info • The constant name 'ActorPath' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:84:20 • constant_identifier_names
+   info • The constant name 'ColorFill' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:85:20 • constant_identifier_names
+   info • The constant name 'ColorStroke' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:86:20 • constant_identifier_names
+   info • The constant name 'GradientFill' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:87:20 • constant_identifier_names
+   info • The constant name 'GradientStroke' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:88:20 • constant_identifier_names
+   info • The constant name 'RadialGradientFill' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:89:20 • constant_identifier_names
+   info • The constant name 'RadialGradientStroke' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:90:20 • constant_identifier_names
+   info • The constant name 'ActorEllipse' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:91:20 • constant_identifier_names
+   info • The constant name 'ActorRectangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:92:20 • constant_identifier_names
+   info • The constant name 'ActorTriangle' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:93:20 • constant_identifier_names
+   info • The constant name 'ActorStar' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:94:20 • constant_identifier_names
+   info • The constant name 'ActorPolygon' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:95:20 • constant_identifier_names
+   info • The constant name 'ActorSkin' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:96:20 • constant_identifier_names
+   info • The constant name 'ActorArtboard' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:97:20 • constant_identifier_names
+   info • The constant name 'Artboards' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/block_types.dart:98:20 • constant_identifier_names
+   info • The constant name 'JellyMax' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:14:20 • constant_identifier_names
+   info • The variable name 'OptimalDistance' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:15:17 • non_constant_identifier_names
+   info • The variable name 'CurveConstant' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:16:17 • non_constant_identifier_names
+   info • The constant name 'Epsilon' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:17:23 • constant_identifier_names
+   info • Invalid assignment to the parameter 'c0' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:40:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c1' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:41:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c2' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:42:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c3' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:43:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c0' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:47:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c1' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:48:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c2' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:49:7 • parameter_assignments
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:157:21 • unnecessary_null_comparison
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:161:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:216:81 • lines_longer_than_80_chars
+   info • Static method should be a constructor • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:222:25 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:224:5 • parameter_assignments
+warning • The value of the local variable 'parentBoneJelly' isn't used • dependencies/Flare-Flutter/flare_dart/lib/jelly_component.dart:294:21 • unused_local_variable
+   info • Field overrides a field inherited from 'JSONReader' • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:5:7 • overridden_fields
+   info • An uninitialized variable should have an explicit type annotation • dependencies/Flare-Flutter/flare_dart/lib/json_block_reader.dart:55:9 • prefer_typing_uninitialized_variables
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_dart/lib/math/aabb.dart:36:12 • type_annotate_public_apis
+   info • The constant name 'Straight' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:8:18 • constant_identifier_names
+   info • The constant name 'Mirror' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:8:28 • constant_identifier_names
+   info • The constant name 'Disconnected' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:8:36 • constant_identifier_names
+   info • The constant name 'Asymmetric' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/path_point.dart:8:50 • constant_identifier_names
+   info • The constant name 'Local' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/transform_space.dart:2:20 • constant_identifier_names
+   info • The constant name 'World' isn't a lowerCamelCase identifier • dependencies/Flare-Flutter/flare_dart/lib/transform_space.dart:3:20 • constant_identifier_names
+warning • The 'author' field is no longer used and can be removed • dependencies/Flare-Flutter/flare_dart/pubspec.yaml:4:1 • deprecated_field
+warning • 'always_require_non_null_named_parameters' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:9:5 • removed_lint
+warning • 'avoid_returning_null' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:25:5 • removed_lint
+warning • 'avoid_returning_null_for_future' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:26:5 • removed_lint
+warning • 'invariant_booleans' was removed in Dart '3.0.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:50:5 • removed_lint
+warning • 'iterable_contains_unrelated_type' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:51:5 • removed_lint
+warning • 'list_remove_unrelated_type' was removed in Dart '3.3.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:56:5 • removed_lint
+warning • 'package_api_docs' was removed in Dart '3.7.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:65:5 • removed_lint
+warning • 'prefer_equal_for_default_values' was removed in Dart '3.0.0' • dependencies/Flare-Flutter/flare_flutter/analysis_options.yaml:79:5 • removed_lint
+  error • A value of type 'T?' can't be assigned to a variable of type 'T' • dependencies/Flare-Flutter/flare_flutter/lib/cache.dart:40:15 • invalid_assignment
+warning • Dead code • dependencies/Flare-Flutter/flare_flutter/lib/cache.dart:46:7 • dead_code
+  error • Non-nullable instance field '_callbacks' must be initialized • dependencies/Flare-Flutter/flare_flutter/lib/cache_asset.dart:24:31 • not_initialized_non_nullable_instance_field
+warning • The left operand can't be null, so the right operand is never executed • dependencies/Flare-Flutter/flare_flutter/lib/cache_asset.dart:29:20 • dead_null_aware_expression
+warning • Dead code • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:108:5 • dead_code
+warning • Dead code • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:120:5 • dead_code
+   info • Invalid assignment to the parameter 'path' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:159:7 • parameter_assignments
+  error • A value of type 'Path?' can't be assigned to a variable of type 'Path' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:159:14 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:169:49 • prefer_mixin
+  error • The method 'initializeGraphics' isn't defined for the type 'ActorNode' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:181:16 • undefined_method
+  error • The getter 'path' isn't defined for the type 'ActorNode' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:216:32 • undefined_getter
+  error • The getter 'path' isn't defined for the type 'ActorNode' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:219:32 • undefined_getter
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:276:47 • prefer_mixin
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:295:12 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:295:25 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:295:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:295:54 • deprecated_member_use
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:308:51 • prefer_mixin
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:327:12 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:327:25 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:327:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:327:54 • deprecated_member_use
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:341:53 • prefer_mixin
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:363:33 • deprecated_member_use
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:368:35 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:394:57 • prefer_mixin
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:416:33 • deprecated_member_use
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:421:35 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:448:57 • prefer_mixin
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:477:33 • deprecated_member_use
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:482:35 • invalid_assignment
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:508:61 • prefer_mixin
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:531:33 • deprecated_member_use
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:536:35 • invalid_assignment
+   info • Missing type annotation on a public API • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:692:29 • type_annotate_public_apis
+warning • The method doesn't override an inherited method • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:705:8 • override_on_non_overriding_member
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:719:47 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:728:53 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:737:53 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:746:47 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:755:57 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:764:55 • prefer_mixin
+   info • Only mixins should be mixed in • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:915:49 • prefer_mixin
+warning • The value of the local variable 'images' isn't used • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:977:21 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • dependencies/Flare-Flutter/flare_flutter/lib/flare.dart:1042:22 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:176:17 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:177:17 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:178:17 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:179:17 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:275:17 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:276:17 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:277:17 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • dependencies/Flare-Flutter/flare_flutter/lib/flare_actor.dart:278:17 • deprecated_member_use
+  error • A value of type 'FlareCache?' can't be assigned to a variable of type 'FlareCache' • dependencies/Flare-Flutter/flare_flutter/lib/flare_cache.dart:31:22 • invalid_assignment
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Flare-Flutter/flare_flutter/lib/flare_cache_asset.dart:29:34 • unnecessary_null_comparison
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_flutter/lib/flare_controller.dart:21:81 • lines_longer_than_80_chars
+  error • A value of type 'ActorAnimation?' can't be assigned to a variable of type 'ActorAnimation' • dependencies/Flare-Flutter/flare_flutter/lib/flare_controls.dart:39:32 • invalid_assignment
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_flutter/lib/flare_controls.dart:65:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Flare-Flutter/flare_flutter/lib/flare_controls.dart:96:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_flutter/lib/flare_controls.dart:104:24 • unnecessary_null_comparison
+warning • This method overrides a method annotated as '@mustCallSuper' in 'RenderObject', but doesn't invoke the overridden method • dependencies/Flare-Flutter/flare_flutter/lib/flare_render_box.dart:119:8 • must_call_super
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Flare-Flutter/flare_flutter/lib/flare_render_box.dart:263:15 • unnecessary_null_comparison
+   info • Invalid assignment to the parameter 'offset' • dependencies/Flare-Flutter/flare_flutter/lib/trim_path.dart:18:5 • parameter_assignments
+warning • The 'author' field is no longer used and can be removed • dependencies/Flare-Flutter/flare_flutter/pubspec.yaml:4:1 • deprecated_field
+   info • Dependencies not sorted alphabetically • dependencies/Flare-Flutter/flare_flutter/pubspec.yaml:11:3 • sort_pub_dependencies
+warning • Publishable packages can't have 'path' dependencies • dependencies/Flare-Flutter/flare_flutter/pubspec.yaml:12:5 • invalid_dependency
+warning • 'always_require_non_null_named_parameters' was removed in Dart '3.3.0' • dependencies/Nima-Flutter/analysis_options.yaml:9:5 • removed_lint
+warning • 'avoid_returning_null' was removed in Dart '3.3.0' • dependencies/Nima-Flutter/analysis_options.yaml:25:5 • removed_lint
+warning • 'avoid_returning_null_for_future' was removed in Dart '3.3.0' • dependencies/Nima-Flutter/analysis_options.yaml:26:5 • removed_lint
+warning • 'invariant_booleans' was removed in Dart '3.0.0' • dependencies/Nima-Flutter/analysis_options.yaml:50:5 • removed_lint
+warning • 'iterable_contains_unrelated_type' was removed in Dart '3.3.0' • dependencies/Nima-Flutter/analysis_options.yaml:51:5 • removed_lint
+warning • 'list_remove_unrelated_type' was removed in Dart '3.3.0' • dependencies/Nima-Flutter/analysis_options.yaml:56:5 • removed_lint
+warning • 'package_api_docs' was removed in Dart '3.7.0' • dependencies/Nima-Flutter/analysis_options.yaml:65:5 • removed_lint
+warning • 'prefer_equal_for_default_values' was removed in Dart '3.0.0' • dependencies/Nima-Flutter/analysis_options.yaml:79:5 • removed_lint
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima.dart:89:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima.dart:90:81 • lines_longer_than_80_chars
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • dependencies/Nima-Flutter/lib/nima.dart:115:33 • deprecated_member_use
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima.dart:115:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima.dart:196:81 • lines_longer_than_80_chars
+   info • Setter has no corresponding getter • dependencies/Nima-Flutter/lib/nima.dart:271:7 • avoid_setters_without_getters
+   info • The constant name 'BlockTypesMap' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:23:24 • constant_identifier_names
+   info • The constant name 'Unknown' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:58:20 • constant_identifier_names
+   info • The constant name 'Components' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:59:20 • constant_identifier_names
+   info • The constant name 'ActorNode' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:60:20 • constant_identifier_names
+   info • The constant name 'ActorBone' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:61:20 • constant_identifier_names
+   info • The constant name 'ActorRootBone' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:62:20 • constant_identifier_names
+   info • The constant name 'ActorImage' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:63:20 • constant_identifier_names
+   info • The constant name 'View' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:64:20 • constant_identifier_names
+   info • The constant name 'Animation' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:65:20 • constant_identifier_names
+   info • The constant name 'Animations' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:66:20 • constant_identifier_names
+   info • The constant name 'Atlases' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:67:20 • constant_identifier_names
+   info • The constant name 'Atlas' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:68:20 • constant_identifier_names
+   info • The constant name 'ActorIKTarget' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:69:20 • constant_identifier_names
+   info • The constant name 'ActorEvent' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:70:20 • constant_identifier_names
+   info • The constant name 'CustomIntProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:71:20 • constant_identifier_names
+   info • The constant name 'CustomFloatProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:72:20 • constant_identifier_names
+   info • The constant name 'CustomStringProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:73:20 • constant_identifier_names
+   info • The constant name 'CustomBooleanProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:74:20 • constant_identifier_names
+   info • The constant name 'ActorColliderRectangle' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:75:20 • constant_identifier_names
+   info • The constant name 'ActorColliderTriangle' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:76:20 • constant_identifier_names
+   info • The constant name 'ActorColliderCircle' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:77:20 • constant_identifier_names
+   info • The constant name 'ActorColliderPolygon' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:78:20 • constant_identifier_names
+   info • The constant name 'ActorColliderLine' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:79:20 • constant_identifier_names
+   info • The constant name 'ActorImageSequence' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:80:20 • constant_identifier_names
+   info • The constant name 'ActorNodeSolo' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:81:20 • constant_identifier_names
+   info • The constant name 'JellyComponent' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:82:20 • constant_identifier_names
+   info • The constant name 'ActorJellyBone' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:83:20 • constant_identifier_names
+   info • The constant name 'ActorIKConstraint' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:84:20 • constant_identifier_names
+   info • The constant name 'ActorDistanceConstraint' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:85:20 • constant_identifier_names
+   info • The constant name 'ActorTranslationConstraint' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:86:20 • constant_identifier_names
+   info • The constant name 'ActorRotationConstraint' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:87:20 • constant_identifier_names
+   info • The constant name 'ActorScaleConstraint' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:88:20 • constant_identifier_names
+   info • The constant name 'ActorTransformConstraint' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:89:20 • constant_identifier_names
+   info • The constant name 'IsImageDrawOrderDirty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:93:20 • constant_identifier_names
+   info • The constant name 'IsVertexDeformDirty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:94:20 • constant_identifier_names
+   info • The constant name 'IsDirty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:95:20 • constant_identifier_names
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Nima-Flutter/lib/nima/actor.dart:118:20 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Nima-Flutter/lib/nima/actor.dart:163:20 • unnecessary_null_comparison
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor.dart:259:81 • lines_longer_than_80_chars
+   info • The constant name 'MaxSteps' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor.dart:322:17 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor.dart:327:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Nima-Flutter/lib/nima/actor.dart:390:58 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • dependencies/Nima-Flutter/lib/nima/actor.dart:391:20 • unnecessary_non_null_assertion
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Nima-Flutter/lib/nima/actor.dart:418:21 • unnecessary_null_comparison
+  error • The argument type 'Null' can't be assigned to the parameter type 'ActorBone'.  • dependencies/Nima-Flutter/lib/nima/actor.dart:428:55 • argument_type_not_assignable
+  error • A value of type 'ActorComponent' can't be assigned to a variable of type 'ActorImage' • dependencies/Nima-Flutter/lib/nima/actor.dart:438:27 • invalid_assignment
+  error • The getter 'textureIndex' isn't defined for the type 'ActorComponent' • dependencies/Nima-Flutter/lib/nima/actor.dart:446:25 • undefined_getter
+  error • The getter 'textureIndex' isn't defined for the type 'ActorComponent' • dependencies/Nima-Flutter/lib/nima/actor.dart:447:42 • undefined_getter
+  error • The argument type 'Null' can't be assigned to the parameter type 'ActorDistanceConstraint'.  • dependencies/Nima-Flutter/lib/nima/actor.dart:512:69 • argument_type_not_assignable
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor.dart:555:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Nima-Flutter/lib/nima/actor.dart:585:66 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • dependencies/Nima-Flutter/lib/nima/actor.dart:586:29 • unnecessary_non_null_assertion
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_bone.dart:34:20 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/actor_bone.dart:35:5 • parameter_assignments
+warning • The left operand can't be null, so the right operand is never executed • dependencies/Nima-Flutter/lib/nima/actor_bone.dart:35:14 • dead_null_aware_expression
+   info • Unnecessary use of getter and setter to wrap a field • dependencies/Nima-Flutter/lib/nima/actor_component.dart:18:18 • unnecessary_getters_setters
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_constraint.dart:48:81 • lines_longer_than_80_chars
+   info • The constant name 'Closer' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_distance_constraint.dart:9:20 • constant_identifier_names
+   info • The constant name 'Further' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_distance_constraint.dart:10:20 • constant_identifier_names
+   info • The constant name 'Exact' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_distance_constraint.dart:11:20 • constant_identifier_names
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_distance_constraint.dart:20:34 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_distance_constraint.dart:22:5 • parameter_assignments
+warning • The left operand can't be null, so the right operand is never executed • dependencies/Nima-Flutter/lib/nima/actor_distance_constraint.dart:22:19 • dead_null_aware_expression
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_event.dart:8:5 • parameter_assignments
+   info • The constant name 'PI2' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:28:23 • constant_identifier_names
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:138:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:146:81 • lines_longer_than_80_chars
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:173:31 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:196:33 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:209:35 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:232:29 • unnecessary_cast
+  error • The property 'worldTransform' can't be unconditionally accessed because the receiver can be 'null' • dependencies/Nima-Flutter/lib/nima/actor_ik_constraint.dart:345:44 • unchecked_use_of_nullable_value
+   info • The constant name 'Normal' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_image.dart:11:19 • constant_identifier_names
+   info • The constant name 'Multiply' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_image.dart:11:27 • constant_identifier_names
+   info • The constant name 'Screen' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_image.dart:11:37 • constant_identifier_names
+   info • The constant name 'Additive' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_image.dart:11:45 • constant_identifier_names
+   info • Unnecessary use of getter and setter to wrap a field • dependencies/Nima-Flutter/lib/nima/actor_image.dart:58:11 • unnecessary_getters_setters
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/actor_image.dart:221:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_image.dart:251:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_image.dart:371:81 • lines_longer_than_80_chars
+  error • The name 'transformBind' is already defined • dependencies/Nima-Flutter/lib/nima/actor_image.dart:508:8 • duplicate_definition
+  error • A nullable expression can't be used as an iterator in a for-in loop • dependencies/Nima-Flutter/lib/nima/actor_image.dart:509:37 • unchecked_use_of_nullable_value
+  error • The name 'makeVertexPositionBuffer' is already defined • dependencies/Nima-Flutter/lib/nima/actor_image.dart:515:15 • duplicate_definition
+  error • The name 'makeVertexUVBuffer' is already defined • dependencies/Nima-Flutter/lib/nima/actor_image.dart:519:15 • duplicate_definition
+  error • The name 'transformDeformVertices' is already defined • dependencies/Nima-Flutter/lib/nima/actor_image.dart:523:8 • duplicate_definition
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Nima-Flutter/lib/nima/actor_image.dart:524:22 • invalid_assignment
+  error • The name 'updateVertexUVBuffer' is already defined • dependencies/Nima-Flutter/lib/nima/actor_image.dart:538:8 • duplicate_definition
+  error • The name 'updateVertexPositionBuffer' is already defined • dependencies/Nima-Flutter/lib/nima/actor_image.dart:551:8 • duplicate_definition
+  error • A value of type 'Float32List?' can't be assigned to a variable of type 'Float32List' • dependencies/Nima-Flutter/lib/nima/actor_image.dart:557:21 • invalid_assignment
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_jelly_bone.dart:14:25 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/actor_jelly_bone.dart:16:5 • parameter_assignments
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_jelly_bone.dart:18:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_jelly_bone.dart:19:81 • lines_longer_than_80_chars
+warning • The value of the local variable 'reader' isn't used • dependencies/Nima-Flutter/lib/nima/actor_loader.dart:11:18 • unused_local_variable
+   info • The private field _children could be 'final' • dependencies/Nima-Flutter/lib/nima/actor_node.dart:9:19 • prefer_final_fields
+   info • The private field _constraints could be 'final' • dependencies/Nima-Flutter/lib/nima/actor_node.dart:24:25 • prefer_final_fields
+   info • The private field _peerConstraints could be 'final' • dependencies/Nima-Flutter/lib/nima/actor_node.dart:25:25 • prefer_final_fields
+   info • The constant name 'TransformDirty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_node.dart:27:20 • constant_identifier_names
+   info • The constant name 'WorldTransformDirty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_node.dart:28:20 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_node.dart:55:81 • lines_longer_than_80_chars
+   info • Setter has no corresponding getter • dependencies/Nima-Flutter/lib/nima/actor_node.dart:105:7 • avoid_setters_without_getters
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_node.dart:186:29 • unnecessary_cast
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_node.dart:201:20 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/actor_node.dart:202:5 • parameter_assignments
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_node.dart:218:28 • unnecessary_cast
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_node_solo.dart:42:24 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/actor_node_solo.dart:44:5 • parameter_assignments
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_root_bone.dart:32:24 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/actor_root_bone.dart:34:5 • parameter_assignments
+   info • The constant name 'PI2' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:13:23 • constant_identifier_names
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:28:34 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:30:5 • parameter_assignments
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:60:30 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:67:38 • unnecessary_cast
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:97:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Nima-Flutter/lib/nima/actor_rotation_constraint.dart:114:35 • unnecessary_null_comparison
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_scale_constraint.dart:16:31 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_scale_constraint.dart:18:5 • parameter_assignments
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_scale_constraint.dart:37:30 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_scale_constraint.dart:44:38 • unnecessary_cast
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_scale_constraint.dart:83:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Nima-Flutter/lib/nima/actor_scale_constraint.dart:104:35 • unnecessary_null_comparison
+  error • Undefined class 'ActorNode' • dependencies/Nima-Flutter/lib/nima/actor_targeted_constraint.dart:19:7 • undefined_class
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_transform_constraint.dart:21:35 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_transform_constraint.dart:23:5 • parameter_assignments
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_transform_constraint.dart:57:32 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_transform_constraint.dart:65:32 • unnecessary_cast
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/actor_translation_constraint.dart:13:37 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'component' • dependencies/Nima-Flutter/lib/nima/actor_translation_constraint.dart:15:5 • parameter_assignments
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_translation_constraint.dart:35:30 • unnecessary_cast
+warning • Unnecessary cast • dependencies/Nima-Flutter/lib/nima/actor_translation_constraint.dart:43:38 • unnecessary_cast
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/actor_translation_constraint.dart:78:81 • lines_longer_than_80_chars
+warning • The operand can't be 'null', so the condition is always 'true' • dependencies/Nima-Flutter/lib/nima/actor_translation_constraint.dart:98:35 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:24:24 • unnecessary_null_comparison
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:29:81 • lines_longer_than_80_chars
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:41:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:44:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:47:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:50:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:53:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:56:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:59:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:62:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:65:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:68:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:71:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:74:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:77:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:80:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:83:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:86:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:89:26 • invalid_assignment
+  error • A value of type 'KeyFrame? Function(StreamReader, ActorComponent)' can't be assigned to a variable of type 'KeyFrameReader?' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:92:26 • invalid_assignment
+  error • Abstract classes can't be instantiated • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:103:55 • instantiate_abstract_class
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:103:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:189:81 • lines_longer_than_80_chars
+warning • The value of the field '_fps' isn't used • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:245:7 • unused_field
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:267:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:312:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:371:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:372:81 • lines_longer_than_80_chars
+   info • The private field _actor could be 'final' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:417:9 • prefer_final_fields
+   info • The private field _animation could be 'final' • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:418:18 • prefer_final_fields
+   info • Setter has no corresponding getter • dependencies/Nima-Flutter/lib/nima/animation/actor_animation.dart:444:7 • avoid_setters_without_getters
+   info • Unnecessary use of an abstract class • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:15:16 • one_member_abstracts
+   info • The constant name 'Hold' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:28:3 • constant_identifier_names
+   info • The constant name 'Linear' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:29:3 • constant_identifier_names
+   info • The constant name 'Mirrored' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:30:3 • constant_identifier_names
+   info • The constant name 'Asymmetric' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:31:3 • constant_identifier_names
+   info • The constant name 'Disconnected' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:32:3 • constant_identifier_names
+   info • The constant name 'Progression' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:33:3 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:134:81 • lines_longer_than_80_chars
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:186:81 • lines_longer_than_80_chars
+warning • The value of the field '_value' isn't used • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:290:10 • unused_field
+warning • The value of the field '_value' isn't used • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:319:8 • unused_field
+warning • The value of the field '_value' isn't used • dependencies/Nima-Flutter/lib/nima/animation/keyframe.dart:348:8 • unused_field
+   info • The constant name 'Unknown' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:2:20 • constant_identifier_names
+   info • The constant name 'PosX' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:3:20 • constant_identifier_names
+   info • The constant name 'PosY' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:4:20 • constant_identifier_names
+   info • The constant name 'ScaleX' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:5:20 • constant_identifier_names
+   info • The constant name 'ScaleY' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:6:20 • constant_identifier_names
+   info • The constant name 'Rotation' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:7:20 • constant_identifier_names
+   info • The constant name 'Opacity' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:8:20 • constant_identifier_names
+   info • The constant name 'DrawOrder' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:9:20 • constant_identifier_names
+   info • The constant name 'Length' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:10:20 • constant_identifier_names
+   info • The constant name 'VertexDeform' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:11:20 • constant_identifier_names
+   info • The constant name 'ConstraintStrength' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:12:20 • constant_identifier_names
+   info • The constant name 'Trigger' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:13:20 • constant_identifier_names
+   info • The constant name 'IntProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:14:20 • constant_identifier_names
+   info • The constant name 'FloatProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:15:20 • constant_identifier_names
+   info • The constant name 'StringProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:16:20 • constant_identifier_names
+   info • The constant name 'BooleanProperty' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:17:20 • constant_identifier_names
+   info • The constant name 'CollisionEnabled' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:18:20 • constant_identifier_names
+   info • The constant name 'Sequence' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:19:20 • constant_identifier_names
+   info • The constant name 'ActiveChildIndex' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:20:20 • constant_identifier_names
+   info • The constant name 'PropertyTypesMap' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/property_types.dart:23:24 • constant_identifier_names
+   info • The constant name 'EPSILON' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:94:23 • constant_identifier_names
+warning • The value of the field '_y0' isn't used • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:96:10 • unused_field
+warning • The value of the field '_y1' isn't used • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:98:10 • unused_field
+warning • The value of the field '_y2' isn't used • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:100:10 • unused_field
+warning • The value of the field '_y3' isn't used • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:102:10 • unused_field
+   info • The constant name 'DEBUG_VALUE' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:108:23 • constant_identifier_names
+   info • The line length exceeds the 80-character limit • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:112:81 • lines_longer_than_80_chars
+   info • Invalid assignment to the parameter 'a' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:142:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'b' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:143:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:144:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'a' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:147:9 • parameter_assignments
+   info • Invalid assignment to the parameter 'b' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:148:9 • parameter_assignments
+   info • Invalid assignment to the parameter 'b' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:153:22 • parameter_assignments
+   info • Invalid assignment to the parameter 'b' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:159:22 • parameter_assignments
+   info • Invalid assignment to the parameter 'b' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:162:23 • parameter_assignments
+   info • Invalid assignment to the parameter 'b' • dependencies/Nima-Flutter/lib/nima/animation/value_time_curve_interpolator.dart:163:23 • parameter_assignments
+  error • A value of type 'Null' can't be returned from the method 'sort' because it has a return type of 'List<ActorComponent>' • dependencies/Nima-Flutter/lib/nima/dependency_sorter.dart:17:14 • return_of_invalid_type
+warning • Unused import: 'actor_root_bone.dart' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:9:8 • unused_import
+   info • The constant name 'JellyMax' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:16:20 • constant_identifier_names
+   info • The variable name 'OptimalDistance' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:17:17 • non_constant_identifier_names
+   info • The variable name 'CurveConstant' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:18:17 • non_constant_identifier_names
+   info • The constant name 'Epsilon' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:19:23 • constant_identifier_names
+   info • Invalid assignment to the parameter 'c0' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:42:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c1' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:43:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c2' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:44:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c3' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:45:5 • parameter_assignments
+   info • Invalid assignment to the parameter 'c0' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:49:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c1' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:50:7 • parameter_assignments
+   info • Invalid assignment to the parameter 'c2' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:51:7 • parameter_assignments
+   info • Static method should be a constructor • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:215:25 • prefer_constructors_over_static_methods
+   info • Invalid assignment to the parameter 'node' • dependencies/Nima-Flutter/lib/nima/jelly_component.dart:217:5 • parameter_assignments
+  error • Missing concrete implementation of 'setter abstract class StreamReader.blockType' • dependencies/Nima-Flutter/lib/nima/readers/block_reader.dart:4:7 • non_abstract_class_inherits_abstract_member
+  error • 'BlockReader.readNextBlock' ('BlockReader? Function(Map<String, int>)') isn't a valid override of 'StreamReader.readNextBlock' ('StreamReader Function(Map<String, int>)') • dependencies/Nima-Flutter/lib/nima/readers/block_reader.dart:17:16 • invalid_override
+   info • Field overrides a field inherited from 'JSONReader' • dependencies/Nima-Flutter/lib/nima/readers/json_block_reader.dart:5:13 • overridden_fields
+  error • 'JSONBlockReader.readNextBlock' ('JSONBlockReader? Function(Map<String, int>)') isn't a valid override of 'StreamReader.readNextBlock' ('StreamReader Function(Map<String, int>)') • dependencies/Nima-Flutter/lib/nima/readers/json_block_reader.dart:16:20 • invalid_override
+  error • The non-nullable local variable 'reader' must be assigned before it can be used • dependencies/Nima-Flutter/lib/nima/readers/stream_reader.dart:22:12 • not_assigned_potentially_non_nullable_local_variable
+   info • The constant name 'Local' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/transform_space.dart:2:20 • constant_identifier_names
+   info • The constant name 'World' isn't a lowerCamelCase identifier • dependencies/Nima-Flutter/lib/nima/transform_space.dart:3:20 • constant_identifier_names
+  error • Expected a method, getter, setter or operator declaration • dependencies/Nima-Flutter/lib/nima_actor.dart:405:1 • expected_executable
+warning • The 'author' field is no longer used and can be removed • dependencies/Nima-Flutter/pubspec.yaml:4:1 • deprecated_field
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/main.dart:143:31 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/main.dart:147:35 • deprecated_member_use
+   info • The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/screens/challenge_records_screen.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:intl/intl.dart' • lib/screens/challenge_records_screen.dart:3:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/challenge_records_screen.dart:119:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/challenge_records_screen.dart:235:112 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/challenge_records_screen.dart:251:65 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/flow_screen.dart:371:37 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/flow_screen.dart:543:47 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/flow_screen.dart:598:69 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/flow_screen.dart:639:84 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/flow_screen.dart:647:160 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/screens/flow_screen.dart:671:35 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/screens/flow_screen.dart:672:35 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/screens/flow_screen.dart:673:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:88:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:144:74 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:156:78 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:219:45 • deprecated_member_use
+warning • The value of the local variable 'currentTotal' isn't used • lib/screens/map_screen.dart:260:9 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:290:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:294:37 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:327:104 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:400:22 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:402:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/map_screen.dart:417:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/me_screen.dart:56:51 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/me_screen.dart:132:53 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/me_screen.dart:198:39 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/me_screen.dart:226:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/river_selector_sheet.dart:73:29 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/river_selector_sheet.dart:107:43 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/river_selector_sheet.dart:147:34 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/river_selector_sheet.dart:167:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/river_selector_sheet.dart:196:43 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/river_selector_sheet.dart:265:44 • deprecated_member_use
+   info • The import of 'package:flutter/widgets.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/article/article_widget.dart:4:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:50:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:50:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:55:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:55:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:61:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:61:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:67:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:67:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:72:25 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:72:46 • deprecated_member_use
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/article/article_widget.dart:99:42 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/article/article_widget.dart:100:52 • unnecessary_non_null_assertion
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:138:43 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:183:63 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:184:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:192:65 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/article/article_widget.dart:193:62 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/article_widget.dart:233:53 • deprecated_member_use
+warning • Unused import: 'package:flare_dart/math/mat2d.dart' • lib/timeline/article/controllers/flare_interaction_controller.dart:2:8 • unused_import
+warning • Unused import: 'package:nima/nima/math/mat2d.dart' • lib/timeline/article/controllers/nima_interaction_controller.dart:2:8 • unused_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/article/timeline_entry_widget.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/actor_image.dart' • lib/timeline/article/timeline_entry_widget.dart:6:8 • unused_import
+warning • Unused import: 'package:flare_dart/math/mat2d.dart' • lib/timeline/article/timeline_entry_widget.dart:8:8 • unused_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/article/timeline_entry_widget.dart:11:8 • unnecessary_import
+warning • Unused import: 'package:nima/nima/actor_image.dart' • lib/timeline/article/timeline_entry_widget.dart:14:8 • unused_import
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/article/timeline_entry_widget.dart:206:41 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/article/timeline_entry_widget.dart:224:36 • deprecated_member_use
+   info • 'canLaunch' is deprecated and shouldn't be used. Use canLaunchUrl instead • lib/timeline/main_menu/about_page.dart:16:5 • deprecated_member_use
+   info • 'launch' is deprecated and shouldn't be used. Use launchUrl instead • lib/timeline/main_menu/about_page.dart:18:9 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:29:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:35:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:47:35 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:47:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:59:37 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:59:58 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:69:39 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:69:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:78:42 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:78:63 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:139:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:156:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/about_page.dart:174:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/about_page.dart:174:61 • deprecated_member_use
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/favorites_page.dart:2:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:49:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:57:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:68:35 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/favorites_page.dart:68:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:94:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/favorites_page.dart:94:61 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/favorites_page.dart:108:57 • deprecated_member_use
+warning • Unused import: 'dart:io' • lib/timeline/main_menu/main_menu.dart:2:8 • unused_import
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/main_menu.dart:4:8 • unnecessary_import
+   info • The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/cupertino.dart' • lib/timeline/main_menu/main_menu.dart:6:8 • unnecessary_import
+   info • The import of 'package:flutter/widgets.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/main_menu.dart:7:8 • unnecessary_import
+warning • Unused import: 'package:rive/rive.dart' • lib/timeline/main_menu/main_menu.dart:8:8 • unused_import
+warning • Unused import: 'package:share_plus/share_plus.dart' • lib/timeline/main_menu/main_menu.dart:9:8 • unused_import
+warning • Unused import: 'package:rivtrek/timeline/main_menu/collapsible.dart' • lib/timeline/main_menu/main_menu.dart:11:8 • unused_import
+warning • Unused import: 'package:rivtrek/timeline/main_menu/about_page.dart' • lib/timeline/main_menu/main_menu.dart:16:8 • unused_import
+warning • Unused import: 'package:rivtrek/timeline/colors.dart' • lib/timeline/main_menu/main_menu.dart:20:8 • unused_import
+warning • The value of the field '_topBarAnimation' isn't used • lib/timeline/main_menu/main_menu.dart:41:11 • unused_field
+   info • 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope. This feature was deprecated after v3.12.0-1.0.pre • lib/timeline/main_menu/main_menu.dart:173:10 • deprecated_member_use
+warning • The value of the local variable 'devicePadding' isn't used • lib/timeline/main_menu/main_menu.dart:195:16 • unused_local_variable
+warning • The left operand can't be null, so the right operand is never executed • lib/timeline/main_menu/main_menu.dart:215:36 • dead_null_aware_expression
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/main_menu.dart:248:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/main_menu.dart:255:41 • deprecated_member_use
+   info • 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope. This feature was deprecated after v3.12.0-1.0.pre • lib/timeline/main_menu/main_menu.dart:324:12 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/main_menu.dart:374:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/main_menu.dart:382:32 • deprecated_member_use
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/main_menu/menu_data.dart:93:15 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/main_menu/menu_data.dart:117:25 • unnecessary_null_comparison
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/menu_vignette.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/actor_image.dart' • lib/timeline/main_menu/menu_vignette.dart:5:8 • unused_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/menu_vignette.dart:8:8 • unnecessary_import
+warning • Unused import: 'package:nima/nima/actor_image.dart' • lib/timeline/main_menu/menu_vignette.dart:10:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:165:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:252:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:253:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:347:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:348:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:441:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/menu_vignette.dart:442:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/search_widget.dart:32:34 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/search_widget.dart:32:55 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/search_widget.dart:42:33 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/search_widget.dart:42:54 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/search_widget.dart:57:29 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/search_widget.dart:57:50 • deprecated_member_use
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/main_menu/thumbnail_detail_widget.dart:1:8 • unnecessary_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/main_menu/thumbnail_detail_widget.dart:44:33 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/thumbnail_detail_widget.dart:73:40 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/main_menu/thumbnail_detail_widget.dart:73:61 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/main_menu/thumbnail_detail_widget.dart:79:57 • deprecated_member_use
+warning • Unused import: 'package:intl/intl.dart' • lib/timeline/timeline/ticks.dart:5:8 • unused_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/ticks.dart:72:20 • unnecessary_null_comparison
+   info • The import of 'package:flare_dart/animation/actor_animation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flare_flutter/flare.dart' • lib/timeline/timeline/timeline.dart:8:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/math/vec2d.dart' • lib/timeline/timeline/timeline.dart:10:8 • unused_import
+   info • The import of 'package:flutter/widgets.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline.dart:14:8 • unnecessary_import
+warning • Unused import: 'package:nima/nima/actor_image.dart' • lib/timeline/timeline/timeline.dart:16:8 • unused_import
+warning • Unused import: 'package:nima/nima/animation/actor_animation.dart' • lib/timeline/timeline/timeline.dart:17:8 • unused_import
+warning • Unused import: 'package:nima/nima/math/vec2d.dart' • lib/timeline/timeline/timeline.dart:19:8 • unused_import
+warning • Unused import: 'package:rivtrek/services/database_service.dart' • lib/timeline/timeline/timeline.dart:26:8 • unused_import
+warning • Unused import: '../main_menu/main_menu.dart' • lib/timeline/timeline/timeline.dart:28:8 • unused_import
+warning • The value of the field '_riveResources' isn't used • lib/timeline/timeline/timeline.dart:142:30 • unused_field
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:375:15 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:551:25 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:635:25 • unnecessary_null_comparison
+warning • Dead code • lib/timeline/timeline/timeline.dart:764:15 • dead_code
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:906:38 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/timeline/timeline.dart:1008:21 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'false' • lib/timeline/timeline/timeline.dart:1023:23 • unnecessary_null_comparison
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1043:41 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1043:57 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1083:38 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • lib/timeline/timeline/timeline.dart:1084:34 • unnecessary_non_null_assertion
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:1102:21 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:1111:23 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline.dart:1164:18 • unnecessary_null_comparison
+   info • The import of 'package:flare_dart/animation/actor_animation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flare_flutter/flare.dart' • lib/timeline/timeline/timeline_entry.dart:5:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/math/vec2d.dart' • lib/timeline/timeline/timeline_entry.dart:7:8 • unused_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline_render_widget.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:flare_dart/actor_image.dart' • lib/timeline/timeline/timeline_render_widget.dart:5:8 • unused_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline_render_widget.dart:8:8 • unnecessary_import
+warning • Unused import: 'package:nima/nima/actor_image.dart' • lib/timeline/timeline/timeline_render_widget.dart:10:8 • unused_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_render_widget.dart:220:26 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:277:42 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:555:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:637:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:986:14 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:992:16 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_render_widget.dart:1039:18 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:10:17 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:10:41 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:12:12 • deprecated_member_use
+   info • 'alpha' is deprecated and shouldn't be used. Use (*.a * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:14:14 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:17:10 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:17:32 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:19:12 • deprecated_member_use
+   info • 'red' is deprecated and shouldn't be used. Use (*.r * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:21:14 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:24:10 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:24:34 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:26:12 • deprecated_member_use
+   info • 'green' is deprecated and shouldn't be used. Use (*.g * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:28:14 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:31:10 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:31:33 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:33:12 • deprecated_member_use
+   info • 'blue' is deprecated and shouldn't be used. Use (*.b * 255.0).round().clamp(0, 255) • lib/timeline/timeline/timeline_utils.dart:35:14 • deprecated_member_use
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/cupertino.dart' • lib/timeline/timeline/timeline_widget.dart:1:8 • unnecessary_import
+warning • Unused import: 'package:flare_flutter/flare_actor.dart' • lib/timeline/timeline/timeline_widget.dart:3:8 • unused_import
+   info • The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/timeline/timeline/timeline_widget.dart:4:8 • unnecessary_import
+   info • The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/cupertino.dart' • lib/timeline/timeline/timeline_widget.dart:6:8 • unnecessary_import
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:177:18 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:206:52 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:235:18 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • lib/timeline/timeline/timeline_widget.dart:250:18 • unnecessary_null_comparison
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:292:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:309:50 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/timeline/timeline_widget.dart:310:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:321:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/timeline/timeline/timeline_widget.dart:329:62 • deprecated_member_use
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • lib/timeline/timeline/timeline_widget.dart:330:64 • deprecated_member_use
+warning • Unused import: 'package:rivtrek/timeline/colors.dart' • lib/timeline/timeline_page.dart:5:8 • unused_import
+  error • The name 'MyApp' isn't a class • test/widget_test.dart:16:35 • creation_with_non_type
+

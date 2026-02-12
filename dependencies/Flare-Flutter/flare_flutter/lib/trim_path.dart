@@ -10,10 +10,8 @@ double _appendPathSegmentSequential(Iterator<PathMetric> metricsIterator,
     nextOffset = offset + metric.length;
     if (start < nextOffset) {
       Path extracted = metric.extractPath(start - offset, stop - offset);
-      if (extracted != null) {
-        to.addPath(extracted, Offset.zero);
-      }
-      if (stop < nextOffset) {
+      to.addPath(extracted, Offset.zero);
+          if (stop < nextOffset) {
         break;
       }
     }
@@ -27,10 +25,8 @@ void _appendPathSegmentSync(
   double nextOffset = offset + metric.length;
   if (start < nextOffset) {
     Path extracted = metric.extractPath(start - offset, stop - offset);
-    if (extracted != null) {
-      to.addPath(extracted, Offset.zero);
+    to.addPath(extracted, Offset.zero);
     }
-  }
 }
 
 Path _trimPathSequential(

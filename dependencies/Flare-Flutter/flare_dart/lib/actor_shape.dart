@@ -14,8 +14,8 @@ class ActorShape extends ActorDrawable {
   final List<ActorStroke> _strokes = <ActorStroke>[];
   final List<ActorFill> _fills = <ActorFill>[];
 
-  ActorFill get fill => _fills.isNotEmpty ? _fills.first : null;
-  ActorStroke get stroke => _strokes.isNotEmpty ? _strokes.first : null;
+  ActorFill? get fill => _fills.isNotEmpty ? _fills.first : null;
+  ActorStroke? get stroke => _strokes.isNotEmpty ? _strokes.first : null;
   List<ActorFill> get fills => _fills;
   List<ActorStroke> get strokes => _strokes;
 
@@ -45,53 +45,41 @@ class ActorShape extends ActorDrawable {
 
   @override
   AABB computeAABB() {
-    AABB aabb;
+    AABB aabb = AABB.fromValues(double.maxFinite, double.maxFinite,
+        -double.maxFinite, -double.maxFinite);
     for (final List<ActorShape> clips in clipShapes) {
       for (final ActorShape node in clips) {
         AABB bounds = node.computeAABB();
-        if (bounds == null) {
-          continue;
+        if (bounds[0] < aabb[0]) {
+          aabb[0] = bounds[0];
         }
-        if (aabb == null) {
-          aabb = bounds;
-        } else {
-          if (bounds[0] < aabb[0]) {
-            aabb[0] = bounds[0];
-          }
-          if (bounds[1] < aabb[1]) {
-            aabb[1] = bounds[1];
-          }
-          if (bounds[2] > aabb[2]) {
-            aabb[2] = bounds[2];
-          }
-          if (bounds[3] > aabb[3]) {
-            aabb[3] = bounds[3];
-          }
+        if (bounds[1] < aabb[1]) {
+          aabb[1] = bounds[1];
+        }
+        if (bounds[2] > aabb[2]) {
+          aabb[2] = bounds[2];
+        }
+        if (bounds[3] > aabb[3]) {
+          aabb[3] = bounds[3];
         }
       }
     }
-    if (aabb != null) {
-      return aabb;
-    }
 
-    for (final ActorNode node in children) {
-      ActorBasePath path = node as ActorBasePath;
-      if (path == null) {
-        continue;
-      }
-      // This is the axis aligned bounding box in the space of the
-      // parent (this case our shape).
-      AABB pathAABB = path.getPathAABB();
+    if (children != null) {
+      for (final ActorNode node in children!) {
+        if (node is ActorBasePath) {
+          ActorBasePath path = node as ActorBasePath;
+          // This is the axis aligned bounding box in the space of the
+          // parent (this case our shape).
+          AABB pathAABB = path.getPathAABB();
 
-      if (aabb == null) {
-        aabb = pathAABB;
-      } else {
-        // Combine.
-        aabb[0] = min(aabb[0], pathAABB[0]);
-        aabb[1] = min(aabb[1], pathAABB[1]);
+          // Combine.
+          aabb[0] = min(aabb[0], pathAABB[0]);
+          aabb[1] = min(aabb[1], pathAABB[1]);
 
-        aabb[2] = max(aabb[2], pathAABB[2]);
-        aabb[3] = max(aabb[3], pathAABB[3]);
+          aabb[2] = max(aabb[2], pathAABB[2]);
+          aabb[3] = max(aabb[3], pathAABB[3]);
+        }
       }
     }
 
@@ -99,25 +87,19 @@ class ActorShape extends ActorDrawable {
     double minY = double.maxFinite;
     double maxX = -double.maxFinite;
     double maxY = -double.maxFinite;
-
-    if (aabb == null) {
-      return AABB.fromValues(minX, minY, maxX, maxY);
-    }
     Mat2D world = worldTransform;
 
-    if (_strokes != null) {
-      double maxStroke = 0.0;
-      for (final ActorStroke stroke in _strokes) {
-        if (stroke.width > maxStroke) {
-          maxStroke = stroke.width;
-        }
+    double maxStroke = 0.0;
+    for (final ActorStroke stroke in _strokes) {
+      if (stroke.width > maxStroke) {
+        maxStroke = stroke.width;
       }
-      double padStroke = maxStroke / 2.0;
-      aabb[0] -= padStroke;
-      aabb[2] += padStroke;
-      aabb[1] -= padStroke;
-      aabb[3] += padStroke;
     }
+    double padStroke = maxStroke / 2.0;
+    aabb[0] -= padStroke;
+    aabb[2] += padStroke;
+    aabb[1] -= padStroke;
+    aabb[3] += padStroke;
 
     List<Vec2D> points = [
       Vec2D.fromValues(aabb[0], aabb[1]),

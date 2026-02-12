@@ -6,7 +6,7 @@ class Vec2D {
   late Float32List _buffer;
 
   Float32List get values {
-  late return _buffer;
+  return _buffer;
   }
 
   double operator [](int index) {
@@ -18,9 +18,6 @@ class Vec2D {
   }
 
   bool equals(Vec2D other) {
-    if (other == null) {
-      return false;
-    }
     return _buffer[0] == other[0] && _buffer[1] == other[1];
   }
 

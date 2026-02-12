@@ -95,6 +95,7 @@ class _SectionState extends State<MenuSection>
         break;
       case AnimationStatus.reverse:
       case AnimationStatus.forward:
+      case null:
         break;
     }
   }

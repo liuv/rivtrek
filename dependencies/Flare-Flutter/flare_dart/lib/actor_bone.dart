@@ -1,9 +1,9 @@
-import "stream_reader.dart";
 import "actor_artboard.dart";
 import "actor_bone_base.dart";
 import "actor_component.dart";
 import "actor_node.dart";
 import "jelly_component.dart";
+import "stream_reader.dart";
 
 class ActorBone extends ActorBoneBase {
   late ActorBone _firstBone;
@@ -13,17 +13,19 @@ class ActorBone extends ActorBoneBase {
     return _firstBone;
   }
 
+  @override
   ActorComponent makeInstance(ActorArtboard resetArtboard) {
     ActorBone instanceNode = ActorBone();
     instanceNode.copyBoneBase(this, resetArtboard);
     return instanceNode;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
     List<ActorNode>? children = this.children;
     if (children != null) {
-      for (ActorNode node in children) {
+      for (final ActorNode node in children) {
         if (node is ActorBone) {
           _firstBone = node;
           return;
@@ -34,9 +36,7 @@ class ActorBone extends ActorBoneBase {
 
   static ActorBone read(
       ActorArtboard artboard, StreamReader reader, ActorBone? node) {
-    if (node == null) {
-      node = ActorBone();
-    }
+    node ??= ActorBone();
     ActorBoneBase.read(artboard, reader, node);
     return node;
   }

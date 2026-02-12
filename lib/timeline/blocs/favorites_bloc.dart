@@ -17,12 +17,12 @@ class FavoritesBloc {
   /// use those references to fill [_favorites].
   init(List<TimelineEntry> entries) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> favs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
+    List<String>? favs = prefs.getStringList(FavoritesBloc.FAVORITES_KEY);
     /// A [Map] is used to optimize retrieval times when checking if a favorite
     /// is already present - in fact the label's used as the key.
     /// Checking if an element is in the map is O(1), making this process O(n)
     /// with n entries.
-    Map<String, TimelineEntry> entriesMap = Map();
+    Map<String, TimelineEntry> entriesMap = {};
     for (TimelineEntry e in entries) {
       entriesMap.putIfAbsent(e.label, () => e);
     }

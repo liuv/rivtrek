@@ -1,15 +1,16 @@
 import "actor_artboard.dart";
-import "actor_node.dart";
-import "math/vec2d.dart";
-import "stream_reader.dart";
-import "actor_path.dart";
-import "path_point.dart";
 import "actor_component.dart";
+import "actor_node.dart";
+import "actor_path.dart";
+import "math/vec2d.dart";
+import "path_point.dart";
+import "stream_reader.dart";
 
 class ActorTriangle extends ActorProceduralPath {
   @override
   void invalidatePath() {}
 
+  @override
   ActorComponent makeInstance(ActorArtboard resetArtboard) {
     ActorTriangle instance = ActorTriangle();
     instance.copyPath(this, resetArtboard);
@@ -17,10 +18,8 @@ class ActorTriangle extends ActorProceduralPath {
   }
 
   static ActorTriangle read(
-      ActorArtboard artboard, StreamReader reader, ActorTriangle component) {
-    if (component == null) {
-      component = ActorTriangle();
-    }
+      ActorArtboard artboard, StreamReader reader, ActorTriangle? component) {
+    component ??= ActorTriangle();
 
     ActorNode.read(artboard, reader, component);
 
@@ -38,11 +37,11 @@ class ActorTriangle extends ActorProceduralPath {
         StraightPathPoint.fromTranslation(Vec2D.fromValues(radiusX, radiusY)));
     _trianglePoints.add(
         StraightPathPoint.fromTranslation(Vec2D.fromValues(-radiusX, radiusY)));
-  late return _trianglePoints;
+  return _trianglePoints;
   }
 
   bool get isClosed => true;
-  bool get doesDraw => !this.renderCollapsed;
-  double get radiusX => this.width / 2;
-  double get radiusY => this.height / 2;
+  bool get doesDraw => !renderCollapsed;
+  double get radiusX => width / 2;
+  double get radiusY => height / 2;
 }

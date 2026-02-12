@@ -1,11 +1,12 @@
 import 'dart:math';
 import 'dart:typed_data';
+
+import 'package:flare_dart/actor_drawable.dart';
+import 'package:flare_dart/math/aabb.dart';
+import 'package:flare_dart/math/mat2d.dart';
 import 'package:flare_flutter/flare_render_box.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flare_dart/actor_drawable.dart';
-import 'package:flare_dart/math/mat2d.dart';
-import 'package:flare_dart/math/aabb.dart';
+
 import 'flare.dart';
 import 'flare_controller.dart';
 
@@ -16,10 +17,10 @@ class FlareActor extends LeafRenderObjectWidget {
   final String filename;
 
   /// The name of the artboard to display.
-  final String artboard;
+  final String? artboard;
 
   /// The name of the animation to play.
-  final String animation;
+  final String? animation;
 
   /// When true, the animation will be applied at the end of its duration.
   final bool snapToEnd;
@@ -41,18 +42,18 @@ class FlareActor extends LeafRenderObjectWidget {
 
   /// The [FlareController] used to drive animations/mixing/procedural hierarchy
   /// manipulation of the Flare contents.
-  final FlareController controller;
+  final FlareController? controller;
 
   /// Callback invoked when [animation] has completed. If [animation] is looping
   /// this callback is never invoked.
-  final FlareCompletedCallback callback;
+  final FlareCompletedCallback? callback;
 
   /// The color to override any fills/strokes with.
-  final Color color;
+  final Color? color;
 
   /// The name of the node to use to determine the bounds of the content.
   /// When null it will default to the bounds of the artboard.
-  final String boundsNode;
+  final String? boundsNode;
 
   /// When true the intrinsic size of the artboard will be used as the
   /// dimensions of this widget.
@@ -60,6 +61,7 @@ class FlareActor extends LeafRenderObjectWidget {
 
   const FlareActor(
     this.filename, {
+    Key? key,
     this.boundsNode,
     this.animation,
     this.fit = BoxFit.contain,
@@ -72,7 +74,7 @@ class FlareActor extends LeafRenderObjectWidget {
     this.shouldClip = true,
     this.sizeFromArtboard = false,
     this.artboard,
-  });
+  }) : super(key: key);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -118,8 +120,8 @@ class FlareActor extends LeafRenderObjectWidget {
 }
 
 class FlareAnimationLayer {
-  String name;
-  ActorAnimation animation;
+  late String name;
+  late ActorAnimation animation;
   double time = 0.0, mix = 0.0, mixSeconds = 0.2;
   void apply(FlutterActorArtboard artboard) {
     animation.apply(time, artboard, mix);
@@ -132,17 +134,17 @@ class FlareAnimationLayer {
 class FlareActorRenderObject extends FlareRenderBox {
   late Mat2D _lastControllerViewTransform;
   late String _filename;
-  late String _artboardName;
-  late String _animationName;
-  late String _boundsNodeName;
-  late FlareController _controller;
-  late FlareCompletedCallback _completedCallback;
+  String? _artboardName;
+  String? _animationName;
+  String? _boundsNodeName;
+  FlareController? _controller;
+  FlareCompletedCallback? _completedCallback;
   bool snapToEnd = false;
   bool _isPaused = false;
-  late FlutterActor _actor;
+  FlutterActor? _actor;
 
-  String get artboardName => _artboardName;
-  set artboardName(String name) {
+  String? get artboardName => _artboardName;
+  set artboardName(String? name) {
     if (_artboardName == name) {
       return;
     }
@@ -160,37 +162,35 @@ class FlareActorRenderObject extends FlareRenderBox {
   }
 
   final List<FlareAnimationLayer> _animationLayers = [];
-  bool shouldClip;
-  late FlutterActorArtboard _artboard;
+  bool shouldClip = true;
+  FlutterActorArtboard? _artboard;
   late AABB _setupAABB;
-  late Color _color;
+  Color? _color;
 
-  Color get color => _color;
-  set color(Color value) {
+  Color? get color => _color;
+  set color(Color? value) {
     if (value != _color) {
       _color = value;
-      if (_artboard != null) {
-        _artboard.overrideColor = value == null
-            ? null
-            : Float32List.fromList([
-                value.red / 255.0,
-                value.green / 255.0,
-                value.blue / 255.0,
-                value.opacity
-              ]);
+      if (_artboard != null && value != null) {
+        _artboard!.overrideColor = Float32List.fromList([
+          value.red / 255.0,
+          value.green / 255.0,
+          value.blue / 255.0,
+          value.opacity
+        ]);
       }
       markNeedsPaint();
     }
   }
 
-  String get boundsNodeName => _boundsNodeName;
-  set boundsNodeName(String value) {
+  String? get boundsNodeName => _boundsNodeName;
+  set boundsNodeName(String? value) {
     if (_boundsNodeName == value) {
       return;
     }
     _boundsNodeName = value;
     if (_artboard != null) {
-      ActorNode node = _artboard.getNode(_boundsNodeName);
+      ActorNode? node = _artboard!.getNode(_boundsNodeName ?? "");
       if (node is ActorDrawable) {
         _setupAABB = node.computeAABB();
       }
@@ -198,19 +198,19 @@ class FlareActorRenderObject extends FlareRenderBox {
   }
 
   void updateBounds() {
-    if (_artboard != null) {
-      ActorNode node;
-      if (_boundsNodeName != null &&
-          (node = _artboard.getNode(_boundsNodeName)) is ActorDrawable) {
-        _setupAABB = (node as ActorDrawable).computeAABB();
-      } else {
-        _setupAABB = _artboard.artboardAABB();
-      }
+    if (_artboard == null) {
+      return;
+    }
+    ActorNode? node = _artboard!.getNode(_boundsNodeName ?? "");
+    if (node is ActorDrawable) {
+      _setupAABB = node.computeAABB();
+    } else {
+      _setupAABB = _artboard!.artboardAABB();
     }
   }
 
-  String get animationName => _animationName;
-  set animationName(String value) {
+  String? get animationName => _animationName;
+  set animationName(String? value) {
     if (value != _animationName) {
       _animationName = value;
       _updateAnimation();
@@ -222,21 +222,21 @@ class FlareActorRenderObject extends FlareRenderBox {
   @override
   bool get isPlaying =>
       !_isPaused &&
-      ((_controller?.isActive?.value ?? false) || _animationLayers.isNotEmpty);
+      ((_controller?.isActive.value ?? false) || _animationLayers.isNotEmpty);
 
   void onControllerActiveChange() {
     updatePlayState();
   }
 
-  FlareController get controller => _controller;
-  set controller(FlareController c) {
+  FlareController? get controller => _controller;
+  set controller(FlareController? c) {
     if (_controller != c) {
-      _lastControllerViewTransform = c == null ? null : Mat2D();
-      _controller?.isActive?.removeListener(onControllerActiveChange);
+      _lastControllerViewTransform = Mat2D();
+      _controller?.isActive.removeListener(onControllerActiveChange);
       _controller = c;
-      _controller?.isActive?.addListener(onControllerActiveChange);
-      if (_controller != null && _artboard != null) {
-        _controller.initialize(_artboard);
+      _controller?.isActive.addListener(onControllerActiveChange);
+      if (_artboard != null) {
+        _controller?.initialize(_artboard!);
       }
     }
   }
@@ -252,38 +252,37 @@ class FlareActorRenderObject extends FlareRenderBox {
       return;
     }
     _filename = value;
-
-    if (_filename == null) {
-      markNeedsPaint();
-    }
     // file will change, let's clear out old animations.
     _animationLayers.clear();
     load();
   }
 
   bool _instanceArtboard() {
-    if (_actor == null || _actor.artboard == null) {
+    if (_actor == null || _actor!.artboard == null) {
       return false;
     }
-    FlutterActorArtboard artboard = _actor
-        .getArtboard(_artboardName)
-        .makeInstance() as FlutterActorArtboard;
+    FlutterActorArtboard? artboard = _actor!
+        .getArtboard(_artboardName ?? "")
+        ?.makeInstance() as FlutterActorArtboard?;
+    if (artboard == null) {
+      return false;
+    }
     artboard.initializeGraphics();
     _artboard = artboard;
     intrinsicSize = Size(artboard.width, artboard.height);
-    _artboard.overrideColor = _color == null
-        ? null
-        : Float32List.fromList([
-            _color.red / 255.0,
-            _color.green / 255.0,
-            _color.blue / 255.0,
-            _color.opacity
-          ]);
-    _artboard.advance(0.0);
+    if (_color != null) {
+      _artboard!.overrideColor = Float32List.fromList([
+        _color!.red / 255.0,
+        _color!.green / 255.0,
+        _color!.blue / 255.0,
+        _color!.opacity
+      ]);
+    }
+    _artboard!.advance(0.0);
     updateBounds();
 
     if (_controller != null) {
-      _controller.initialize(_artboard);
+      _controller!.initialize(_artboard!);
     }
     _updateAnimation(onlyWhenMissing: true);
     markNeedsPaint();
@@ -292,18 +291,15 @@ class FlareActorRenderObject extends FlareRenderBox {
 
   @override
   Future<void> load() async {
-    if (_filename == null) {
-      return;
-    }
     _actor = await loadFlare(_filename);
-    if (_actor == null || _actor.artboard == null) {
+    if (_actor!.artboard == null) {
       return;
     }
     _instanceArtboard();
   }
 
-  FlareCompletedCallback get completed => _completedCallback;
-  set completed(FlareCompletedCallback value) {
+  FlareCompletedCallback? get completed => _completedCallback;
+  set completed(FlareCompletedCallback? value) {
     if (_completedCallback != value) {
       _completedCallback = value;
     }
@@ -328,13 +324,15 @@ class FlareActorRenderObject extends FlareRenderBox {
           layer.time += elapsedSeconds;
         }
 
-        lastMix = (layer.mixSeconds == null || layer.mixSeconds == 0.0)
+        lastMix = (layer.mixSeconds == 0.0)
             ? 1.0
             : min(1.0, layer.mix / layer.mixSeconds);
         if (layer.animation.isLooping) {
           layer.time %= layer.animation.duration;
         }
-        layer.animation.apply(layer.time, _artboard, lastMix);
+        if (_artboard != null) {
+          layer.animation.apply(layer.time, _artboard!, lastMix);
+        }
         if (lastMix == 1.0) {
           lastFullyMixed = i;
         }
@@ -354,21 +352,17 @@ class FlareActorRenderObject extends FlareRenderBox {
       }
       for (final FlareAnimationLayer animation in completed) {
         _animationLayers.remove(animation);
-        if (_completedCallback != null) {
-          _completedCallback(animation.name);
-        }
+        _completedCallback?.call(animation.name);
       }
     }
 
-    if (_artboard != null &&
-        _controller != null &&
-        !_controller.advance(_artboard, elapsedSeconds)) {
-      _controller?.isActive?.value = false;
+    if (_controller != null && _artboard != null) {
+      if (!_controller!.advance(_artboard!, elapsedSeconds)) {
+        _controller!.isActive.value = false;
+      }
     }
 
-    if (_artboard != null) {
-      _artboard.advance(elapsedSeconds);
-    }
+    _artboard?.advance(elapsedSeconds);
   }
 
   @override
@@ -383,34 +377,31 @@ class FlareActorRenderObject extends FlareRenderBox {
 
   @override
   void paintFlare(Canvas canvas, Mat2D viewTransform) {
-    if (_artboard == null) {
-      return;
-    }
-    if (controller != null &&
-        !Mat2D.areEqual(_lastControllerViewTransform, viewTransform)) {
+    if (!Mat2D.areEqual(_lastControllerViewTransform, viewTransform)) {
       Mat2D.copy(_lastControllerViewTransform, viewTransform);
-      controller?.setViewTransform(viewTransform);
+      _controller?.setViewTransform(viewTransform);
     }
 
-    _artboard.draw(canvas);
+    _artboard?.draw(canvas);
   }
 
   void _updateAnimation({bool onlyWhenMissing = false}) {
+    if (_artboard == null || _animationName == null) {
+      return;
+    }
     if (onlyWhenMissing && _animationLayers.isNotEmpty) {
       return;
     }
-    if (_animationName != null && _artboard != null) {
-      ActorAnimation animation = _artboard.getAnimation(_animationName);
-      if (animation != null) {
-        _animationLayers.add(FlareAnimationLayer()
-          ..name = _animationName
-          ..animation = animation
-          ..mix = 1.0
-          ..mixSeconds = 0.2);
-        animation.apply(0.0, _artboard, 1.0);
-        _artboard.advance(0.0);
-        updatePlayState();
-      }
+    ActorAnimation? animation = _artboard!.getAnimation(_animationName!);
+    if (animation != null) {
+      _animationLayers.add(FlareAnimationLayer()
+        ..name = _animationName!
+        ..animation = animation
+        ..mix = 1.0
+        ..mixSeconds = 0.2);
+      animation.apply(0.0, _artboard!, 1.0);
+      _artboard!.advance(0.0);
+      updatePlayState();
     }
   }
 }

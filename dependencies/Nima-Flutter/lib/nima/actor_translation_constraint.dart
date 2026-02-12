@@ -11,10 +11,8 @@ class ActorTranslationConstraint extends ActorAxisConstraint {
   ActorTranslationConstraint() : super();
 
   static ActorTranslationConstraint read(
-      Actor actor, StreamReader reader, ActorTranslationConstraint component) {
-    if (component == null) {
-      component = ActorTranslationConstraint();
-    }
+      Actor actor, StreamReader reader, ActorTranslationConstraint? component) {
+    component ??= ActorTranslationConstraint();
     ActorAxisConstraint.read(actor, reader, component);
 
     return component;
@@ -29,59 +27,55 @@ class ActorTranslationConstraint extends ActorAxisConstraint {
 
   @override
   void constrain(ActorNode node) {
-    ActorNode t = target as ActorNode;
-    ActorNode p = parent;
-    ActorNode grandParent = p.parent;
+    ActorNode? t = target as ActorNode?;
+    ActorNode? p = parent;
+    if (t == null || p == null) {
+      return;
+    }
+    ActorNode? grandParent = p.parent as ActorNode?;
 
-    Mat2D transformA = parent.worldTransform;
+    Mat2D transformA = p.worldTransform;
     Vec2D translationA = Vec2D.fromValues(transformA[4], transformA[5]);
     Vec2D translationB = Vec2D();
 
-    if (t == null) {
-      Vec2D.copy(translationB, translationA);
+    Mat2D transformB = Mat2D.clone(t.worldTransform);
+    if (sourceSpace == TransformSpace.Local) {
+      ActorNode? sourceGrandParent = t.parent as ActorNode?;
+      if (sourceGrandParent != null) {
+        Mat2D inverse = Mat2D();
+        Mat2D.invert(inverse, sourceGrandParent.worldTransform);
+        Mat2D.multiply(transformB, inverse, transformB);
+      }
+    }
+    translationB[0] = transformB[4];
+    translationB[1] = transformB[5];
+
+    if (!copyX) {
+      translationB[0] =
+          destSpace == TransformSpace.Local ? 0.0 : translationA[0];
     } else {
-      Mat2D transformB = Mat2D.clone(t.worldTransform);
-      if (sourceSpace == TransformSpace.Local) {
-        ActorNode sourceGrandParent = t.parent;
-        if (sourceGrandParent != null) {
-          Mat2D inverse = Mat2D();
-          Mat2D.invert(inverse, sourceGrandParent.worldTransform);
-          Mat2D.multiply(transformB, inverse, transformB);
-        }
-      }
-      translationB[0] = transformB[4];
-      translationB[1] = transformB[5];
-
-      if (!copyX) {
-        translationB[0] =
-            destSpace == TransformSpace.Local ? 0.0 : translationA[0];
-      } else {
-        translationB[0] *= scaleX;
-        if (offset) {
-          translationB[0] += parent.translation[0];
-        }
-      }
-
-      if (!copyY) {
-        translationB[1] =
-            destSpace == TransformSpace.Local ? 0.0 : translationA[1];
-      } else {
-        translationB[1] *= scaleY;
-        if (offset) {
-          translationB[1] += parent.translation[1];
-        }
-      }
-
-      if (destSpace == TransformSpace.Local) {
-        if (grandParent != null) {
-          Vec2D.transformMat2D(
-              translationB, translationB, grandParent.worldTransform);
-        }
+      translationB[0] *= scaleX;
+      if (offset) {
+        translationB[0] += p.translation[0];
       }
     }
 
-    bool clampLocal =
-        minMaxSpace == TransformSpace.Local && grandParent != null;
+    if (!copyY) {
+      translationB[1] =
+          destSpace == TransformSpace.Local ? 0.0 : translationA[1];
+    } else {
+      translationB[1] *= scaleY;
+      if (offset) {
+        translationB[1] += p.translation[1];
+      }
+    }
+
+    if (destSpace == TransformSpace.Local && grandParent != null) {
+      Vec2D.transformMat2D(
+          translationB, translationB, grandParent.worldTransform);
+    }
+
+    bool clampLocal = minMaxSpace == TransformSpace.Local && grandParent != null;
     if (clampLocal) {
       // Apply min max in local space, so transform to local coordinates first.
       Mat2D temp = Mat2D();
@@ -101,7 +95,7 @@ class ActorTranslationConstraint extends ActorAxisConstraint {
     if (enableMinY && translationB[1] < minY) {
       translationB[1] = minY;
     }
-    if (clampLocal) {
+    if (clampLocal && grandParent != null) {
       // Transform back to world.
       Vec2D.transformMat2D(
           translationB, translationB, grandParent.worldTransform);

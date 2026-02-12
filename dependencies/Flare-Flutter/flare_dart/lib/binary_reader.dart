@@ -174,8 +174,8 @@ abstract class BinaryReader implements StreamReader {
 
   @override
   Uint8List readAsset() {
-    int length = readUint32();
-    return readUint8Array(length);
+    int length = readUint32("");
+    return readUint8Array(length, "");
   }
 
   @override

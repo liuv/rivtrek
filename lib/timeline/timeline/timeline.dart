@@ -20,7 +20,7 @@ import 'package:nima/nima/math/vec2d.dart' as nima;
 import 'package:rivtrek/timeline/timeline/timeline_utils.dart';
 
 import 'package:rive/rive.dart' as rive;
-import 'package:rive/src/rive_core/math/aabb.dart' as rive;
+// import 'package:rive/src/rive_core/math/aabb.dart' as rive; 
 
 import 'package:rivtrek/models/daily_stats.dart';
 import 'package:rivtrek/services/database_service.dart';
@@ -136,13 +136,10 @@ class Timeline {
   /// The list of [TimelineAsset], also loaded from disk at boot.
   List<TimelineAsset> _renderAssets = <TimelineAsset>[];
 
-  Map<String, TimelineEntry> _entriesById = Map<String, TimelineEntry>();
-  Map<String, nima.FlutterActor> _nimaResources =
-      Map<String, nima.FlutterActor>();
-  Map<String, flare.FlutterActor> _flareResources =
-      Map<String, flare.FlutterActor>();
-  Map<String, rive.Artboard> _riveResources =
-  Map<String, rive.Artboard>();
+  Map<String, TimelineEntry> _entriesById = {};
+  Map<String, nima.FlutterActor> _nimaResources = {};
+  Map<String, flare.FlutterActor> _flareResources = {};
+  Map<String, dynamic> _riveResources = {};
 
   /// Callback set by [TimelineRenderWidget] when adding a reference to this object.
   /// It'll trigger [RenderBox.markNeedsPaint()].
@@ -160,8 +157,8 @@ class Timeline {
   double get renderLabelX => _renderLabelX;
   double get start => _start;
   double get end => _end;
-  double get renderStart => _renderStart!;
-  double get renderEnd => _renderEnd!;
+  double get renderStart => _renderStart;
+  double get renderEnd => _renderEnd;
   double get gutterWidth => _gutterWidth;
   double get nextEntryOpacity => _nextEntryOpacity;
   double get prevEntryOpacity => _prevEntryOpacity;
@@ -309,7 +306,7 @@ class Timeline {
       entry.end = activity.accumulatedDistanceKm;
       
       // 构建标签内容
-      String weatherStr = weather != null ? "\n${weather.temp} ${weather.cityName}" : "";
+      String weatherStr = weather != null ? "\n${weather.currentTemp} ${weather.cityName}" : "";
       entry.label = "${activity.date}\n步数: ${activity.steps}\n里程: ${activity.distanceKm.toStringAsFixed(1)}km$weatherStr";
       
       entry.accent = Colors.blueAccent;
@@ -551,14 +548,16 @@ class Timeline {
                   _flareResources[filename] = actor;
                 }
               }
-              if (actor != null) {
+              if (actor != null && actor.artboard != null) {
                 /// Distinguish between the actual actor, and its intance.
                 flareAsset.actorStatic = actor.artboard as flare.FlutterActorArtboard;
-				flareAsset.actorStatic?.initializeGraphics();
-                flareAsset.actor = actor.artboard.makeInstance() as flare.FlutterActorArtboard;
-				flareAsset.actor?.initializeGraphics();
+                flareAsset.actorStatic?.initializeGraphics();
+                flareAsset.actor = actor.artboard!.makeInstance() as flare.FlutterActorArtboard;
+                flareAsset.actor?.initializeGraphics();
                 /// and the reference to their first animation is grabbed.
-                flareAsset.animation = actor.artboard.animations[0];
+                if (actor.artboard!.animations.isNotEmpty) {
+                  flareAsset.animation = actor.artboard!.animations[0];
+                }
 
                 dynamic name = assetMap["idle"];
                 if (name is String) {
@@ -568,10 +567,10 @@ class Timeline {
                   }
                 } else if (name is List) {
                   for (String animationName in name) {
-                    flare.ActorAnimation animation =
-                        flareAsset.actor!.getAnimation(animationName);
+                    flare.ActorAnimation? animation =
+                        flareAsset.actor?.getAnimation(animationName);
                     if (animation != null) {
-                      flareAsset.idleAnimations??<flare.ActorAnimation>[];
+                      flareAsset.idleAnimations ??= <flare.ActorAnimation>[];
                       flareAsset.idleAnimations?.add(animation);
                       flareAsset.animation = animation;
                     }
@@ -591,10 +590,12 @@ class Timeline {
                 flareAsset.animationTime = 0.0;
                 flareAsset.actor?.advance(0.0);
                 flareAsset.setupAABB = flareAsset.actor?.computeAABB();
-                flareAsset.animation
-                    ?.apply(flareAsset.animationTime, flareAsset.actor, 1.0);
-                flareAsset.animation?.apply(
-                    flareAsset.animation?.duration, flareAsset.actorStatic, 1.0);
+                if (flareAsset.animation != null) {
+                  flareAsset.animation!
+                      .apply(flareAsset.animationTime, flareAsset.actor!, 1.0);
+                  flareAsset.animation!.apply(
+                      flareAsset.animation!.duration, flareAsset.actorStatic!, 1.0);
+                }
                 flareAsset.actor?.advance(0.0);
                 flareAsset.actorStatic?.advance(0.0);
 
@@ -638,17 +639,19 @@ class Timeline {
                 dynamic name = assetMap["idle"];
                 if (name is String) {
                   nimaAsset.animation = nimaAsset.actor?.getAnimation(name);
-                } else {
+                } else if (actor.animations.isNotEmpty) {
                   nimaAsset.animation = actor.animations[0];
                 }
                 nimaAsset.animationTime = 0.0;
                 nimaAsset.actor?.advance(0.0);
 
                 nimaAsset.setupAABB = nimaAsset.actor?.computeAABB();
-                nimaAsset.animation
-                    ?.apply(nimaAsset.animationTime, nimaAsset.actor, 1.0);
-                nimaAsset.animation?.apply(
-                    nimaAsset.animation?.duration, nimaAsset.actorStatic, 1.0);
+                if (nimaAsset.animation != null) {
+                  nimaAsset.animation!
+                      .apply(nimaAsset.animationTime, nimaAsset.actor!, 1.0);
+                  nimaAsset.animation!.apply(
+                      nimaAsset.animation!.duration, nimaAsset.actorStatic!, 1.0);
+                }
                 nimaAsset.actor?.advance(0.0);
                 nimaAsset.actorStatic?.advance(0.0);
                 dynamic loop = assetMap["loop"];
@@ -673,67 +676,57 @@ class Timeline {
             case "riv":
               TimelineRive riveAsset = TimelineRive();
               asset = riveAsset;
-              rive.Artboard? actor = _riveResources[filename];
+              dynamic actor = _riveResources[filename];
               if (actor == null) {
-                // if (filename == "Person/plant-parent.riv") {
-                //   _riveResources[filename] = MainMenuWidget.getRiveFirstArtboard()!;
-                //   actor = _riveResources[filename];
-                // } else {
-                  ByteData data = await rootBundle.load(filename);
-                  // Load the RiveFile from the binary data.
-                  if (data != null) {
-                    final file = rive.RiveFile.import(data);
-                    final artboard = file.mainArtboard;
-                    _riveResources[filename] = artboard;
-                    actor = artboard;
-                  }
-                // }
+                ByteData data = await rootBundle.load(filename);
+                // 0.14.x 动态调用解码，避开未定义的类名
+                final file = await (rive.File as dynamic).decode(data.buffer.asUint8List());
+                final artboard = file.defaultArtboard;
+                _riveResources[filename] = artboard;
+                actor = artboard;
               }
 
               if (actor != null) {
-                /// Distinguish between the actual actor, and its intance.
-                riveAsset.actorStatic = actor.artboard;
-                riveAsset.actor = actor.artboard.instance();
-                /// and the reference to their first animation is grabbed.
-                // riveAsset.animation = actor.animations[0] as rive.SimpleAnimation;
-                riveAsset.animation = rive.SimpleAnimation('idle');
-                riveAsset.animation!.init(riveAsset.actor!.context);
+                riveAsset.actorStatic = actor;
+                riveAsset.actor = actor.instance();
+
+                riveAsset.animation = riveAsset.actor.animationByName('idle');
                 dynamic name = assetMap["idle"];
                 if (name is String) {
-                  rive.RiveAnimationController animation = rive.SimpleAnimation(name);
-                  if (animation!.init(riveAsset.actor!)) {
-                    riveAsset.idle = animation as rive.SimpleAnimation;
-                    riveAsset.animation = animation;
+                  final anim = riveAsset.actor.animationByName(name);
+                  if (anim != null) {
+                    riveAsset.idle = anim;
+                    riveAsset.animation = anim;
                   }
                 } else if (name is List) {
                   for (String animationName in name) {
-                    rive.RiveAnimationController animation = rive.SimpleAnimation(animationName);
-                    if (animation!.init(riveAsset.actor!)) {
-                      riveAsset.idleAnimations??=<rive.SimpleAnimation>[];
-                      riveAsset.idleAnimations?.add(animation as rive.SimpleAnimation);
-                      riveAsset.animation = animation as rive.SimpleAnimation?;
+                    final anim = riveAsset.actor.animationByName(animationName);
+                    if (anim != null) {
+                      riveAsset.idleAnimations ??= <dynamic>[];
+                      riveAsset.idleAnimations?.add(anim);
+                      riveAsset.animation = anim;
                     }
                   }
                 }
 
                 name = assetMap["intro"];
                 if (name is String) {
-                  rive.RiveAnimationController animation = rive.SimpleAnimation(name);
-                  if (animation!.init(riveAsset.actor!)) {
-                    riveAsset.intro = animation as rive.SimpleAnimation;
-                    riveAsset.animation = animation as rive.SimpleAnimation?;
+                  final anim = riveAsset.actor.animationByName(name);
+                  if (anim != null) {
+                    riveAsset.intro = anim;
+                    riveAsset.animation = anim;
                   }
                 }
-                // riveAsset.actor?.addController(riveAsset.animation!);
-                /// Make sure that all the initial values are set for the actor and for the actor instance.
+                
                 riveAsset.animationTime = 0.0;
-                riveAsset.actor?.advance(0.0);
-                // riveAsset.setupAABB = riveAsset.actor?.computeAABB();
-                // double duration = asset.animation!.instance!.animation.endTime - asset.animation!.instance!.animation.startTime;
-                riveAsset.animation?.apply(riveAsset.actor!.context, riveAsset.animationTime);
-                // riveAsset.animation?.apply(riveAsset.actorStatic!.context, riveAsset.animation!.instance!.animation.duration/60);
-                riveAsset.actor?.advance(0.0);
-                riveAsset.actorStatic?.advance(0.0);
+                riveAsset.actor.advance(0.0);
+                
+                if (riveAsset.animation != null) {
+                  riveAsset.animation.apply(riveAsset.actor, riveAsset.animationTime);
+                }
+                
+                riveAsset.actor.advance(0.0);
+                riveAsset.actorStatic.advance(0.0);
 
                 dynamic loop = assetMap["loop"];
                 riveAsset.loop = loop is bool ? loop : true;
@@ -747,8 +740,7 @@ class Timeline {
 
                 dynamic bounds = assetMap["bounds"];
                 if (bounds is List) {
-                  /// Override the AABB for this entry with custom values.
-                  riveAsset.setupAABB = rive.AABB.fromValues(
+                  riveAsset.setupAABB = (rive.AABB as dynamic).fromValues(
                       bounds[0] is int ? bounds[0].toDouble() : bounds[0],
                       bounds[1] is int ? bounds[1].toDouble() : bounds[1],
                       bounds[2] is int ? bounds[2].toDouble() : bounds[2],
@@ -952,7 +944,8 @@ class Timeline {
           maxScrollExtent: double.infinity,
           pixels: 0.0,
           viewportDimension: _height,
-          axisDirection: AxisDirection.down);
+          axisDirection: AxisDirection.down,
+          devicePixelRatio: 1.0);
 
       _scrollSimulation =
           _scrollPhysics?.createBallisticSimulation(_scrollMetrics!, velocity);
@@ -1510,15 +1503,15 @@ class Timeline {
             }
           } else {
             /// Item is in view, apply the new animation time and advance the actor.
-            if (asset is TimelineNima && isActive) {
+            if (asset is TimelineNima && isActive && asset.actor != null) {
               asset.animationTime += elapsed;
-              if (asset.loop) {
+              if (asset.loop && asset.animation != null) {
                 asset.animationTime %= asset.animation!.duration;
               }
-              asset.animation?.apply(asset.animationTime, asset.actor, 1.0);
+              asset.animation?.apply(asset.animationTime, asset.actor!, 1.0);
               asset.actor?.advance(elapsed);
               stillAnimating = true;
-            } else if (asset is TimelineFlare && isActive) {
+            } else if (asset is TimelineFlare && isActive && asset.actor != null) {
               asset.animationTime += elapsed;
               /// Flare animations can have idle animations, as well as intro animations.
               /// Distinguish which one has the top priority and apply it accordingly.
@@ -1527,45 +1520,44 @@ class Timeline {
                 for (flare.ActorAnimation animation in asset.idleAnimations!) {
                   animation.apply(
                       (asset.animationTime + phase) % animation.duration,
-                      asset.actor,
+                      asset.actor!,
                       1.0);
                   phase += 0.16;
                 }
               } else {
                 if (asset.intro == asset.animation &&
+                    asset.animation != null &&
                     asset.animationTime >= asset.animation!.duration) {
                   asset.animationTime -= asset.animation!.duration;
                   asset.animation = asset.idle;
                 }
-                if (asset.loop && asset.animationTime > 0) {
+                if (asset.loop && asset.animationTime > 0 && asset.animation != null) {
                   asset.animationTime %= asset.animation!.duration;
                 }
-                asset.animation?.apply(asset.animationTime, asset.actor, 1.0);
+                asset.animation?.apply(asset.animationTime, asset.actor!, 1.0);
               }
               asset.actor?.advance(elapsed);
               stillAnimating = true;
             }  else if (asset is TimelineRive && isActive) {
               asset.animationTime += elapsed;
-              /// Flare animations can have idle animations, as well as intro animations.
-              /// Distinguish which one has the top priority and apply it accordingly.
               if (asset.idleAnimations != null) {
-                // double phase = 0.0;
-                for (rive.SimpleAnimation animation in asset.idleAnimations!) {
-                  animation.apply(asset.actor!.context, elapsed);
-                  // phase += 0.16;
+                for (dynamic animation in asset.idleAnimations!) {
+                  animation.apply(asset.actor, asset.animationTime);
                 }
-              } else {
+              } else if (asset.animation != null) {
+                dynamic anim = asset.animation;
+                double duration = anim.duration / 60.0;
                 if (asset.intro == asset.animation &&
-                    asset.animationTime >= asset.animation!.instance!.animation.duration) {
-                  asset.animationTime -= asset.animation!.instance!.animation.duration;
+                    asset.animationTime >= duration) { 
+                  asset.animationTime -= duration;
                   asset.animation = asset.idle;
                 }
                 if (asset.loop && asset.animationTime > 0) {
-                  asset.animationTime %= asset.animation!.instance!.animation.duration;
+                  asset.animationTime %= duration;
                 }
-                asset.animation?.apply(asset.actor!.context, elapsed);
+                anim.apply(asset.actor, asset.animationTime);
               }
-              asset.actor?.advance(elapsed);
+              asset.actor.advance(elapsed);
               stillAnimating = true;
             }
             /// Add this asset to the list of rendered assets.

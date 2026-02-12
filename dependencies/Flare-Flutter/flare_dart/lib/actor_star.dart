@@ -28,10 +28,8 @@ class ActorStar extends ActorProceduralPath {
   }
 
   static ActorStar read(
-      ActorArtboard artboard, StreamReader reader, ActorStar component) {
-    if (component == null) {
-      component = ActorStar();
-    }
+      ActorArtboard artboard, StreamReader reader, ActorStar? component) {
+    component ??= ActorStar();
 
     ActorNode.read(artboard, reader, component);
 
@@ -58,7 +56,7 @@ class ActorStar extends ActorProceduralPath {
           Vec2D.fromValues(cos(angle) * sx[i % 2], sin(angle) * sy[i % 2])));
       angle += inc;
     }
-  late return _starPoints;
+  return _starPoints;
   }
 
   set innerRadius(double val) {

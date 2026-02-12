@@ -1,8 +1,8 @@
-import "stream_reader.dart";
 import "actor_artboard.dart";
 import "actor_node.dart";
-import "math/vec2d.dart";
 import "math/mat2d.dart";
+import "math/vec2d.dart";
+import "stream_reader.dart";
 
 class ActorBoneBase extends ActorNode {
   late double _length;
@@ -18,7 +18,7 @@ class ActorBoneBase extends ActorNode {
     _length = value;
     List<ActorNode>? children = this.children;
     if (children != null) {
-      for (ActorNode node in children) {
+      for (final ActorNode node in children) {
         if (node is ActorBoneBase) {
           node.x = value;
         }
@@ -37,9 +37,7 @@ class ActorBoneBase extends ActorNode {
 
   static ActorBoneBase read(
       ActorArtboard artboard, StreamReader reader, ActorBoneBase? node) {
-    if (node == null) {
-      node = ActorBoneBase();
-    }
+    node ??= ActorBoneBase();
     ActorNode.read(artboard, reader, node);
 
     node._length = reader.readFloat32("length");

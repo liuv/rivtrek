@@ -23,7 +23,7 @@ typedef SelectItemCallback(TimelineEntry item);
 class TimelineWidget extends StatefulWidget {
   final MenuItemData focusItem;
   final Timeline timeline;
-  TimelineWidget(this.focusItem, this.timeline, {Key key = const Key('')}) : super(key: key);
+  TimelineWidget(this.focusItem, this.timeline, {Key? key}) : super(key: key);
 
   @override
   _TimelineWidgetState createState() => _TimelineWidgetState();
@@ -221,8 +221,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
         });
       };
       setState(() {
-        _eraName =
-            (timeline.currentEra ?? DefaultEraName) as String?;
+        _eraName = timeline.currentEra != null ? timeline.currentEra!.label : DefaultEraName;
         _showFavorites = timeline.showFavorites;
       });
     }
@@ -300,7 +299,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                               },
                             ),
                             Text(
-                              _eraName!,
+                              _eraName ?? DefaultEraName,
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                   fontFamily: "RobotoMedium",

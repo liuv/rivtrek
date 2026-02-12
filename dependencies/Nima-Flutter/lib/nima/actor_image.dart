@@ -1,41 +1,38 @@
 import 'dart:typed_data';
-import "readers/stream_reader.dart";
+
+import "actor.dart";
+import "actor_bone_base.dart";
+import "actor_component.dart";
 import "actor_node.dart";
 import "math/mat2d.dart";
 import "math/vec2d.dart";
-import "actor.dart";
-import "actor_component.dart";
-import "actor_bone_base.dart";
+import "readers/stream_reader.dart";
 
 enum BlendModes { Normal, Multiply, Screen, Additive }
 
 class BoneConnection {
-  int boneIdx;
-  ActorNode node;
+  int boneIdx = 0;
+  late ActorNode node;
   Mat2D bind = Mat2D();
   Mat2D inverseBind = Mat2D();
 }
 
 class SequenceFrame {
-  late int _atlasIndex;
-  late int _offset;
+  final int _atlasIndex;
+  final int _offset;
   SequenceFrame(this._atlasIndex, this._offset);
 
   @override
   String toString() {
-    return "(" +
-        this._atlasIndex.toString() +
-        ", " +
-        this._offset.toString() +
-        ")";
+    return "(" + _atlasIndex.toString() + ", " + _offset.toString() + ")";
   }
 
   int get atlasIndex {
-    return this._atlasIndex;
+    return _atlasIndex;
   }
 
   int get offset {
-    return this._offset;
+    return _offset;
   }
 }
 
@@ -44,66 +41,66 @@ class ActorImage extends ActorNode {
   int drawOrder = 0;
   // Computed draw index in the image list.
   int drawIndex = 0;
-  late BlendModes _blendMode;
+  BlendModes _blendMode = BlendModes.Normal;
   int _textureIndex = -1;
-  late Float32List _vertices;
-  late Uint16List _triangles;
+  Float32List _vertices = Float32List(0);
+  Uint16List _triangles = Uint16List(0);
   int _vertexCount = 0;
   int _triangleCount = 0;
-  late Float32List _animationDeformedVertices;
+  Float32List? _animationDeformedVertices;
   bool isVertexDeformDirty = false;
-  late List<BoneConnection> _boneConnections;
-  late Float32List _boneMatrices;
-  late List<SequenceFrame> _sequenceFrames;
-  late Float32List _sequenceUVs;
+  List<BoneConnection>? _boneConnections;
+  Float32List _boneMatrices = Float32List(0);
+  List<SequenceFrame> _sequenceFrames = [];
+  Float32List _sequenceUVs = Float32List(0);
   int _sequenceFrame = 0;
 
   int get sequenceFrame {
-    return this._sequenceFrame;
+    return _sequenceFrame;
   }
 
   Float32List get sequenceUVs {
-    return this._sequenceUVs;
+    return _sequenceUVs;
   }
 
   List<SequenceFrame> get sequenceFrames {
-    return this._sequenceFrames;
+    return _sequenceFrames;
   }
 
   set sequenceFrame(int value) {
-    this._sequenceFrame = value;
+    _sequenceFrame = value;
   }
 
   int get connectedBoneCount {
-    return _boneConnections == null ? 0 : _boneConnections.length;
+    return _boneConnections?.length ?? 0;
   }
 
-  List<BoneConnection> get boneConnections {
-  late return _boneConnections;
+  List<BoneConnection>? get boneConnections {
+    return _boneConnections;
   }
 
   int get textureIndex {
-  late return _textureIndex;
+    return _textureIndex;
   }
 
   BlendModes get blendMode {
-  late return _blendMode;
+    return _blendMode;
   }
 
   int get vertexCount {
-  late return _vertexCount;
+    return _vertexCount;
   }
 
   int get triangleCount {
-  late return _triangleCount;
+    return _triangleCount;
   }
 
   Uint16List get triangles {
-  late return _triangles;
+    return _triangles;
   }
 
   Float32List get vertices {
-  late return _vertices;
+    return _vertices;
   }
 
   int get vertexPositionOffset {
@@ -123,7 +120,7 @@ class ActorImage extends ActorNode {
   }
 
   int get vertexStride {
-    return _boneConnections != null ? 12 : 4;
+    return 12;
   }
 
   bool get isSkinned {
@@ -137,15 +134,15 @@ class ActorImage extends ActorNode {
   set doesAnimationVertexDeform(bool value) {
     if (value) {
       if (_animationDeformedVertices == null ||
-          _animationDeformedVertices.length != _vertexCount * 2) {
-        _animationDeformedVertices = Float32List(vertexCount * 2);
+          _animationDeformedVertices!.length != _vertexCount * 2) {
+        _animationDeformedVertices = Float32List(_vertexCount * 2);
         // Copy the deform verts from the rig verts.
         int writeIdx = 0;
         int readIdx = 0;
         int readStride = vertexStride;
         for (int i = 0; i < _vertexCount; i++) {
-          _animationDeformedVertices[writeIdx++] = _vertices[readIdx];
-          _animationDeformedVertices[writeIdx++] = _vertices[readIdx + 1];
+          _animationDeformedVertices![writeIdx++] = _vertices[readIdx];
+          _animationDeformedVertices![writeIdx++] = _vertices[readIdx + 1];
           readIdx += readStride;
         }
       }
@@ -154,28 +151,24 @@ class ActorImage extends ActorNode {
     }
   }
 
-  Float32List get animationDeformedVertices {
-  late return _animationDeformedVertices;
+  Float32List? get animationDeformedVertices {
+    return _animationDeformedVertices;
   }
 
   ActorImage();
 
   void disposeGeometry() {
     // Delete vertices only if we do not vertex deform at runtime.
-    if (_animationDeformedVertices == null) {
-      _vertices = null;
-    }
-    _triangles = null;
+    _triangles = Uint16List(0);
   }
 
   // We don't do this at initialization as some engines (like Unity)
   // don't need us to handle the bone matrix transforms ourselves.
   // This helps keep memory a little lower when this code runs in those engines.
   void instanceBoneMatrices() {
-    if (_boneMatrices == null) {
-      int numConnectedBones = _boneConnections.length;
-      _boneMatrices = Float32List((numConnectedBones + 1) * 6);
-      // First bone transform is always identity.
+    if (_boneConnections != null &&
+        _boneMatrices.length != _boneConnections!.length * 6 + 6) {
+      _boneMatrices = Float32List(_boneConnections!.length * 6 + 6);
       _boneMatrices[0] = 1.0;
       _boneMatrices[1] = 0.0;
       _boneMatrices[2] = 0.0;
@@ -190,40 +183,42 @@ class ActorImage extends ActorNode {
 
     Mat2D mat = Mat2D();
     int bidx = 6;
-    for (BoneConnection bc in _boneConnections) {
-      Mat2D.multiply(mat, bc.node.worldTransform, bc.inverseBind);
+    if (_boneConnections != null) {
+      for (final BoneConnection bc in _boneConnections!) {
+        Mat2D.multiply(mat, bc.node.worldTransform, bc.inverseBind);
 
-      _boneMatrices[bidx++] = mat[0];
-      _boneMatrices[bidx++] = mat[1];
-      _boneMatrices[bidx++] = mat[2];
-      _boneMatrices[bidx++] = mat[3];
-      _boneMatrices[bidx++] = mat[4];
-      _boneMatrices[bidx++] = mat[5];
+        _boneMatrices[bidx++] = mat[0];
+        _boneMatrices[bidx++] = mat[1];
+        _boneMatrices[bidx++] = mat[2];
+        _boneMatrices[bidx++] = mat[3];
+        _boneMatrices[bidx++] = mat[4];
+        _boneMatrices[bidx++] = mat[5];
+      }
     }
-  late return _boneMatrices;
+    return _boneMatrices;
   }
 
   Float32List get boneTransformMatrices {
     instanceBoneMatrices();
 
     int bidx = 6;
-    for (BoneConnection bc in _boneConnections) {
-      Mat2D mat = bc.node.worldTransform;
+    if (_boneConnections != null) {
+      for (final BoneConnection bc in _boneConnections!) {
+        Mat2D mat = bc.node.worldTransform;
 
-      _boneMatrices[bidx++] = mat[0];
-      _boneMatrices[bidx++] = mat[1];
-      _boneMatrices[bidx++] = mat[2];
-      _boneMatrices[bidx++] = mat[3];
-      _boneMatrices[bidx++] = mat[4];
-      _boneMatrices[bidx++] = mat[5];
+        _boneMatrices[bidx++] = mat[0];
+        _boneMatrices[bidx++] = mat[1];
+        _boneMatrices[bidx++] = mat[2];
+        _boneMatrices[bidx++] = mat[3];
+        _boneMatrices[bidx++] = mat[4];
+        _boneMatrices[bidx++] = mat[5];
+      }
     }
-  late return _boneMatrices;
+    return _boneMatrices;
   }
 
-  static ActorImage read(Actor actor, StreamReader reader, ActorImage node) {
-    if (node == null) {
-      node = ActorImage();
-    }
+  static ActorImage read(Actor actor, StreamReader reader, ActorImage? node) {
+    node ??= ActorImage();
 
     ActorNode.read(actor, reader, node);
 
@@ -252,16 +247,16 @@ class ActorImage extends ActorNode {
       reader.openArray("bones");
       int numConnectedBones = reader.readUint8Length();
       if (numConnectedBones != 0) {
-        node._boneConnections = List<BoneConnection>(numConnectedBones);
+        node._boneConnections =
+            List<BoneConnection>.generate(numConnectedBones, (i) => BoneConnection());
 
         for (int i = 0; i < numConnectedBones; i++) {
           reader.openObject("bone");
-          BoneConnection bc = BoneConnection();
+          BoneConnection bc = node._boneConnections![i];
           bc.boneIdx = reader.readId("id");
           reader.readFloat32ArrayOffset(bc.bind.values, 6, 0, "bind");
           reader.closeObject();
           Mat2D.invert(bc.inverseBind, bc.bind);
-          node._boneConnections[i] = bc;
         }
         reader.closeArray();
 
@@ -303,12 +298,12 @@ class ActorImage extends ActorNode {
       int uvStride = node._vertexCount * 2;
       node._sequenceUVs = uvs;
       SequenceFrame firstFrame = SequenceFrame(node._textureIndex, 0);
-      node._sequenceFrames = List<SequenceFrame>();
+      node._sequenceFrames = <SequenceFrame>[];
       node._sequenceFrames.add(firstFrame);
       int readIdx = 2;
       int writeIdx = 0;
       int vertexStride = 4;
-      if (node._boneConnections != null && node._boneConnections.length > 0) {
+      if (node._boneConnections != null && node._boneConnections!.isNotEmpty) {
         vertexStride = 12;
       }
       for (int i = 0; i < node._vertexCount; i++) {
@@ -336,11 +331,12 @@ class ActorImage extends ActorNode {
     return node;
   }
 
+  @override
   void resolveComponentIndices(List<ActorComponent> components) {
     super.resolveComponentIndices(components);
     if (_boneConnections != null) {
-      for (int i = 0; i < _boneConnections.length; i++) {
-        BoneConnection bc = _boneConnections[i];
+      for (int i = 0; i < _boneConnections!.length; i++) {
+        BoneConnection bc = _boneConnections![i];
         bc.node = components[bc.boneIdx] as ActorNode;
         ActorBoneBase bone = bc.node as ActorBoneBase;
         bone.isConnectedToImage = true;
@@ -348,6 +344,7 @@ class ActorImage extends ActorNode {
     }
   }
 
+  @override
   ActorComponent makeInstance(Actor resetActor) {
     ActorImage instanceNode = ActorImage();
     instanceNode.copyImage(this, resetActor);
@@ -366,24 +363,24 @@ class ActorImage extends ActorNode {
     _triangles = node._triangles;
     if (node._animationDeformedVertices != null) {
       _animationDeformedVertices =
-          Float32List.fromList(node._animationDeformedVertices);
+          Float32List.fromList(node._animationDeformedVertices!);
     }
 
     if (node._boneConnections != null) {
-      _boneConnections = List<BoneConnection>(node._boneConnections.length);
-      for (int i = 0; i < node._boneConnections.length; i++) {
-        BoneConnection bc = BoneConnection();
-        bc.boneIdx = node._boneConnections[i].boneIdx;
-        Mat2D.copy(bc.bind, node._boneConnections[i].bind);
-        Mat2D.copy(bc.inverseBind, node._boneConnections[i].inverseBind);
-        _boneConnections[i] = bc;
+      _boneConnections =
+          List<BoneConnection>.generate(node._boneConnections!.length, (i) => BoneConnection());
+      for (int i = 0; i < node._boneConnections!.length; i++) {
+        BoneConnection bc = _boneConnections![i];
+        bc.boneIdx = node._boneConnections![i].boneIdx;
+        Mat2D.copy(bc.bind, node._boneConnections![i].bind);
+        Mat2D.copy(bc.inverseBind, node._boneConnections![i].inverseBind);
       }
     }
   }
 
   void transformBind(Mat2D xform) {
     if (_boneConnections != null) {
-      for (BoneConnection bc in _boneConnections) {
+      for (final BoneConnection bc in _boneConnections!) {
         Mat2D.multiply(bc.bind, xform, bc.bind);
         Mat2D.invert(bc.inverseBind, bc.bind);
       }
@@ -399,11 +396,10 @@ class ActorImage extends ActorNode {
   }
 
   void transformDeformVertices(Mat2D wt) {
-    if (_animationDeformedVertices == null) {
+    Float32List? fv = _animationDeformedVertices;
+    if (fv == null) {
       return;
     }
-
-    Float32List fv = _animationDeformedVertices;
 
     int vidx = 0;
     for (int j = 0; j < _vertexCount; j++) {
@@ -436,10 +432,11 @@ class ActorImage extends ActorNode {
     int readIdx = 0;
     int writeIdx = 0;
 
-    Float32List v = _animationDeformedVertices != null
-        ? _animationDeformedVertices
-        : _vertices;
-    int stride = _animationDeformedVertices != null ? 2 : vertexStride;
+    Float32List? v = _animationDeformedVertices;
+    if (v == null) {
+      return;
+    }
+    int stride = 2;
 
     if (isSkinned) {
       Float32List boneTransforms = boneInfluenceMatrices;
@@ -448,31 +445,6 @@ class ActorImage extends ActorNode {
       Float32List influenceMatrix =
           Float32List.fromList([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
 
-      // if(this.name == "evolution_1_0001s_0003_evolution_1_weapo")
-      // {
-      // //	print("TEST!");
-      // 	int boneIndexOffset = vertexBoneIndexOffset;
-      // 	int weightOffset = vertexBoneWeightOffset;
-      // 	for(int i = 0; i < _vertexCount; i++)
-      // 	{
-      // 		for(int wi = 0; wi < 4; wi++)
-      // 		{
-      // 			int boneIndex = _vertices[boneIndexOffset+wi].toInt();
-      // 			double weight = _vertices[weightOffset+wi];
-      // 			if(boneIndex == 1)
-      // 			{
-      // 				_vertices[weightOffset+wi] = 1.0;
-      // 			}
-      // 			else if(boneIndex == 2)
-      // 			{
-      // 				_vertices[weightOffset+wi] = 0.0;
-      // 			}
-      // 			//print("BI $boneIndex $weight");
-      // 		}
-      // 		boneIndexOffset += vertexStride;
-      // 		weightOffset += vertexStride;
-      // 	}
-      // }
       int boneIndexOffset = vertexBoneIndexOffset;
       int weightOffset = vertexBoneWeightOffset;
       for (int i = 0; i < _vertexCount; i++) {
@@ -481,7 +453,7 @@ class ActorImage extends ActorNode {
 
         double px, py;
 
-        if (_animationDeformedVertices != null && isSkinnedDeformInWorld) {
+        if (isSkinnedDeformInWorld) {
           px = x;
           py = y;
         } else {

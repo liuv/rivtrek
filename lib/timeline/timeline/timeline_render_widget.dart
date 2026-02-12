@@ -16,7 +16,8 @@ import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
 import 'package:rivtrek/timeline/timeline/timeline_utils.dart';
 
-import 'package:rive/src/rive_core/math/aabb.dart' as rive;
+// import 'package:rive/rive.dart' as rive;
+// import 'package:rive/src/rive_core/math/aabb.dart' as rive; // Removed private import // Removed private import
 
 /// These two callbacks are used to detect if a bubble or an entry have been tapped.
 /// If that's the case, [ArticlePage] will be pushed onto the [Navigator] stack.
@@ -175,7 +176,9 @@ class TimelineRenderObject extends RenderBox {
   /// Check if the current tap on the screen has hit a bubble.
   @override
   bool hitTestSelf(Offset screenOffset) {
-    touchEntry!(null as TimelineEntry);
+    if (touchEntry != null) {
+      // touchEntry!(null as TimelineEntry);
+    }
     for (TapTarget bubble in _tapTargets.reversed) {
       if (bubble.rect!.contains(screenOffset)) {
         if (touchBubble != null) {
@@ -184,7 +187,9 @@ class TimelineRenderObject extends RenderBox {
         return true;
       }
     }
-    touchBubble!(null as TapTarget);
+    if (touchBubble != null) {
+      // touchBubble!(null as TapTarget);
+    }
 
     return true;
   }
@@ -454,95 +459,7 @@ class TimelineRenderObject extends RenderBox {
               ..rect = renderOffset & renderSize);
           }else if (asset is TimelineRive && asset.actor != null) {
             /// If we have a [TimelineRive] asset set it up properly and paint it.
-            ///
-            /// 1. Calculate the bounds for the current object.
-            /// An Axis-Aligned Bounding Box (AABB) is already set up when the asset is first loaded.
-            /// We rely on this AABB to perform screen-space calculations.
-            Alignment alignment = Alignment.center;
-            BoxFit fit = BoxFit.cover;
-
-            rive.AABB bounds = asset.setupAABB!;
-            double contentWidth = bounds[2] - bounds[0];
-            double contentHeight = bounds[3] - bounds[1];
-            double x = -bounds[0] -
-                contentWidth / 2.0 -
-                (alignment.x * contentWidth / 2.0) +
-                asset.offset;
-            double y = -bounds[1] -
-                contentHeight / 2.0 +
-                (alignment.y * contentHeight / 2.0);
-
-            Offset renderOffset = Offset(offset.dx + size.width - w, asset.y);
-            Size renderSize = Size(w * rs, h * rs);
-
-            double scaleX = 1.0, scaleY = 1.0;
-
-            canvas.save();
-
-            /// This widget is always set up to use [BoxFit.cover].
-            /// But this behavior can be customized according to anyone's needs.
-            /// The following switch/case contains all the various alternatives native to Flutter.
-            switch (fit) {
-              case BoxFit.fill:
-                scaleX = renderSize.width / contentWidth;
-                scaleY = renderSize.height / contentHeight;
-                break;
-              case BoxFit.contain:
-                double minScale = min(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.cover:
-                double maxScale = max(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = maxScale;
-                break;
-              case BoxFit.fitHeight:
-                double minScale = renderSize.height / contentHeight;
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.fitWidth:
-                double minScale = renderSize.width / contentWidth;
-                scaleX = scaleY = minScale;
-                break;
-              case BoxFit.none:
-                scaleX = scaleY = 1.0;
-                break;
-              case BoxFit.scaleDown:
-                double minScale = min(renderSize.width / contentWidth,
-                    renderSize.height / contentHeight);
-                scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-                break;
-            }
-
-            /// 2. Move the [canvas] to the right position so that the widget's position
-            /// is center-aligned based on its offset, size and alignment position.
-            canvas.translate(
-                renderOffset.dx +
-                    renderSize.width / 2.0 +
-                    (alignment.x * renderSize.width / 2.0),
-                renderOffset.dy +
-                    renderSize.height / 2.0 +
-                    (alignment.y * renderSize.height / 2.0));
-
-            /// 3. Scale depending on the [fit].
-            canvas.scale(scaleX, scaleY);
-
-            /// 4. Move the canvas to the correct [_flareActor] position calculated above.
-            canvas.translate(x, y);
-
-            /// 5. perform the drawing operations.
-            asset.actor?.opacity = asset.opacity;
-            asset.actor?.draw(canvas);
-
-            /// 6. Restore the canvas' original transform state.
-            canvas.restore();
-
-            /// 7. This asset is also a *tappable* element, add it to the list
-            /// so it can be processed.
-            _tapTargets.add(TapTarget()
-              ..entry = asset.entry
-              ..rect = renderOffset & renderSize);
+            // Rive painting is temporarily disabled due to API incompatibility
           }
         }
       }
@@ -966,72 +883,12 @@ class TimelineRenderObject extends RenderBox {
             ..rect = renderOffset & renderSize
             ..zoom = true);
         }  else if (asset is TimelineRive && asset.actorStatic != null) {
-          rive.AABB bounds = asset.setupAABB!;
-          double contentWidth = bounds[2] - bounds[0];
-          double contentHeight = bounds[3] - bounds[1];
-          double x = -bounds[0] -
-              contentWidth / 2.0 -
-              (alignment.x * contentWidth / 2.0) +
-              asset.offset;
-          double y = -bounds[1] -
-              contentHeight / 2.0 +
-              (alignment.y * contentHeight / 2.0);
-
-          double scaleX = 1.0, scaleY = 1.0;
-
-          canvas.save();
-          canvas.clipRRect(RRect.fromRectAndRadius(
-              renderOffset & renderSize, Radius.circular(favoritesRadius)));
-
-          switch (fit) {
-            case BoxFit.fill:
-              scaleX = renderSize.width / contentWidth;
-              scaleY = renderSize.height / contentHeight;
-              break;
-            case BoxFit.contain:
-              double minScale = min(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.cover:
-              double maxScale = max(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = maxScale;
-              break;
-            case BoxFit.fitHeight:
-              double minScale = renderSize.height / contentHeight;
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.fitWidth:
-              double minScale = renderSize.width / contentWidth;
-              scaleX = scaleY = minScale;
-              break;
-            case BoxFit.none:
-              scaleX = scaleY = 1.0;
-              break;
-            case BoxFit.scaleDown:
-              double minScale = min(renderSize.width / contentWidth,
-                  renderSize.height / contentHeight);
-              scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-              break;
-          }
-
-          canvas.translate(
-              renderOffset.dx +
-                  renderSize.width / 2.0 +
-                  (alignment.x * renderSize.width / 2.0),
-              renderOffset.dy +
-                  renderSize.height / 2.0 +
-                  (alignment.y * renderSize.height / 2.0));
-          canvas.scale(scaleX, scaleY);
-          canvas.translate(x, y);
-
+          // Rive 1.0 logic is not compatible with Rive 0.14
+          /*
+          dynamic bounds = asset.setupAABB!;
+          // ...
           asset.actorStatic?.draw(canvas);
-          canvas.restore();
-          _tapTargets.add(TapTarget()
-            ..entry = asset.entry
-            ..rect = renderOffset & renderSize
-            ..zoom = true);
+          */
         }
         else {
           _tapTargets.add(TapTarget()

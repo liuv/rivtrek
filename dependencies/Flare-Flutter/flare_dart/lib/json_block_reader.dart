@@ -8,9 +8,9 @@ class JSONBlockReader extends JSONReader {
       : blockType = 0,
         super(object);
 
-  JSONBlockReader.fromObject(int type, Map object) : super(object) {
-    blockType = type;
-  }
+  JSONBlockReader.fromObject(int type, Map object)
+      : blockType = type,
+        super(object);
 
   @override
   JSONBlockReader? readNextBlock(Map<String, int> blockTypes) {
@@ -18,12 +18,12 @@ class JSONBlockReader extends JSONReader {
       return null;
     }
 
-    var obj = Map();
-    obj["container"] = this._peek();
-    var type = this.readBlockType(blockTypes);
-    var c = this.context.first;
+    var obj = {};
+    obj["container"] = _peek();
+    var type = readBlockType(blockTypes);
+    var c = context.first;
     if (c is Map) {
-      c.remove(this.nextKey);
+      c.remove(nextKey);
     } else if (c is List) {
       c.removeAt(0);
     }
@@ -32,12 +32,12 @@ class JSONBlockReader extends JSONReader {
   }
 
   int? readBlockType(Map<String, int> blockTypes) {
-    var next = this._peek();
+    var next = _peek();
     int? bType;
     if (next is Map) {
-      var c = this.context.first;
+      var c = context.first;
       if (c is Map) {
-        bType = blockTypes[this.nextKey];
+        bType = blockTypes[nextKey];
       } else if (c is List) {
         // Objects are serialized with "type" property.
         var nType = next["type"];
@@ -45,21 +45,21 @@ class JSONBlockReader extends JSONReader {
       }
     } else if (next is List) {
       // Arrays are serialized as "type": [Array].
-      bType = blockTypes[this.nextKey];
+      bType = blockTypes[nextKey];
     }
     return bType;
   }
 
   dynamic _peek() {
-    var stream = this.context.first;
+    var stream = context.first;
     var next;
     if (stream is Map) {
-      next = stream[this.nextKey];
+      next = stream[nextKey];
     } else if (stream is List) {
       next = stream[0];
     }
     return next;
   }
 
-  dynamic get nextKey => this.context.first.keys.first;
+  dynamic get nextKey => context.first.keys.first;
 }

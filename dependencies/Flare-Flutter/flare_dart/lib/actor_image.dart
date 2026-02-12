@@ -1,12 +1,13 @@
 import 'dart:typed_data';
+
 import 'package:flare_dart/actor_skinnable.dart';
 
-import "stream_reader.dart";
-import "math/mat2d.dart";
 import "actor_artboard.dart";
 import "actor_component.dart";
 import "actor_drawable.dart";
 import "math/aabb.dart";
+import "math/mat2d.dart";
+import "stream_reader.dart";
 
 class SequenceFrame {
   final int _atlasIndex;
@@ -24,10 +25,10 @@ class SequenceFrame {
 
 class ActorImage extends ActorDrawable with ActorSkinnable {
   @override
-  int drawIndex;
+  int drawIndex = 0;
 
   @override
-  int drawOrder;
+  int drawOrder = 0;
 
   int _textureIndex = -1;
   late Float32List _vertices;
@@ -35,8 +36,8 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
   int _vertexCount = 0;
   int _triangleCount = 0;
   Float32List? _animationDeformedVertices;
-  late List<SequenceFrame> _sequenceFrames;
-  late Float32List _sequenceUVs;
+  List<SequenceFrame> _sequenceFrames = [];
+  Float32List _sequenceUVs = Float32List(0);
   int _sequenceFrame = 0;
 
   int get sequenceFrame => _sequenceFrame;
@@ -128,10 +129,8 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
   }
 
   static ActorImage read(
-      ActorArtboard artboard, StreamReader reader, ActorImage node) {
-    if (node == null) {
-      node = ActorImage();
-    }
+      ActorArtboard artboard, StreamReader reader, ActorImage? node) {
+    node ??= ActorImage();
 
     ActorDrawable.read(artboard, reader, node);
     ActorSkinnable.read(artboard, reader, node);
@@ -166,7 +165,7 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
 //       int uvStride = node._vertexCount * 2;
 //       node._sequenceUVs = uvs;
 //       SequenceFrame firstFrame = SequenceFrame(node._textureIndex, 0);
-//       node._sequenceFrames = List<SequenceFrame>();
+//       node._sequenceFrames = <SequenceFrame>[];
 //       node._sequenceFrames.add(firstFrame);
 //       int readIdx = 2;
 //       int writeIdx = 0;
@@ -199,11 +198,13 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
 //     return node;
 //   }
 
-  void resolveComponentIndices(List<ActorComponent> components) {
+  @override
+  void resolveComponentIndices(List<ActorComponent?> components) {
     super.resolveComponentIndices(components);
     resolveSkinnable(components);
   }
 
+  @override
   ActorComponent makeInstance(ActorArtboard resetArtboard) {
     ActorImage instanceNode = resetArtboard.actor.makeImageNode();
     instanceNode.copyImage(this, resetArtboard);
@@ -221,7 +222,7 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
     _triangles = node._triangles;
     if (node._animationDeformedVertices != null) {
       _animationDeformedVertices =
-          Float32List.fromList(node._animationDeformedVertices);
+          Float32List.fromList(node._animationDeformedVertices!);
     }
   }
 
@@ -247,7 +248,7 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
       return;
     }
 
-    Float32List fv = _animationDeformedVertices;
+    Float32List fv = _animationDeformedVertices!;
 
     int vidx = 0;
     for (int j = 0; j < _vertexCount; j++) {
@@ -285,94 +286,63 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
         : _vertices;
     int stride = _animationDeformedVertices != null ? 2 : vertexStride;
 
-    if (skin != null) {
-      Float32List boneTransforms = skin!.boneMatrices;
+    Float32List? boneTransforms = skin?.boneMatrices;
 
-      //Mat2D inverseWorldTransform = Mat2D.Invert(new Mat2D(), worldTransform);
-      Float32List influenceMatrix =
-          Float32List.fromList([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+    //Mat2D inverseWorldTransform = Mat2D.Invert(new Mat2D(), worldTransform);
+    Float32List influenceMatrix =
+        Float32List.fromList([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
 
-      // if(this.name == "evolution_1_0001s_0003_evolution_1_weapo")
-      // {
-      // //	print("TEST!");
-      // 	int boneIndexOffset = vertexBoneIndexOffset;
-      // 	int weightOffset = vertexBoneWeightOffset;
-      // 	for(int i = 0; i < _vertexCount; i++)
-      // 	{
-      // 		for(int wi = 0; wi < 4; wi++)
-      // 		{
-      // 			int boneIndex = _vertices[boneIndexOffset+wi].toInt();
-      // 			double weight = _vertices[weightOffset+wi];
-      // 			if(boneIndex == 1)
-      // 			{
-      // 				_vertices[weightOffset+wi] = 1.0;
-      // 			}
-      // 			else if(boneIndex == 2)
-      // 			{
-      // 				_vertices[weightOffset+wi] = 0.0;
-      // 			}
-      // 			//print("BI $boneIndex $weight");
-      // 		}
-      // 		boneIndexOffset += vertexStride;
-      // 		weightOffset += vertexStride;
-      // 	}
-      // }
-      int boneIndexOffset = vertexBoneIndexOffset;
-      int weightOffset = vertexBoneWeightOffset;
-      for (int i = 0; i < _vertexCount; i++) {
-        double x = v[readIdx];
-        double y = v[readIdx + 1];
+    int boneIndexOffset = vertexBoneIndexOffset;
+    int weightOffset = vertexBoneWeightOffset;
+    for (int i = 0; i < _vertexCount; i++) {
+      double x = v[readIdx];
+      double y = v[readIdx + 1];
 
-        double px, py;
+      double px, py;
 
-        if (_animationDeformedVertices != null && isSkinnedDeformInWorld) {
-          px = x;
-          py = y;
-        } else {
-          px =
-              worldTransform[0] * x + worldTransform[2] * y + worldTransform[4];
-          py =
-              worldTransform[1] * x + worldTransform[3] * y + worldTransform[5];
-        }
+      if (_animationDeformedVertices != null && isSkinnedDeformInWorld) {
+        px = x;
+        py = y;
+      } else {
+        px =
+            worldTransform[0] * x + worldTransform[2] * y + worldTransform[4];
+        py =
+            worldTransform[1] * x + worldTransform[3] * y + worldTransform[5];
+      }
 
-        influenceMatrix[0] = influenceMatrix[1] = influenceMatrix[2] =
-            influenceMatrix[3] = influenceMatrix[4] = influenceMatrix[5] = 0.0;
+      influenceMatrix[0] = influenceMatrix[1] = influenceMatrix[2] =
+          influenceMatrix[3] = influenceMatrix[4] = influenceMatrix[5] = 0.0;
 
+      if (boneTransforms != null) {
         for (int wi = 0; wi < 4; wi++) {
           int boneIndex = _vertices[boneIndexOffset + wi].toInt();
           double weight = _vertices[weightOffset + wi];
 
           int boneTransformIndex = boneIndex * 6;
-          if (boneIndex <= connectedBones.length) {
+          if (boneTransformIndex + 5 < boneTransforms.length) {
             for (int j = 0; j < 6; j++) {
               influenceMatrix[j] +=
                   boneTransforms[boneTransformIndex + j] * weight;
             }
           }
         }
-
-        x = influenceMatrix[0] * px +
-            influenceMatrix[2] * py +
-            influenceMatrix[4];
-        y = influenceMatrix[1] * px +
-            influenceMatrix[3] * py +
-            influenceMatrix[5];
-
-        readIdx += stride;
-        boneIndexOffset += vertexStride;
-        weightOffset += vertexStride;
-
-        buffer[writeIdx++] = x;
-        buffer[writeIdx++] = y;
       }
-    } else {
-      for (int i = 0; i < _vertexCount; i++) {
-        buffer[writeIdx++] = v[readIdx];
-        buffer[writeIdx++] = v[readIdx + 1];
-        readIdx += stride;
-      }
+
+      x = influenceMatrix[0] * px +
+          influenceMatrix[2] * py +
+          influenceMatrix[4];
+      y = influenceMatrix[1] * px +
+          influenceMatrix[3] * py +
+          influenceMatrix[5];
+
+      readIdx += stride;
+      boneIndexOffset += vertexStride;
+      weightOffset += vertexStride;
+
+      buffer[writeIdx++] = x;
+      buffer[writeIdx++] = y;
     }
-  }
+    }
 
   @override
   AABB computeAABB() {
@@ -382,7 +352,7 @@ class ActorImage extends ActorDrawable with ActorSkinnable {
         worldTransform[4], worldTransform[5]);
   }
 
-  Mat2D get imageTransform => isConnectedToBones ? null : worldTransform;
+  Mat2D? get imageTransform => isConnectedToBones ? null : worldTransform;
 
   @override
   void initializeGraphics() {}

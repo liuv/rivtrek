@@ -1,14 +1,14 @@
-import "stream_reader.dart";
-import "actor_artboard.dart";
-import "actor_jelly_bone.dart";
-import "actor_component.dart";
-import "actor_node.dart";
-import "actor_bone.dart";
-import "math/vec2d.dart";
-import "math/mat2d.dart";
 import "dart:math";
-import "actor_root_bone.dart";
+
+import "actor_artboard.dart";
+import "actor_bone.dart";
+import "actor_component.dart";
 import "actor_constraint.dart";
+import "actor_jelly_bone.dart";
+import "actor_node.dart";
+import "math/mat2d.dart";
+import "math/vec2d.dart";
+import "stream_reader.dart";
 
 class JellyComponent extends ActorComponent {
   static const int JellyMax = 16;
@@ -19,8 +19,8 @@ class JellyComponent extends ActorComponent {
   static bool fuzzyEquals(Vec2D a, Vec2D b) {
     double a0 = a[0], a1 = a[1];
     double b0 = b[0], b1 = b[1];
-    return ((a0 - b0).abs() <= Epsilon * max(1.0, max(a0.abs(), b0.abs())) &&
-        (a1 - b1).abs() <= Epsilon * max(1.0, max(a1.abs(), b1.abs())));
+    return (a0 - b0).abs() <= Epsilon * max(1.0, max(a0.abs(), b0.abs())) &&
+        (a1 - b1).abs() <= Epsilon * max(1.0, max(a1.abs(), b1.abs()));
   }
 
   static void forwardDiffBezier(double c0, double c1, double c2, double c3,
@@ -53,7 +53,7 @@ class JellyComponent extends ActorComponent {
   List<Vec2D> normalizeCurve(List<Vec2D> curve, int numSegments) {
     List<Vec2D> points = [];
     int curvePointCount = curve.length;
-    List<double?> distances = List<double?>.filled(curvePointCount, null);
+    List<double> distances = List<double>.filled(curvePointCount, 0.0);
     distances[0] = 0.0;
     for (int i = 0; i < curvePointCount - 1; i++) {
       Vec2D p1 = curve[i];
@@ -92,8 +92,8 @@ class JellyComponent extends ActorComponent {
   late double _scaleOut;
   late int _inTargetIdx;
   late int _outTargetIdx;
-  late ActorNode _inTarget;
-  late ActorNode _outTarget;
+  ActorNode? _inTarget;
+  ActorNode? _outTarget;
   late List<ActorJellyBone> _bones;
   late Vec2D _inPoint;
   late Vec2D _inDirection;
@@ -106,8 +106,8 @@ class JellyComponent extends ActorComponent {
   late double _cachedScaleOut;
   late List<Vec2D> _jellyPoints;
 
-  ActorNode get inTarget => _inTarget;
-  ActorNode get outTarget => _outTarget;
+  ActorNode? get inTarget => _inTarget;
+  ActorNode? get outTarget => _outTarget;
 
   JellyComponent() {
     _inPoint = Vec2D();
@@ -120,6 +120,7 @@ class JellyComponent extends ActorComponent {
 
     _jellyPoints = List<Vec2D>.generate(JellyMax + 1, (i) => Vec2D());
   }
+  @override
   ActorComponent makeInstance(ActorArtboard artboard) {
     JellyComponent instance = JellyComponent();
     instance.copyJelly(this, artboard);
@@ -136,14 +137,15 @@ class JellyComponent extends ActorComponent {
     _outTargetIdx = component._outTargetIdx;
   }
 
+  @override
   void resolveComponentIndices(List<ActorComponent?> components) {
     super.resolveComponentIndices(components);
 
     if (_inTargetIdx != 0) {
-      _inTarget = components[_inTargetIdx] as ActorNode;
+      _inTarget = components[_inTargetIdx] as ActorNode?;
     }
     if (_outTargetIdx != 0) {
-      _outTarget = components[_outTargetIdx] as ActorNode;
+      _outTarget = components[_outTargetIdx] as ActorNode?;
     }
 
     List<ActorConstraint> dependencyConstraints = <ActorConstraint>[];
@@ -161,37 +163,38 @@ class JellyComponent extends ActorComponent {
         if (_outTarget == null &&
             firstBone.jelly != null &&
             firstBone.jelly!.inTarget != null) {
-          artboard.addDependency(this, firstBone.jelly!.inTarget);
-          dependencyConstraints += firstBone.jelly!.inTarget.allConstraints;
+          artboard.addDependency(this, firstBone.jelly!.inTarget!);
+          dependencyConstraints += firstBone.jelly!.inTarget!.allConstraints;
         }
       }
       if (bone.parent is ActorBone) {
         ActorBone parentBone = bone.parent as ActorBone;
         JellyComponent? parentBoneJelly = parentBone.jelly;
         if (parentBoneJelly != null && parentBoneJelly.outTarget != null) {
-          artboard.addDependency(this, parentBoneJelly.outTarget);
-          dependencyConstraints += parentBoneJelly.outTarget.allConstraints;
+          artboard.addDependency(this, parentBoneJelly.outTarget!);
+          dependencyConstraints += parentBoneJelly.outTarget!.allConstraints;
         }
       }
     }
 
     if (_inTarget != null) {
-      artboard.addDependency(this, _inTarget);
-      dependencyConstraints += _inTarget.allConstraints;
+      artboard.addDependency(this, _inTarget!);
+      dependencyConstraints += _inTarget!.allConstraints;
     }
     if (_outTarget != null) {
-      artboard.addDependency(this, _outTarget);
-      dependencyConstraints += _outTarget.allConstraints;
+      artboard.addDependency(this, _outTarget!);
+      dependencyConstraints += _outTarget!.allConstraints;
     }
 
     // We want to depend on any and all constraints that our dependents have.
     Set<ActorConstraint> constraints =
         Set<ActorConstraint>.from(dependencyConstraints);
-    for (ActorConstraint constraint in constraints) {
+    for (final ActorConstraint constraint in constraints) {
       artboard.addDependency(this, constraint);
     }
   }
 
+  @override
   void completeResolve() {
     //super.completeResolve();
     if (parent is! ActorBone) {
@@ -207,7 +210,7 @@ class JellyComponent extends ActorComponent {
     }
 
     _bones = <ActorJellyBone>[];
-    for (ActorNode child in children) {
+    for (final ActorNode child in children) {
       if (child is ActorJellyBone) {
         _bones.add(child);
         // Make sure the jelly doesn't update until the jelly component has updated
@@ -218,9 +221,7 @@ class JellyComponent extends ActorComponent {
 
   static JellyComponent read(
       ActorArtboard artboard, StreamReader reader, JellyComponent? node) {
-    if (node == null) {
-      node = JellyComponent();
-    }
+    node ??= JellyComponent();
     ActorComponent.read(artboard, reader, node);
 
     node._easeIn = reader.readFloat32("easeIn");
@@ -234,9 +235,6 @@ class JellyComponent extends ActorComponent {
   }
 
   void updateJellies() {
-    if (_bones == null) {
-      return;
-    }
     ActorBone bone = parent as ActorBone;
     // We are in local bone space.
     Vec2D tipPosition = Vec2D.fromValues(bone.length, 0.0);
@@ -292,10 +290,10 @@ class JellyComponent extends ActorComponent {
   @override
   void update(int dirt) {
     ActorBone bone = parent as ActorBone;
-    ActorNode parentBone = bone.parent;
-    JellyComponent parentBoneJelly;
-    if (parentBone is ActorBone) {
-      parentBoneJelly = parentBone.jelly;
+    ActorNode? parentNode = bone.parent;
+    JellyComponent? parentBoneJelly;
+    if (parentNode is ActorBone) {
+      parentBoneJelly = parentNode.jelly;
     }
 
     Mat2D inverseWorld = Mat2D();
@@ -304,86 +302,17 @@ class JellyComponent extends ActorComponent {
     }
 
     if (_inTarget != null) {
-      Vec2D translation = _inTarget.getWorldTranslation(Vec2D());
+      Vec2D translation = _inTarget!.getWorldTranslation(Vec2D());
       Vec2D.transformMat2D(_inPoint, translation, inverseWorld);
       Vec2D.normalize(_inDirection, _inPoint);
-    } else if (parentBone != null) {
-      ActorBone firstBone;
-      if (parentBone is ActorBone) {
-        firstBone = parentBone.firstBone;
-      } else if (parentBone is ActorRootBone) {
-        firstBone = parentBone.firstBone;
-      }
-      if (firstBone == bone &&
-          parentBoneJelly != null &&
-          parentBoneJelly._outTarget != null) {
-        Vec2D translation =
-            parentBoneJelly._outTarget.getWorldTranslation(Vec2D());
-        Vec2D localParentOut =
-            Vec2D.transformMat2D(Vec2D(), translation, inverseWorld);
-        Vec2D.normalize(localParentOut, localParentOut);
-        Vec2D.negate(_inDirection, localParentOut);
-      } else {
-        Vec2D d1 = Vec2D.fromValues(1.0, 0.0);
-        Vec2D d2 = Vec2D.fromValues(1.0, 0.0);
-
-        Vec2D.transformMat2(d1, d1, parentBone.worldTransform);
-        Vec2D.transformMat2(d2, d2, bone.worldTransform);
-
-        Vec2D sum = Vec2D.add(Vec2D(), d1, d2);
-        Vec2D.transformMat2(_inDirection, sum, inverseWorld);
-        Vec2D.normalize(_inDirection, _inDirection);
-      }
-      _inPoint[0] = _inDirection[0] * _easeIn * bone.length * CurveConstant;
-      _inPoint[1] = _inDirection[1] * _easeIn * bone.length * CurveConstant;
-    } else {
-      _inDirection[0] = 1.0;
-      _inDirection[1] = 0.0;
-      _inPoint[0] = _inDirection[0] * _easeIn * bone.length * CurveConstant;
     }
 
     if (_outTarget != null) {
-      Vec2D translation = _outTarget.getWorldTranslation(Vec2D());
+      Vec2D translation = _outTarget!.getWorldTranslation(Vec2D());
       Vec2D.transformMat2D(_outPoint, translation, inverseWorld);
       Vec2D tip = Vec2D.fromValues(bone.length, 0.0);
       Vec2D.subtract(_outDirection, _outPoint, tip);
       Vec2D.normalize(_outDirection, _outDirection);
-    } else if (bone.firstBone != null) {
-      ActorBone firstBone = bone.firstBone;
-      JellyComponent firstBoneJelly = firstBone.jelly;
-      if (firstBoneJelly != null && firstBoneJelly._inTarget != null) {
-        Vec2D translation =
-            firstBoneJelly._inTarget.getWorldTranslation(Vec2D());
-        Vec2D worldChildInDir = Vec2D.subtract(
-            Vec2D(), firstBone.getWorldTranslation(Vec2D()), translation);
-        Vec2D.transformMat2(_outDirection, worldChildInDir, inverseWorld);
-      } else {
-        Vec2D d1 = Vec2D.fromValues(1.0, 0.0);
-        Vec2D d2 = Vec2D.fromValues(1.0, 0.0);
-
-        Vec2D.transformMat2(d1, d1, firstBone.worldTransform);
-        Vec2D.transformMat2(d2, d2, bone.worldTransform);
-
-        Vec2D sum = Vec2D.add(Vec2D(), d1, d2);
-        Vec2D negativeSum = Vec2D.negate(Vec2D(), sum);
-        Vec2D.transformMat2(_outDirection, negativeSum, inverseWorld);
-        Vec2D.normalize(_outDirection, _outDirection);
-      }
-      Vec2D.normalize(_outDirection, _outDirection);
-      Vec2D scaledOut = Vec2D.scale(
-          Vec2D(), _outDirection, _easeOut * bone.length * CurveConstant);
-      _outPoint[0] = bone.length;
-      _outPoint[1] = 0.0;
-      Vec2D.add(_outPoint, _outPoint, scaledOut);
-    } else {
-      _outDirection[0] = -1.0;
-      _outDirection[1] = 0.0;
-
-      Vec2D scaledOut = Vec2D.scale(
-          Vec2D(), _outDirection, _easeOut * bone.length * CurveConstant);
-      _outPoint[0] = bone.length;
-      _outPoint[1] = 0.0;
-      Vec2D.add(_outPoint, _outPoint, scaledOut);
     }
 
     updateJellies();

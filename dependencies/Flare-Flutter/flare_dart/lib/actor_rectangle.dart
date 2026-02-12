@@ -27,10 +27,8 @@ class ActorRectangle extends ActorProceduralPath {
   }
 
   static ActorRectangle read(
-      ActorArtboard artboard, StreamReader reader, ActorRectangle component) {
-    if (component == null) {
-      component = ActorRectangle();
-    }
+      ActorArtboard artboard, StreamReader reader, ActorRectangle? component) {
+    component ??= ActorRectangle();
 
     ActorNode.read(artboard, reader, component);
 
@@ -54,7 +52,7 @@ class ActorRectangle extends ActorProceduralPath {
         Vec2D.fromValues(halfWidth, halfHeight), renderRadius));
     _rectanglePathPoints.add(StraightPathPoint.fromValues(
         Vec2D.fromValues(-halfWidth, halfHeight), renderRadius));
-  late return _rectanglePathPoints;
+  return _rectanglePathPoints;
   }
 
   set radius(double rd) {

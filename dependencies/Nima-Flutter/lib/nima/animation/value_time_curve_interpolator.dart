@@ -5,10 +5,10 @@ import "keyframe.dart";
 
 // AE style curve interpolation
 class ValueTimeCurveInterpolator extends KeyFrameInterpolator {
-  late double _inFactor;
-  late double _inValue;
-  late double _outFactor;
-  late double _outValue;
+  double _inFactor = 0.0;
+  double _inValue = 0.0;
+  double _outFactor = 0.0;
+  double _outValue = 0.0;
 
   double get inFactor => _inFactor;
   double get inValue => _inValue;
@@ -32,13 +32,10 @@ class ValueTimeCurveInterpolator extends KeyFrameInterpolator {
     // Just a sanity check really, both keyframes need to be numeric.
     KeyFrameNumeric ourFrame = frame as KeyFrameNumeric;
     KeyFrameNumeric next = nextFrame as KeyFrameNumeric;
-    if (ourFrame == null || next == null) {
-      return false;
-    }
 
     // We are not gauranteed to have a next interpolator
     // (usually when the next keyframe is linear).
-    ValueTimeCurveInterpolator nextInterpolator;
+    ValueTimeCurveInterpolator? nextInterpolator;
 
     double timeRange = next.time - ourFrame.time;
     double outTime = ourFrame.time + timeRange * _outFactor;
@@ -50,9 +47,11 @@ class ValueTimeCurveInterpolator extends KeyFrameInterpolator {
     // (this is where hold keyframes get their interpolator values
     //  processed too).
     if (next.interpolator is ValueTimeCurveInterpolator) {
-      nextInterpolator = next.interpolator as ValueTimeCurveInterpolator;
-      nextInValue = nextInterpolator._inValue;
-      nextInFactor = nextInterpolator._inFactor;
+      nextInterpolator = next.interpolator as ValueTimeCurveInterpolator?;
+      if (nextInterpolator != null) {
+        nextInValue = nextInterpolator._inValue;
+        nextInFactor = nextInterpolator._inFactor;
+      }
     } else {
       // Happens when next is linear.
       nextInValue = next.value;
@@ -66,7 +65,7 @@ class ValueTimeCurveInterpolator extends KeyFrameInterpolator {
     return true;
   }
 
-  static ValueTimeCurveInterpolator read(
+  static ValueTimeCurveInterpolator? read(
       StreamReader reader, InterpolationTypes type) {
     ValueTimeCurveInterpolator vtci = ValueTimeCurveInterpolator();
     switch (type) {
@@ -93,18 +92,18 @@ class ValueTimeCurveInterpolator extends KeyFrameInterpolator {
   }
 
   static const double EPSILON = double.minPositive;
-  late double _x0;
-  late double _y0;
-  late double _x1;
-  late double _y1;
-  late double _x2;
-  late double _y2;
-  late double _x3;
-  late double _y3;
-  late double _e;
-  late double _f;
-  late double _g;
-  late double _h;
+  double _x0 = 0.0;
+  double _y0 = 0.0;
+  double _x1 = 0.0;
+  double _y1 = 0.0;
+  double _x2 = 0.0;
+  double _y2 = 0.0;
+  double _x3 = 0.0;
+  double _y3 = 0.0;
+  double _e = 0.0;
+  double _f = 0.0;
+  double _g = 0.0;
+  double _h = 0.0;
 
   static const double DEBUG_VALUE = 7.325263977050781;
 

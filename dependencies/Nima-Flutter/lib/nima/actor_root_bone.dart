@@ -1,22 +1,20 @@
-import "readers/stream_reader.dart";
 import "actor.dart";
-import "actor_node.dart";
 import "actor_bone.dart";
 import "actor_component.dart";
+import "actor_node.dart";
+import "readers/stream_reader.dart";
 
 class ActorRootBone extends ActorNode {
-  late ActorBone _firstBone;
+  ActorBone? _firstBone;
 
-  ActorBone get firstBone {
-  late return _firstBone;
+  ActorBone? get firstBone {
+    return _firstBone;
   }
 
+  @override
   void completeResolve() {
     super.completeResolve();
-    if (children == null) {
-      return;
-    }
-    for (ActorNode node in children) {
+    for (final ActorNode node in children) {
       if (node is ActorBone) {
         _firstBone = node;
         return;
@@ -24,6 +22,7 @@ class ActorRootBone extends ActorNode {
     }
   }
 
+  @override
   ActorComponent makeInstance(Actor resetActor) {
     ActorRootBone instanceNode = ActorRootBone();
     instanceNode.copyNode(this, resetActor);
@@ -31,10 +30,8 @@ class ActorRootBone extends ActorNode {
   }
 
   static ActorRootBone read(
-      Actor actor, StreamReader reader, ActorRootBone node) {
-    if (node == null) {
-      node = ActorRootBone();
-    }
+      Actor actor, StreamReader reader, ActorRootBone? node) {
+    node ??= ActorRootBone();
     ActorNode.read(actor, reader, node);
     return node;
   }

@@ -10,7 +10,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:nima/nima/actor_image.dart' as nima;
 import 'package:nima/nima/math/aabb.dart' as nima;
 
-import 'package:rive/src/rive_core/math/aabb.dart' as rive;
+import 'package:rive/rive.dart' as rive;
+// import 'package:rive/src/rive_core/math/aabb.dart' as rive; // Removed private import
 import 'package:rivtrek/timeline/bloc_provider.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
@@ -429,7 +430,7 @@ class MenuVignetteRenderObject extends RenderBox {
       canvas.translate(x, y);
 
       /// 5. perform the drawing operations.
-      asset.actor?.draw(canvas);
+      // asset.actor?.draw(canvas);
 
       /// 6. Restore the canvas' original transform state.
       canvas.restore();
@@ -483,9 +484,11 @@ class MenuVignetteRenderObject extends RenderBox {
           asset.animationTime %= asset.animation!.duration;
         }
         /// Apply the current time to the [asset] animation.
-        asset.animation!.apply(asset.animationTime, asset.actor, 1.0);
-        /// Use the library function to update the actor's time.
-        asset.actor!.advance(elapsed);
+        if (asset.actor != null && asset.animation != null) {
+          asset.animation!.apply(asset.animationTime, asset.actor!, 1.0);
+          /// Use the library function to update the actor's time.
+          asset.actor!.advance(elapsed);
+        }
       } else if (asset is TimelineFlare && asset.actor != null) {
         if (opacity < 1.0) {
           /// Modulate the opacity value used by [gradientFade].
@@ -506,14 +509,18 @@ class MenuVignetteRenderObject extends RenderBox {
           asset.animationTime -= asset.animation!.duration;
           asset.animation = asset.idle;
         }
-        if (asset.loop && asset.animationTime >= 0) {
+        if (asset.loop && asset.animationTime >= 0 && asset.animation != null) {
           asset.animationTime %= asset.animation!.duration;
         }
         /// Apply the current time to this [ActorAnimation].
-        asset.animation!.apply(asset.animationTime, asset.actor, 1.0);
-        /// Use the library function to update the actor's time.
-        asset.actor!.advance(elapsed);
+        if (asset.actor != null && asset.animation != null) {
+          asset.animation!.apply(asset.animationTime, asset.actor!, 1.0);
+          /// Use the library function to update the actor's time.
+          asset.actor!.advance(elapsed);
+        }
       } else if (asset is TimelineRive && asset.actor != null) {
+        // Rive 1.0 logic is not compatible with Rive 0.14
+        /*
         if (opacity < 1.0) {
           /// Modulate the opacity value used by [gradientFade].
           opacity = min(opacity + elapsed, 1.0);
@@ -541,6 +548,7 @@ class MenuVignetteRenderObject extends RenderBox {
         asset.animation!.apply(asset.actor!.context, elapsed);
         /// Use the library function to update the actor's time.
         asset.actor!.advance(elapsed);
+        */
       }
     }
 

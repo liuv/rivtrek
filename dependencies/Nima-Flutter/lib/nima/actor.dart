@@ -1,22 +1,23 @@
-import "dart:typed_data";
 import "dart:convert";
+import "dart:typed_data";
+
+import "actor_bone.dart";
 import "actor_component.dart";
+import "actor_distance_constraint.dart";
 import "actor_event.dart";
+import "actor_ik_constraint.dart";
+import "actor_image.dart";
+import "actor_jelly_bone.dart";
 import "actor_node.dart";
 import "actor_node_solo.dart";
-import "actor_bone.dart";
 import "actor_root_bone.dart";
-import "actor_jelly_bone.dart";
-import "jelly_component.dart";
-import "actor_ik_constraint.dart";
 import "actor_rotation_constraint.dart";
-import "actor_translation_constraint.dart";
-import "actor_distance_constraint.dart";
-import "actor_transform_constraint.dart";
 import "actor_scale_constraint.dart";
-import "dependency_sorter.dart";
-import "actor_image.dart";
+import "actor_transform_constraint.dart";
+import "actor_translation_constraint.dart";
 import "animation/actor_animation.dart";
+import "dependency_sorter.dart";
+import "jelly_component.dart";
 import "readers/stream_reader.dart";
 
 const Map<String, int> BlockTypesMap = {
@@ -103,19 +104,19 @@ class Actor {
   int _version = 0;
   int _dirtDepth = 0;
   late ActorNode _root;
-  late List<ActorComponent> _components;
-  late List<ActorNode> _nodes;
-  late List<ActorImage> _imageNodes;
-  late List<ActorAnimation> _animations;
-  late List<ActorComponent> _dependencyOrder;
-  late List _atlases;
+  List<ActorComponent> _components = [];
+  List<ActorNode> _nodes = [];
+  List<ActorImage> _imageNodes = [];
+  List<ActorAnimation> _animations = [];
+  List<ActorComponent> _dependencyOrder = [];
+  List _atlases = [];
 
   Actor();
 
   bool addDependency(ActorComponent a, ActorComponent b) {
-    List<ActorComponent> dependents = b.dependents;
+    List<ActorComponent>? dependents = b.dependents;
     if (dependents == null) {
-      b.dependents = dependents = <ActorComponent>[];
+      return false;
     }
     if (dependents.contains(a)) {
       return false;
@@ -150,17 +151,17 @@ class Actor {
     component.onDirty(dirt);
 
     // If the order of this component is less than the current dirt depth, 
-	// update the dirt depth so that the update loop can break out early 
-	// and re-run (something up the tree is dirty).
+    // update the dirt depth so that the update loop can break out early 
+    // and re-run (something up the tree is dirty).
     if (component.graphOrder < _dirtDepth) {
       _dirtDepth = component.graphOrder;
     }
     if (!recurse) {
       return true;
     }
-    List<ActorComponent> dependents = component.dependents;
+    List<ActorComponent>? dependents = component.dependents;
     if (dependents != null) {
-      for (ActorComponent d in dependents) {
+      for (final ActorComponent d in dependents) {
         addDirt(d, value, recurse);
       }
     }
@@ -169,23 +170,23 @@ class Actor {
   }
 
   int get version {
-  late return _version;
+    return _version;
   }
 
   List<ActorComponent> get components {
-  late return _components;
+    return _components;
   }
 
   List<ActorNode> get nodes {
-  late return _nodes;
+    return _nodes;
   }
 
   List<ActorAnimation> get animations {
-  late return _animations;
+    return _animations;
   }
 
   List<ActorImage> get imageNodes {
-  late return _imageNodes;
+    return _imageNodes;
   }
 
   ActorComponent operator [](int index) {
@@ -197,11 +198,11 @@ class Actor {
   }
 
   int get nodeCount {
-  late return _nodeCount;
+    return _nodeCount;
   }
 
   int get imageNodeCount {
-  late return _imageNodeCount;
+    return _imageNodeCount;
   }
 
   int get texturesUsed {
@@ -209,11 +210,11 @@ class Actor {
   }
 
   ActorNode get root {
-  late return _root;
+    return _root;
   }
 
-  ActorAnimation getAnimation(String name) {
-    for (ActorAnimation a in _animations) {
+  ActorAnimation? getAnimation(String name) {
+    for (final ActorAnimation a in _animations) {
       if (a.name == name) {
         return a;
       }
@@ -221,17 +222,17 @@ class Actor {
     return null;
   }
 
-  ActorAnimationInstance getAnimationInstance(String name) {
-    ActorAnimation animation = getAnimation(name);
+  ActorAnimationInstance? getAnimationInstance(String name) {
+    ActorAnimation? animation = getAnimation(name);
     if (animation == null) {
       return null;
     }
     return ActorAnimationInstance(this, animation);
   }
 
-  ActorNode getNode(String name) {
-    for (ActorNode node in _nodes) {
-      if (node != null && node.name == name) {
+  ActorNode? getNode(String name) {
+    for (final ActorNode node in _nodes) {
+      if (node.name == name) {
         return node;
       }
     }
@@ -254,14 +255,16 @@ class Actor {
     _nodeCount = actor._nodeCount;
 
     if (actor.componentCount != 0) {
-      _components = List<ActorComponent>(actor.componentCount);
+      _components =
+          List<ActorComponent>.generate(actor.componentCount, (i) => ActorNode());
     }
     if (_nodeCount != 0) // This will always be at least 1.
     {
-      _nodes = List<ActorNode>(_nodeCount);
+      _nodes = List<ActorNode>.generate(_nodeCount, (i) => ActorNode());
     }
     if (_imageNodeCount != 0) {
-      _imageNodes = List<ActorImage>(_imageNodeCount);
+      _imageNodes =
+          List<ActorImage>.generate(_imageNodeCount, (i) => ActorImage());
     }
 
     if (actor.componentCount != 0) {
@@ -269,11 +272,7 @@ class Actor {
       int imgIdx = 0;
       int ndIdx = 0;
 
-      for (ActorComponent component in actor.components) {
-        if (component == null) {
-          _components[idx++] = null;
-          continue;
-        }
+      for (final ActorComponent component in actor.components) {
         ActorComponent instanceComponent = component.makeInstance(this);
         _components[idx++] = instanceComponent;
         // ActorNode nodeInstance = instanceComponent as ActorNode;
@@ -291,15 +290,15 @@ class Actor {
 
     _root = _components[0] as ActorNode;
 
-    for (ActorComponent component in _components) {
-      if (_root == component || component == null) {
+    for (final ActorComponent component in _components) {
+      if (_root == component) {
         continue;
       }
       component.resolveComponentIndices(_components);
     }
 
-    for (ActorComponent component in _components) {
-      if (_root == component || component == null) {
+    for (final ActorComponent component in _components) {
+      if (_root == component) {
         continue;
       }
       component.completeResolve();
@@ -307,11 +306,9 @@ class Actor {
 
     sortDependencies();
 
-    if (_imageNodes != null) {
-      _imageNodes.sort((a, b) => a.drawOrder.compareTo(b.drawOrder));
-      for (int i = 0; i < _imageNodes.length; i++) {
-        _imageNodes[i].drawIndex = i;
-      }
+    _imageNodes.sort((a, b) => a.drawOrder.compareTo(b.drawOrder));
+    for (int i = 0; i < _imageNodes.length; i++) {
+      _imageNodes[i].drawIndex = i;
     }
   }
 
@@ -348,18 +345,16 @@ class Actor {
     if ((_flags & ActorFlags.IsImageDrawOrderDirty) != 0) {
       _flags &= ~ActorFlags.IsImageDrawOrderDirty;
 
-      if (_imageNodes != null) {
-        _imageNodes.sort((a, b) => a.drawOrder.compareTo(b.drawOrder));
-        for (int i = 0; i < _imageNodes.length; i++) {
-          _imageNodes[i].drawIndex = i;
-        }
+      _imageNodes.sort((a, b) => a.drawOrder.compareTo(b.drawOrder));
+      for (int i = 0; i < _imageNodes.length; i++) {
+        _imageNodes[i].drawIndex = i;
       }
     }
     if ((_flags & ActorFlags.IsVertexDeformDirty) != 0) {
       _flags &= ~ActorFlags.IsVertexDeformDirty;
       for (int i = 0; i < _imageNodeCount; i++) {
         ActorImage imageNode = _imageNodes[i];
-        if (imageNode != null && imageNode.isVertexDeformDirty) {
+        if (imageNode.isVertexDeformDirty) {
           imageNode.isVertexDeformDirty = false;
           updateVertexDeform(imageNode);
         }
@@ -391,9 +386,9 @@ class Actor {
 
     _root = ActorNode.withActor(this);
 
-    StreamReader block;
+    StreamReader? block;
     while ((block = reader.readNextBlock(BlockTypesMap)) != null) {
-      switch (block.blockType) {
+      switch (block!.blockType) {
         case BlockTypes.Components:
           readComponentsBlock(block);
           break;
@@ -409,7 +404,8 @@ class Actor {
 
   void readComponentsBlock(StreamReader block) {
     int componentCount = block.readUint16Length();
-    _components = List<ActorComponent>(componentCount + 1);
+    _components =
+        List<ActorComponent>.generate(componentCount + 1, (i) => ActorNode());
     _components[0] = _root;
 
     // Guaranteed from the exporter to be in index order.
@@ -418,11 +414,11 @@ class Actor {
     for (int componentIndex = 1, end = componentCount + 1;
         componentIndex < end;
         componentIndex++) {
-      StreamReader nodeBlock = block.readNextBlock(BlockTypesMap);
+      StreamReader? nodeBlock = block.readNextBlock(BlockTypesMap);
       if (nodeBlock == null) {
-        break;
+        continue;
       }
-      ActorComponent component;
+      ActorComponent? component;
       switch (nodeBlock.blockType) {
         case BlockTypes.ActorNode:
           component = ActorNode.read(this, nodeBlock, null);
@@ -438,17 +434,17 @@ class Actor {
 
         case BlockTypes.ActorImageSequence:
           _imageNodeCount++;
-          component = ActorImage.readSequence(this, nodeBlock, makeImageNode());
-          ActorImage ai = component as ActorImage;
-          _maxTextureIndex = ai
-              .sequenceFrames.last.atlasIndex; // Last atlasIndex is the biggest
+          ActorImage ain = makeImageNode() as ActorImage;
+          component = ActorImage.readSequence(this, nodeBlock, ain);
+          _maxTextureIndex = ain.sequenceFrames.last.atlasIndex; // Last atlasIndex is the biggest
           break;
 
         case BlockTypes.ActorImage:
           _imageNodeCount++;
-          component = ActorImage.read(this, nodeBlock, makeImageNode());
-          if ((component as ActorImage).textureIndex > _maxTextureIndex) {
-            _maxTextureIndex = (component as ActorImage).textureIndex;
+          ActorImage ain = makeImageNode() as ActorImage;
+          component = ActorImage.read(this, nodeBlock, ain);
+          if (ain.textureIndex > _maxTextureIndex) {
+            _maxTextureIndex = ain.textureIndex;
           }
           break;
 
@@ -533,18 +529,21 @@ class Actor {
           break;
       }
 
+      if (component == null) {
+        continue;
+      }
+
       if (component is ActorNode) {
         _nodeCount++;
       }
 
       _components[componentIndex] = component;
-      if (component != null) {
-        component.idx = componentIndex;
-      }
+      component.idx = componentIndex;
     }
 
-    _imageNodes = List<ActorImage>(_imageNodeCount);
-    _nodes = List<ActorNode>(_nodeCount);
+    _imageNodes =
+        List<ActorImage>.generate(_imageNodeCount, (i) => ActorImage());
+    _nodes = List<ActorNode>.generate(_nodeCount, (i) => ActorNode());
     _nodes[0] = _root;
 
     // Resolve nodes.
@@ -554,30 +553,22 @@ class Actor {
     for (int i = 1; i <= componentCount; i++) {
       ActorComponent c = _components[i];
       // Nodes can be null if we read from a file version that contained nodes that we don't interpret in this runtime.
-      if (c != null) {
-        c.resolveComponentIndices(_components);
-      }
+      c.resolveComponentIndices(_components);
 
       if (c is ActorImage) {
         ActorImage ain = c;
-        if (ain != null) {
-          _imageNodes[imgIdx++] = ain;
-        }
+        _imageNodes[imgIdx++] = ain;
       }
 
       if (c is ActorNode) {
         ActorNode an = c;
-        if (an != null) {
-          _nodes[anIdx++] = an;
-        }
+        _nodes[anIdx++] = an;
       }
     }
 
     for (int i = 1; i <= componentCount; i++) {
-      ActorComponent c = components[i];
-      if (c != null) {
-        c.completeResolve();
-      }
+      ActorComponent c = _components[i];
+      c.completeResolve();
     }
 
     sortDependencies();
@@ -586,12 +577,13 @@ class Actor {
   void readAnimationsBlock(StreamReader block) {
     // Read animations.
     int animationCount = block.readUint16Length();
-    _animations = List<ActorAnimation>(animationCount);
-    StreamReader animationBlock;
+    _animations = List<ActorAnimation>.generate(
+        animationCount, (i) => ActorAnimation()); // Placeholder
+    StreamReader? animationBlock;
     int animationIndex = 0;
 
     while ((animationBlock = block.readNextBlock(BlockTypesMap)) != null) {
-      switch (animationBlock.blockType) {
+      switch (animationBlock!.blockType) {
         case BlockTypes.Animation:
           ActorAnimation anim =
               ActorAnimation.read(animationBlock, _components);
@@ -608,19 +600,19 @@ class Actor {
 
     String readerType = block.containerType;
     if (isOOB) {
-      _atlases = List<String>(numAtlases);
+      _atlases = List<String>.filled(numAtlases, "");
       for (int i = 0; i < numAtlases; i++) {
         String filename = block.readString("data");
         actor._atlases[i] = filename;
       }
     } else {
-      _atlases = List<Uint8List>(numAtlases);
+      _atlases = List<Uint8List>.filled(numAtlases, Uint8List(0));
       switch (readerType) {
         case "json":
           for (int i = 0; i < numAtlases; i++) {
             String imageString = block
                 .readString("data"); // Label wouldn't be neede here either.
-            Uint8List bytes = Base64Decoder().convert(imageString, 22);
+            Uint8List bytes = const Base64Decoder().convert(imageString);
             actor._atlases[i] = bytes;
           }
           break;

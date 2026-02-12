@@ -1,19 +1,21 @@
 import "json_reader.dart";
 
 class JSONBlockReader extends JSONReader {
+  int _blockType = 0;
   @override
-  int blockType;
+  int get blockType => _blockType;
+  @override
+  set blockType(int value) => _blockType = value;
 
   JSONBlockReader(Map object)
-      : blockType = 0,
+      : _blockType = 0,
         super(object);
 
-  JSONBlockReader.fromObject(int type, Map object) : super(object) {
-    blockType = type;
-  }
+  JSONBlockReader.fromObject(this._blockType, Map object)
+      : super(object);
 
   @override
-  JSONBlockReader readNextBlock([Map<String, int> blockTypes]) {
+  JSONBlockReader? readNextBlock(Map<String, int> blockTypes) {
     if (isEOF()) {
       return null;
     }
@@ -33,19 +35,19 @@ class JSONBlockReader extends JSONReader {
 
   int readBlockType(Map<String, int> blockTypes) {
     dynamic next = _peek();
-    int bType;
+    int bType = 0;
     if (next is Map) {
       dynamic c = context.first;
       if (c is Map) {
-        bType = blockTypes[nextKey];
+        bType = blockTypes[nextKey] ?? 0;
       } else if (c is List) {
         // Objects are serialized with "type" property.
         dynamic nType = next["type"];
-        bType = blockTypes[nType];
+        bType = blockTypes[nType] ?? 0;
       }
     } else if (next is List) {
       // Arrays are serialized as "type": [Array].
-      bType = blockTypes[nextKey];
+      bType = blockTypes[nextKey] ?? 0;
     }
     return bType;
   }
@@ -61,5 +63,11 @@ class JSONBlockReader extends JSONReader {
     return next;
   }
 
-  dynamic get nextKey => context.first.keys.first;
+  dynamic get nextKey {
+    dynamic first = context.first;
+    if (first is Map) {
+      return first.keys.first;
+    }
+    return null;
+  }
 }

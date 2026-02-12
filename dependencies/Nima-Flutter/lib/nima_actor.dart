@@ -1,10 +1,11 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:nima/nima.dart';
-import 'package:nima/nima/math/aabb.dart';
-import 'package:nima/nima/animation/actor_animation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:nima/nima.dart';
+import 'package:nima/nima/animation/actor_animation.dart';
+import 'package:nima/nima/math/aabb.dart';
 import 'package:nima/nima/math/mat2d.dart';
 import 'package:nima/nima/math/vec2d.dart';
 
@@ -20,22 +21,23 @@ class NimaActor extends LeafRenderObjectWidget {
   final String filename;
   final BoxFit fit;
   final Alignment alignment;
-  final String animation;
+  final String? animation;
   final double mixSeconds;
   final bool paused;
-  final NimaAnimationCompleted completed;
-  final NimaController controller;
+  final NimaAnimationCompleted? completed;
+  final NimaController? controller;
   final bool clip;
 
   const NimaActor(this.filename,
-      {this.animation,
-      this.fit,
+      {Key? key,
+      this.animation,
+      this.fit = BoxFit.contain,
       this.mixSeconds = 0.2,
       this.clip = true,
       this.alignment = Alignment.center,
       this.paused = false,
       this.completed,
-      this.controller});
+      this.controller}) : super(key: key);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -47,7 +49,7 @@ class NimaActor extends LeafRenderObjectWidget {
       ..completed = completed
       ..mixSeconds = mixSeconds
       ..controller = controller
-      ..isPlaying = !paused && animation != null
+      ..isPlaying = !paused
       ..clip = clip;
   }
 
@@ -62,7 +64,7 @@ class NimaActor extends LeafRenderObjectWidget {
       ..completed = completed
       ..mixSeconds = mixSeconds
       ..controller = controller
-      ..isPlaying = !paused && animation != null
+      ..isPlaying = !paused
       ..clip = clip;
   }
 
@@ -73,32 +75,34 @@ class NimaActor extends LeafRenderObjectWidget {
 }
 
 class NimaAnimationLayer {
-  String name;
-  ActorAnimation animation;
+  String name = "";
+  late ActorAnimation animation;
   double time = 0.0;
   double mix = 0.0;
 }
 
 class NimaActorRenderObject extends RenderBox {
   late String _filename;
-  late BoxFit _fit;
-  late Alignment _alignment;
-  late String _animationName;
+  BoxFit _fit = BoxFit.contain;
+  Alignment _alignment = Alignment.center;
+  String? _animationName;
   double _mixSeconds = 0.2;
-  late int _frameCallbackID;
+  int? _frameCallbackID;
   double _lastFrameTime = 0.0;
-  late NimaAnimationCompleted _completedCallback;
-  late NimaController _controller;
+  NimaAnimationCompleted? _completedCallback;
+  NimaController? _controller;
 
   final List<NimaAnimationLayer> _animationLayers = <NimaAnimationLayer>[];
-  late bool _isPlaying;
-  late FlutterActor _actor;
-  late AABB _setupAABB;
+  bool _isPlaying = false;
+  FlutterActor? _actor;
+  AABB _setupAABB = AABB.fromValues(0.0, 0.0, 0.0, 0.0);
 
+  @override
   void dispose() {
     _isPlaying = false;
     _updatePlayState();
     _controller = null;
+    super.dispose();
   }
 
   @override
@@ -119,15 +123,15 @@ class NimaActorRenderObject extends RenderBox {
           SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
     } else {
       if (_frameCallbackID != null) {
-        SchedulerBinding.instance.cancelFrameCallbackWithId(_frameCallbackID);
+        SchedulerBinding.instance.cancelFrameCallbackWithId(_frameCallbackID!);
         _frameCallbackID = null;
       }
       _lastFrameTime = 0.0;
     }
   }
 
-  NimaAnimationCompleted get completed => _completedCallback;
-  set completed(NimaAnimationCompleted value) {
+  NimaAnimationCompleted? get completed => _completedCallback;
+  set completed(NimaAnimationCompleted? value) {
     if (_completedCallback != value) {
       _completedCallback = value;
     }
@@ -161,8 +165,8 @@ class NimaActorRenderObject extends RenderBox {
     markNeedsPaint();
   }
 
-  String get animationName => _animationName;
-  set animationName(String value) {
+  String? get animationName => _animationName;
+  set animationName(String? value) {
     if (_animationName == value) {
       return;
     }
@@ -171,33 +175,35 @@ class NimaActorRenderObject extends RenderBox {
   }
 
   void _updateAnimation({bool onlyWhenMissing = false}) {
+    if (_actor == null || _animationName == null) {
+      return;
+    }
     if (onlyWhenMissing && _animationLayers.isNotEmpty) {
       return;
     }
-    if (_animationName == null || _actor == null) {
-      return;
+    ActorAnimation? animation = _actor!.getAnimation(_animationName!);
+    if (animation != null) {
+      _animationLayers.add(NimaAnimationLayer()
+        ..name = _animationName!
+        ..animation = animation
+        ..mix = 0.0);
     }
-    ActorAnimation animation = _actor.getAnimation(_animationName);
-    _animationLayers.add(NimaAnimationLayer()
-      ..name = _animationName
-      ..animation = animation
-      ..mix = 0.0);
   }
 
-  NimaController get controller => _controller;
-  set controller(NimaController control) {
+  NimaController? get controller => _controller;
+  set controller(NimaController? control) {
     if (_controller == control) {
       return;
     }
     _controller = control;
-    if (_controller != null && _actor != null) {
-      _controller.initialize(_actor);
+    if (_actor != null) {
+      _controller?.initialize(_actor!);
     }
   }
 
   double get mixSeconds => _mixSeconds;
   set mixSeconds(double seconds) {
-    if (_mixSeconds != seconds) {
+    if (_mixSeconds == seconds) {
       return;
     }
     _mixSeconds = seconds;
@@ -210,23 +216,17 @@ class NimaActorRenderObject extends RenderBox {
     }
     _filename = value;
     if (_actor != null) {
-      _actor.dispose();
+      _actor!.dispose();
       _actor = null;
-    }
-    if (_filename == null) {
-      markNeedsPaint();
-      return;
     }
     FlutterActor actor = FlutterActor();
 
     actor.loadFromBundle(_filename).then((bool success) {
       if (success) {
         _actor = actor;
-        _actor.advance(0.0);
-        _setupAABB = _actor.computeAABB();
-        if (_controller != null) {
-          _controller.initialize(_actor);
-        }
+        _actor!.advance(0.0);
+        _setupAABB = _actor!.computeAABB();
+        _controller?.initialize(_actor!);
         _updateAnimation(onlyWhenMissing: true);
         markNeedsPaint();
       }
@@ -275,31 +275,29 @@ class NimaActorRenderObject extends RenderBox {
 
   bool _advance(double elapsedSeconds) {
     if (_actor == null) {
-  late return _isPlaying;
+      return _isPlaying;
     }
     int lastFullyMixed = -1;
     double lastMix = 0.0;
 
-    List<NimaAnimationLayer> completed = <NimaAnimationLayer>[];
+    List<NimaAnimationLayer> completedLayers = <NimaAnimationLayer>[];
 
     for (int i = 0; i < _animationLayers.length; i++) {
       NimaAnimationLayer layer = _animationLayers[i];
       layer.mix += elapsedSeconds;
       layer.time += elapsedSeconds;
 
-      lastMix = _mixSeconds == null || _mixSeconds == 0.0
-          ? 1.0
-          : min(1.0, layer.mix / _mixSeconds);
+      lastMix = _mixSeconds == 0.0 ? 1.0 : min(1.0, layer.mix / _mixSeconds);
       if (layer.animation.isLooping) {
         layer.time %= layer.animation.duration;
       }
-      layer.animation.apply(layer.time, _actor, lastMix);
+      layer.animation.apply(layer.time, _actor!, lastMix);
       if (lastMix == 1.0) {
         lastFullyMixed = i;
       }
 
       if (layer.time > layer.animation.duration) {
-        completed.add(layer);
+        completedLayers.add(layer);
       }
     }
 
@@ -315,97 +313,92 @@ class NimaActorRenderObject extends RenderBox {
       _animationLayers.removeAt(0);
     }
 
-    for (final NimaAnimationLayer animation in completed) {
+    for (final NimaAnimationLayer animation in completedLayers) {
       _animationLayers.remove(animation);
-      if (_completedCallback != null) {
-        _completedCallback(animation.name);
-      }
+      _completedCallback?.call(animation.name);
     }
 
-    if (_controller != null) {
-      _controller.advance(_actor, elapsedSeconds);
-    }
+    _controller?.advance(_actor!, elapsedSeconds);
 
-    _actor.advance(elapsedSeconds);
-  late return _isPlaying;
+    _actor!.advance(elapsedSeconds);
+    return _isPlaying;
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    if (_actor == null) {
+      return;
+    }
     final Canvas canvas = context.canvas;
 
-    if (_actor != null) {
-      AABB bounds = _setupAABB;
-      double contentHeight = bounds[3] - bounds[1];
-      double contentWidth = bounds[2] - bounds[0];
-      double x = -1 * bounds[0] -
-          contentWidth / 2.0 -
-          (_alignment.x * contentWidth / 2.0);
-      double y = -1 * bounds[1] -
-          contentHeight / 2.0 +
-          (_alignment.y * contentHeight / 2.0);
+    AABB bounds = _setupAABB;
+    double contentHeight = bounds[3] - bounds[1];
+    double contentWidth = bounds[2] - bounds[0];
+    double x = -1 * bounds[0] -
+        contentWidth / 2.0 -
+        (_alignment.x * contentWidth / 2.0);
+    double y = -1 * bounds[1] -
+        contentHeight / 2.0 +
+        (_alignment.y * contentHeight / 2.0);
 
-      double scaleX = 1.0, scaleY = 1.0;
+    double scaleX = 1.0, scaleY = 1.0;
 
-      canvas.save();
-      if (_clip) {
-        canvas.clipRect(offset & size);
-      }
-
-      switch (_fit) {
-        case BoxFit.fill:
-          scaleX = size.width / contentWidth;
-          scaleY = size.height / contentHeight;
-          break;
-        case BoxFit.contain:
-          double minScale =
-              min(size.width / contentWidth, size.height / contentHeight);
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.cover:
-          double maxScale =
-              max(size.width / contentWidth, size.height / contentHeight);
-          scaleX = scaleY = maxScale;
-          break;
-        case BoxFit.fitHeight:
-          double minScale = size.height / contentHeight;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.fitWidth:
-          double minScale = size.width / contentWidth;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.none:
-          scaleX = scaleY = 1.0;
-          break;
-        case BoxFit.scaleDown:
-          double minScale =
-              min(size.width / contentWidth, size.height / contentHeight);
-          scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-          break;
-      }
-
-      if (_controller != null) {
-        Mat2D transform = Mat2D();
-        transform[4] =
-            offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
-        transform[5] =
-            offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
-        Mat2D.scale(transform, transform, Vec2D.fromValues(scaleX, -scaleY));
-        Mat2D center = Mat2D();
-        center[4] = x;
-        center[5] = y;
-        Mat2D.multiply(transform, transform, center);
-        _controller.setViewTransform(transform);
-      }
-
-      canvas.translate(
-          offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0),
-          offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0));
-      canvas.scale(scaleX, -scaleY);
-      canvas.translate(x, y);
-      _actor.draw(canvas);
-      canvas.restore();
+    canvas.save();
+    if (_clip) {
+      canvas.clipRect(offset & size);
     }
+
+    switch (_fit) {
+      case BoxFit.fill:
+        scaleX = size.width / contentWidth;
+        scaleY = size.height / contentHeight;
+        break;
+      case BoxFit.contain:
+        double minScale =
+            min(size.width / contentWidth, size.height / contentHeight);
+        scaleX = scaleY = minScale;
+        break;
+      case BoxFit.cover:
+        double maxScale =
+            max(size.width / contentWidth, size.height / contentHeight);
+        scaleX = scaleY = maxScale;
+        break;
+      case BoxFit.fitHeight:
+        double minScale = size.height / contentHeight;
+        scaleX = scaleY = minScale;
+        break;
+      case BoxFit.fitWidth:
+        double minScale = size.width / contentWidth;
+        scaleX = scaleY = minScale;
+        break;
+      case BoxFit.none:
+        scaleX = scaleY = 1.0;
+        break;
+      case BoxFit.scaleDown:
+        double minScale =
+            min(size.width / contentWidth, size.height / contentHeight);
+        scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
+        break;
+    }
+
+    Mat2D transform = Mat2D();
+    transform[4] =
+        offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
+    transform[5] =
+        offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
+    Mat2D.scale(transform, transform, Vec2D.fromValues(scaleX, -scaleY));
+    Mat2D center = Mat2D();
+    center[4] = x;
+    center[5] = y;
+    Mat2D.multiply(transform, transform, center);
+    _controller?.setViewTransform(transform);
+
+    canvas.translate(
+        offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0),
+        offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0));
+    canvas.scale(scaleX, -scaleY);
+    canvas.translate(x, y);
+    _actor!.draw(canvas, 1.0);
+    canvas.restore();
   }
 }

@@ -14,9 +14,9 @@ class DependencySorter {
   List<ActorComponent> sort(ActorComponent root) {
     _order = <ActorComponent>[];
     if (!visit(root)) {
-      return null;
+      return [];
     }
-  late return _order;
+    return _order;
   }
 
   bool visit(ActorComponent n) {
@@ -31,14 +31,12 @@ class DependencySorter {
     _temp.add(n);
 
     List<ActorComponent> dependents = n.dependents;
-    if (dependents != null) {
-      for (final ActorComponent d in dependents) {
-        if (!visit(d)) {
-          return false;
-        }
+    for (final ActorComponent d in dependents) {
+      if (!visit(d)) {
+        return false;
       }
     }
-    _perm.add(n);
+      _perm.add(n);
     _order.insert(0, n);
 
     return true;

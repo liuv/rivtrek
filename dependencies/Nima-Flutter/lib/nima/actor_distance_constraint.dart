@@ -18,7 +18,7 @@ class ActorDistanceConstraint extends ActorTargetedConstraint {
   ActorDistanceConstraint() : super();
 
   static ActorDistanceConstraint read(
-      Actor actor, StreamReader reader, ActorDistanceConstraint component) {
+      Actor actor, StreamReader reader, ActorDistanceConstraint? component) {
     component ??= ActorDistanceConstraint();
     ActorTargetedConstraint.read(actor, reader, component);
 
@@ -43,12 +43,12 @@ class ActorDistanceConstraint extends ActorTargetedConstraint {
 
   @override
   void constrain(ActorNode node) {
-    ActorNode t = target as ActorNode;
-    if (t == null) {
+    ActorNode? t = target as ActorNode?;
+    ActorNode? p = parent;
+
+    if (t == null || p == null) {
       return;
     }
-
-    ActorNode p = parent;
     Vec2D targetTranslation = t.getWorldTranslation(Vec2D());
     Vec2D ourTranslation = p.getWorldTranslation(Vec2D());
 

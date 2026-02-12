@@ -2,13 +2,13 @@ import 'package:flare_dart/actor_artboard.dart';
 import 'package:flare_dart/actor_shape.dart';
 import 'package:flare_dart/stream_reader.dart';
 
-import "math/aabb.dart";
 import "actor_node.dart";
+import "math/aabb.dart";
 
 enum BlendModes { Normal, Multiply, Screen, Additive }
 
 abstract class ActorDrawable extends ActorNode {
-  List<List<ActorShape>> _clipShapes;
+  late List<List<ActorShape>> _clipShapes;
   List<List<ActorShape>> get clipShapes => _clipShapes;
 
   // Editor set draw index.
@@ -23,8 +23,8 @@ abstract class ActorDrawable extends ActorNode {
   }
 
   // Computed draw index in the draw list.
-  int drawIndex;
-  bool isHidden;
+  late int drawIndex;
+  late bool isHidden;
 
   bool get doesDraw {
     return !isHidden && !renderCollapsed;
@@ -55,19 +55,21 @@ abstract class ActorDrawable extends ActorNode {
   AABB computeAABB();
   void initializeGraphics() {}
 
+  @override
   void completeResolve() {
-    _clipShapes = List<List<ActorShape>>();
+    _clipShapes = [];
     List<List<ActorClip>> clippers = allClips;
-    for (List<ActorClip> clips in clippers) {
+    for (final List<ActorClip> clips in clippers) {
       List<ActorShape> shapes = [];
-      for (ActorClip clip in clips) {
-        clip.node.all((ActorNode node) {
+      for (final ActorClip clip in clips) {
+        clip.node?.all((ActorNode node) {
           if (node is ActorShape) {
             shapes.add(node);
           }
+          return true;
         });
       }
-      if (shapes.length > 0) {
+      if (shapes.isNotEmpty) {
         _clipShapes.add(shapes);
       }
     }

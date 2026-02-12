@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+// import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody, MarkdownStyleSheet;
 import 'package:rivtrek/timeline/article/timeline_entry_widget.dart';
 import 'package:rivtrek/timeline/bloc_provider.dart';
 import 'package:rivtrek/timeline/colors.dart';
@@ -96,7 +97,7 @@ class _ArticleWidgetState extends State<ArticleWidget> {
       _subTitle = widget.article.formatYearsAgo();
       _articleMarkdown = "";
       if (widget.article.articleFilename != null) {
-        loadMarkdown(widget.article.articleFilename);
+        loadMarkdown(widget.article.articleFilename!);
       }
     });
   }

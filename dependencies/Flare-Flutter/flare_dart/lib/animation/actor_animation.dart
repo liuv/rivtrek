@@ -5,7 +5,6 @@ import "../stream_reader.dart";
 import "keyframe.dart";
 import "property_types.dart";
 
-
 typedef KeyFrame KeyFrameReader(StreamReader reader, ActorComponent component);
 
 class PropertyAnimation {
@@ -20,7 +19,8 @@ class PropertyAnimation {
     return _keyFrames;
   }
 
-  static PropertyAnimation? read(StreamReader reader, ActorComponent component) {
+  static PropertyAnimation? read(
+      StreamReader reader, ActorComponent component) {
     StreamReader? propertyBlock = reader.readNextBlock(PropertyTypesMap);
     if (propertyBlock == null) {
       return null;
@@ -32,58 +32,59 @@ class PropertyAnimation {
     KeyFrameReader? keyFrameReader;
     switch (propertyAnimation._type) {
       case PropertyTypes.PosX:
-        keyFrameReader = KeyFramePosX.read;
+        keyFrameReader = KeyFramePosX.read as KeyFrameReader?;
         break;
       case PropertyTypes.PosY:
-        keyFrameReader = KeyFramePosY.read;
+        keyFrameReader = KeyFramePosY.read as KeyFrameReader?;
         break;
       case PropertyTypes.ScaleX:
-        keyFrameReader = KeyFrameScaleX.read;
+        keyFrameReader = KeyFrameScaleX.read as KeyFrameReader?;
         break;
       case PropertyTypes.ScaleY:
-        keyFrameReader = KeyFrameScaleY.read;
+        keyFrameReader = KeyFrameScaleY.read as KeyFrameReader?;
         break;
       case PropertyTypes.Rotation:
-        keyFrameReader = KeyFrameRotation.read;
+        keyFrameReader = KeyFrameRotation.read as KeyFrameReader?;
         break;
       case PropertyTypes.Opacity:
-        keyFrameReader = KeyFrameOpacity.read;
+        keyFrameReader = KeyFrameOpacity.read as KeyFrameReader?;
         break;
       case PropertyTypes.DrawOrder:
-        keyFrameReader = KeyFrameDrawOrder.read;
+        keyFrameReader = KeyFrameDrawOrder.read as KeyFrameReader?;
         break;
       case PropertyTypes.Length:
-        keyFrameReader = KeyFrameLength.read;
+        keyFrameReader = KeyFrameLength.read as KeyFrameReader?;
         break;
       case PropertyTypes.ImageVertices:
-        keyFrameReader = KeyFrameImageVertices.read;
+        keyFrameReader = KeyFrameImageVertices.read as KeyFrameReader?;
         break;
       case PropertyTypes.ConstraintStrength:
-        keyFrameReader = KeyFrameConstraintStrength.read;
+        keyFrameReader = KeyFrameConstraintStrength.read as KeyFrameReader?;
         break;
       case PropertyTypes.Trigger:
-        keyFrameReader = KeyFrameTrigger.read;
+        keyFrameReader = KeyFrameTrigger.read as KeyFrameReader?;
         break;
       case PropertyTypes.IntProperty:
-        keyFrameReader = KeyFrameIntProperty.read;
+        keyFrameReader = KeyFrameIntProperty.read as KeyFrameReader?;
         break;
       case PropertyTypes.FloatProperty:
-        keyFrameReader = KeyFrameFloatProperty.read;
+        keyFrameReader = KeyFrameFloatProperty.read as KeyFrameReader?;
         break;
       case PropertyTypes.StringProperty:
-        keyFrameReader = KeyFrameStringProperty.read;
+        keyFrameReader = KeyFrameStringProperty.read as KeyFrameReader?;
         break;
       case PropertyTypes.BooleanProperty:
-        keyFrameReader = KeyFrameBooleanProperty.read;
+        keyFrameReader = KeyFrameBooleanProperty.read as KeyFrameReader?;
         break;
       case PropertyTypes.CollisionEnabled:
-        keyFrameReader = KeyFrameCollisionEnabledProperty.read;
+        keyFrameReader =
+            KeyFrameCollisionEnabledProperty.read as KeyFrameReader?;
         break;
       case PropertyTypes.ActiveChildIndex:
-        keyFrameReader = KeyFrameActiveChild.read;
+        keyFrameReader = KeyFrameActiveChild.read as KeyFrameReader?;
         break;
       case PropertyTypes.Sequence:
-        keyFrameReader = KeyFrameSequence.read;
+        keyFrameReader = KeyFrameSequence.read as KeyFrameReader;
         break;
       case PropertyTypes.PathVertices:
         keyFrameReader = KeyFramePathVertices.read;
@@ -142,12 +143,12 @@ class PropertyAnimation {
 
     propertyBlock.openArray("frames");
     int keyFrameCount = propertyBlock.readUint16Length();
-    propertyAnimation._keyFrames = List<KeyFrame>.filled(keyFrameCount, KeyFrame()); // Need a default KeyFrame or refactor
+    propertyAnimation._keyFrames = <KeyFrame>[];
     KeyFrame? lastKeyFrame;
     for (int i = 0; i < keyFrameCount; i++) {
       propertyBlock.openObject("frame");
       KeyFrame frame = keyFrameReader(propertyBlock, component);
-      propertyAnimation._keyFrames[i] = frame;
+      propertyAnimation._keyFrames.add(frame);
       if (lastKeyFrame != null) {
         lastKeyFrame.setNext(frame);
       }
@@ -394,13 +395,14 @@ class ActorAnimation {
     int numKeyedComponents = reader.readUint16Length();
 
     // We distinguish between animated and triggered components as ActorEvents
-    // are currently only used to trigger events and don't need the full 
-    // animation cycle. This lets them optimize them out of the regular animation 
+    // are currently only used to trigger events and don't need the full
+    // animation cycle. This lets them optimize them out of the regular animation
     // cycle.
     int animatedComponentCount = 0;
     int triggerComponentCount = 0;
 
-    List<ComponentAnimation?> animatedComponents = List<ComponentAnimation?>.filled(numKeyedComponents, null);
+    List<ComponentAnimation?> animatedComponents =
+        List<ComponentAnimation?>.filled(numKeyedComponents, null);
     for (int i = 0; i < numKeyedComponents; i++) {
       ComponentAnimation componentAnimation =
           ComponentAnimation.read(reader, components);

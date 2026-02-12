@@ -16,7 +16,7 @@ import 'package:nima/nima/math/aabb.dart' as nima;
 import 'package:nima/nima/math/vec2d.dart' as nima;
 
 import 'package:rive/rive.dart' as rive;
-import 'package:rive/src/rive_core/math/aabb.dart' as rive;
+// import 'package:rive/src/rive_core/math/aabb.dart' as rive; // Removed private import
 import 'package:rivtrek/timeline/article/controllers/amelia_controller.dart';
 import 'package:rivtrek/timeline/article/controllers/flare_interaction_controller.dart';
 import 'package:rivtrek/timeline/article/controllers/newton_controller.dart';
@@ -99,32 +99,39 @@ class VignetteRenderObject extends RenderBox {
         /// Instance [_nimaActor] through the actor reference in the asset
         /// and set the initial starting value for its animation.
         _nimaActor = asset.actor?.makeInstance() as nima.FlutterActor?;
-        asset.animation?.apply(asset.animation!.duration, _nimaActor, 1.0);
-        _nimaActor?.advance(0.0);
-        if (asset.filename == "assets/Newton/Newton_v2.nma") {
-          /// Newton uses a custom controller! =)
-          _nimaController = NewtonController();
-          _nimaController?.initialize(_nimaActor!);
+        if (_nimaActor != null && asset.animation != null) {
+          asset.animation!.apply(asset.animation!.duration, _nimaActor!, 1.0);
+          _nimaActor!.advance(0.0);
+          if (asset.filename == "assets/Newton/Newton_v2.nma") {
+            /// Newton uses a custom controller! =)
+            _nimaController = NewtonController();
+            _nimaController?.initialize(_nimaActor!);
+          }
         }
       } else if (asset is TimelineFlare && asset.actor != null) {
         /// Instance [_flareActor] through the actor reference in the asset
         /// and set the initial starting value for its animation.
         _flareActor = asset.actor?.makeInstance() as flare.FlutterActorArtboard?;
-		_flareActor?.initializeGraphics();
-        asset.animation?.apply(asset.animation!.duration, _flareActor, 1.0);
-        _flareActor?.advance(0.0);
-        if (asset.filename == "assets/Amelia_Earhart/Amelia_Earhart.flr") {
-          /// Amelia Earhart uses a custom controller too..!
-          _flareController = AmeliaController();
-          _flareController?.initialize(_flareActor!);
+        if (_flareActor != null && asset.animation != null) {
+          _flareActor!.initializeGraphics();
+          asset.animation!.apply(asset.animation!.duration, _flareActor!, 1.0);
+          _flareActor!.advance(0.0);
+          if (asset.filename == "assets/Amelia_Earhart/Amelia_Earhart.flr") {
+            /// Amelia Earhart uses a custom controller too..!
+            _flareController = AmeliaController();
+            _flareController?.initialize(_flareActor!);
+          }
         }
       } else if (asset is TimelineRive && asset.actor != null) {
         /// Instance [_flareActor] through the actor reference in the asset
         /// and set the initial starting value for its animation.
+        // Rive 1.0 logic is not compatible with Rive 0.14
+        /*
         _riveActor = asset.actorStatic!.instance();
         asset.animation?.init(_riveActor!.context);
         asset.animation?.apply(_riveActor!.context, 0);
         _riveActor?.advance(0.0);
+        */
       }
     }
   }
@@ -438,9 +445,7 @@ class VignetteRenderObject extends RenderBox {
       /// 4. Move the canvas to the correct [_flareActor] position calculated above.
       canvas.translate(x, y);
       /// 5. perform the drawing operations.
-      _riveActor?.draw(canvas);
-      /// 6. Restore the canvas' original transform state.
-      canvas.restore();
+      // _riveActor?.draw(canvas); // Rive drawing usually requires a specific renderer in new versions
     }
     canvas.restore();
   }
@@ -472,8 +477,10 @@ class VignetteRenderObject extends RenderBox {
           asset.animationTime %= asset.animation!.duration;
         }
         /// Apply the current time to the [asset] animation.
-        asset.animation?.apply(asset.animationTime, _nimaActor, 1.0);
-        if (_nimaController != null) {
+        if (_nimaActor != null) {
+          asset.animation?.apply(asset.animationTime, _nimaActor!, 1.0);
+        }
+        if (_nimaController != null && _nimaActor != null) {
           nima.Vec2D localTouchPosition = nima.Vec2D.fromValues(0, 0);
           if (interactOffset != null) {
             nima.AABB bounds = asset.setupAABB!;
@@ -557,22 +564,25 @@ class VignetteRenderObject extends RenderBox {
           double phase = 0.0;
           for (flare.ActorAnimation animation in asset.idleAnimations!) {
             animation.apply((asset.animationTime + phase) % animation.duration,
-                _flareActor, 1.0);
+                _flareActor!, 1.0);
             phase += 0.16;
           }
         } else {
           if (asset.intro == asset.animation &&
+              asset.animation != null &&
               asset.animationTime >= asset.animation!.duration) {
             asset.animationTime -= asset.animation!.duration;
             asset.animation = asset.idle;
           }
-          if (asset.loop && asset.animationTime >= 0) {
+          if (asset.loop && asset.animation != null && asset.animationTime >= 0) {
             asset.animationTime %= asset.animation!.duration;
           }
           /// Apply the current time to this [ActorAnimation].
-          asset.animation?.apply(asset.animationTime, _flareActor, 1.0);
+          if (asset.animation != null) {
+            asset.animation!.apply(asset.animationTime, _flareActor!, 1.0);
+          }
         }
-        if (_flareController != null) {
+        if (_flareController != null && _flareActor != null) {
           flare.Vec2D localTouchPosition = flare.Vec2D.fromValues(0, 0);
           if (interactOffset != null) {
             flare.AABB bounds = asset.setupAABB!;
@@ -641,6 +651,8 @@ class VignetteRenderObject extends RenderBox {
         /// Advance the [FlutterActorArtboard].
         _flareActor?.advance(elapsed);
       } else if (asset is TimelineRive && _riveActor != null) {
+        // Rive 1.0 logic is not compatible with Rive 0.14
+        /*
         /// Some [TimelineFlare] assets have a custom intro that's played
         /// when they're painted for the first time.
         if (_firstUpdate) {
@@ -672,6 +684,7 @@ class VignetteRenderObject extends RenderBox {
         }
         /// Advance the [FlutterActorArtboard].
         _riveActor?.advance(elapsed);
+        */
       }
     }
 

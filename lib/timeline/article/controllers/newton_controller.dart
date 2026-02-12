@@ -24,7 +24,7 @@ class NewtonController extends NimaInteractionController {
   void initialize(FlutterActor artboard) {
     _treeControl = artboard.getNode("ctrl_move_tree");
     if (_treeControl != null) {
-      _originalTranslation = Vec2D.clone(_treeControl?.translation);
+      _originalTranslation = Vec2D.clone(_treeControl!.translation);
     }
   }
 
@@ -33,27 +33,29 @@ class NewtonController extends NimaInteractionController {
   /// with the input touch values.
   @override
   bool advance(FlutterActor artboard, Vec2D touchPosition, double elapsed) {
-    if (touchPosition != null && _lastTouchPosition != null) {
-      Vec2D move = Vec2D.subtract(Vec2D(), touchPosition, _lastTouchPosition);
+    if (_lastTouchPosition != null) {
+      Vec2D move = Vec2D.subtract(Vec2D(), touchPosition, _lastTouchPosition!);
       Mat2D toParentSpace = Mat2D();
       /// Transform world coordinates into object space. Then evaluate the move delta
       /// and apply it to the control.
-      if (Mat2D.invert(toParentSpace, _treeControl?.parent.worldTransform)) {
+      if (_treeControl != null && _treeControl!.parent != null && Mat2D.invert(toParentSpace, _treeControl!.parent!.worldTransform)) {
         Vec2D localMove = Vec2D.transformMat2(Vec2D(), move, toParentSpace);
-        _treeControl?.translation =
-            Vec2D.add(Vec2D(), _treeControl?.translation, localMove);
+        _treeControl!.translation =
+            Vec2D.add(Vec2D(), _treeControl!.translation, localMove);
       }
     } else {
       /// If the finger has been lifted - i.e. [_lastTouchPosition] is null
       /// set the tree's position back to its original value.
-      _treeControl?.translation = Vec2D.add(
-          Vec2D(),
-          _treeControl?.translation,
-          Vec2D.scale(
-              Vec2D(),
-              Vec2D.subtract(
-                  Vec2D(), _originalTranslation, _treeControl?.translation),
-              (elapsed * 3.0).clamp(0.0, 1.0)));
+      if (_treeControl != null && _originalTranslation != null) {
+        _treeControl!.translation = Vec2D.add(
+            Vec2D(),
+            _treeControl!.translation,
+            Vec2D.scale(
+                Vec2D(),
+                Vec2D.subtract(
+                    Vec2D(), _originalTranslation!, _treeControl!.translation),
+                (elapsed * 3.0).clamp(0.0, 1.0)));
+      }
     }
     _lastTouchPosition = touchPosition;
     return true;

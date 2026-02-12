@@ -5,35 +5,35 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:flare_dart/actor_flags.dart';
-import 'package:flare_dart/actor_image.dart';
-import 'package:flare_dart/math/aabb.dart';
-import 'package:flutter/services.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flare_dart/actor_component.dart';
 import 'package:flare_dart/actor.dart';
 import 'package:flare_dart/actor_artboard.dart';
-import 'package:flare_dart/actor_shape.dart';
-import 'package:flare_dart/actor_path.dart';
+import 'package:flare_dart/actor_color.dart';
+import 'package:flare_dart/actor_component.dart';
+import 'package:flare_dart/actor_drawable.dart';
 import 'package:flare_dart/actor_ellipse.dart';
+import 'package:flare_dart/actor_flags.dart';
+import 'package:flare_dart/actor_image.dart';
+import 'package:flare_dart/actor_node.dart';
+import 'package:flare_dart/actor_path.dart';
 import 'package:flare_dart/actor_polygon.dart';
 import 'package:flare_dart/actor_rectangle.dart';
+import 'package:flare_dart/actor_shape.dart';
 import 'package:flare_dart/actor_star.dart';
 import 'package:flare_dart/actor_triangle.dart';
-import 'package:flare_dart/actor_color.dart';
-import 'package:flare_dart/actor_node.dart';
-import 'package:flare_dart/actor_drawable.dart';
+import 'package:flare_dart/math/aabb.dart';
 import 'package:flare_dart/math/mat2d.dart';
 import 'package:flare_dart/math/vec2d.dart';
 import 'package:flare_dart/path_point.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'trim_path.dart';
 
-export 'package:flare_dart/animation/actor_animation.dart';
 export 'package:flare_dart/actor_node.dart';
+export 'package:flare_dart/animation/actor_animation.dart';
 
 abstract class FlutterActorDrawable {
-  ui.BlendMode _blendMode;
+  late ui.BlendMode _blendMode;
   int get blendModeId {
     return _blendMode.index;
   }
@@ -57,7 +57,7 @@ abstract class FlutterActorDrawable {
 }
 
 abstract class FlutterFill {
-  ui.Paint _paint;
+  late ui.Paint _paint;
 
   void onPaintUpdated(ui.Paint paint) {}
 
@@ -80,9 +80,9 @@ abstract class FlutterFill {
 }
 
 abstract class FlutterStroke {
-  ui.Paint _paint;
+  late ui.Paint _paint;
   void onPaintUpdated(ui.Paint paint) {}
-  ui.Path effectPath;
+  ui.Path? effectPath;
 
   void initializeGraphics() {
     // yikes, no nice way to inherit with a mixin.
@@ -156,7 +156,9 @@ abstract class FlutterStroke {
           effectPath = path;
         }
       }
-      path = effectPath;
+      if (effectPath != null) {
+        path = effectPath!;
+      }
     }
     canvas.drawPath(path, _paint);
   }
@@ -167,18 +169,19 @@ abstract class FlutterStroke {
 }
 
 class FlutterActorShape extends ActorShape with FlutterActorDrawable {
-  ui.Path _path;
+  late ui.Path _path;
   bool _isValid = false;
 
   @override
   void initializeGraphics() {
     super.initializeGraphics();
     _path = ui.Path();
+    List<ActorNode>? children = this.children;
     if (children != null) {
-      for (final ActorNode node in children) {
-        FlutterPath flutterPath = node as FlutterPath;
-        if (flutterPath != null) {
-          flutterPath.initializeGraphics();
+      for (final ActorNode node in children!) {
+        if (node is FlutterPath) {
+          FlutterPath fp = node as FlutterPath;
+          fp.initializeGraphics();
         }
       }
     }
@@ -192,36 +195,36 @@ class FlutterActorShape extends ActorShape with FlutterActorDrawable {
 
   @override
   void onBlendModeChanged(ui.BlendMode mode) {
-    if (fills != null) {
-      for (final ActorFill actorFill in fills) {
-        (actorFill as ActorPaint).markPaintDirty();
-      }
+    for (final ActorFill actorFill in fills) {
+      (actorFill as ActorPaint).markPaintDirty();
     }
-    if (strokes != null) {
-      for (final ActorStroke actorStroke in strokes) {
-        (actorStroke as ActorPaint).markPaintDirty();
-      }
+    for (final ActorStroke actorStroke in strokes) {
+      (actorStroke as ActorPaint).markPaintDirty();
     }
   }
 
   ui.Path get path {
     if (_isValid) {
-  late return _path;
+      return _path;
     }
     _isValid = true;
     _path.reset();
 
+    List<ActorNode>? children = this.children;
     if (children != null) {
       for (final ActorNode node in children) {
-        FlutterPath flutterPath = node as FlutterPath;
-        if (flutterPath != null) {
-          Mat2D transform = (node as ActorBasePath).pathTransform;
-          _path.addPath(flutterPath.path, ui.Offset.zero,
-              matrix4: transform?.mat4);
+        if (node is FlutterPath) {
+          FlutterPath fp = node as FlutterPath;
+          Mat2D? transform = (node as ActorBasePath).pathTransform;
+          if (transform != null) {
+            _path.addPath(fp.path, ui.Offset.zero, matrix4: transform.mat4);
+          } else {
+            _path.addPath(fp.path, ui.Offset.zero);
+          }
         }
       }
     }
-  late return _path;
+    return _path;
   }
 
   @override
@@ -258,17 +261,15 @@ class FlutterActorShape extends ActorShape with FlutterActorDrawable {
         }
       }
     }
-    if (fills != null) {
-      for (final ActorFill actorFill in fills) {
-        FlutterFill fill = actorFill as FlutterFill;
-        fill.paint(actorFill, canvas, renderPath);
-      }
+    List<ActorFill>? fills = this.fills;
+    for (final ActorFill actorFill in fills) {
+      FlutterFill fill = actorFill as FlutterFill;
+      fill.paint(actorFill, canvas, renderPath);
     }
-    if (strokes != null) {
-      for (final ActorStroke actorStroke in strokes) {
-        FlutterStroke stroke = actorStroke as FlutterStroke;
-        stroke.paint(actorStroke, canvas, renderPath);
-      }
+    List<ActorStroke>? strokes = this.strokes;
+    for (final ActorStroke actorStroke in strokes) {
+      FlutterStroke stroke = actorStroke as FlutterStroke;
+      stroke.paint(actorStroke, canvas, renderPath);
     }
 
     canvas.restore();
@@ -367,7 +368,7 @@ class FlutterGradientFill extends GradientFill with FlutterFill {
               .clamp(0.0, 1.0)
               .toDouble());
     } else {
-      Float32List overrideColor = artboard.overrideColor;
+      Float32List overrideColor = artboard.overrideColor!;
       paintColor = ui.Color.fromRGBO(
           (overrideColor[0] * 255.0).round(),
           (overrideColor[1] * 255.0).round(),
@@ -420,7 +421,7 @@ class FlutterGradientStroke extends GradientStroke with FlutterStroke {
               .clamp(0.0, 1.0)
               .toDouble());
     } else {
-      Float32List overrideColor = artboard.overrideColor;
+      Float32List overrideColor = artboard.overrideColor!;
       paintColor = ui.Color.fromRGBO(
           (overrideColor[0] * 255.0).round(),
           (overrideColor[1] * 255.0).round(),
@@ -481,7 +482,7 @@ class FlutterRadialFill extends RadialGradientFill with FlutterFill {
               .clamp(0.0, 1.0)
               .toDouble());
     } else {
-      Float32List overrideColor = artboard.overrideColor;
+      Float32List overrideColor = artboard.overrideColor!;
       paintColor = ui.Color.fromRGBO(
           (overrideColor[0] * 255.0).round(),
           (overrideColor[1] * 255.0).round(),
@@ -535,7 +536,7 @@ class FlutterRadialStroke extends RadialGradientStroke with FlutterStroke {
               .clamp(0.0, 1.0)
               .toDouble());
     } else {
-      Float32List overrideColor = artboard.overrideColor;
+      Float32List overrideColor = artboard.overrideColor!;
       paintColor = ui.Color.fromRGBO(
           (overrideColor[0] * 255.0).round(),
           (overrideColor[1] * 255.0).round(),
@@ -573,7 +574,7 @@ class FlutterActor extends Actor {
   late List<ui.Image> _images;
 
   List<ui.Image> get images {
-  late return _images;
+    return _images;
   }
 
   @override
@@ -677,11 +678,9 @@ class FlutterActor extends Actor {
   }
 
   Future<bool> loadImages() async {
-    if (_rawAtlasData == null) {
-      return false;
-    }
-    List<Uint8List> data = _rawAtlasData;
-    _rawAtlasData = null;
+    final rawAtlasData = _rawAtlasData;
+    List<Uint8List> data = rawAtlasData;
+    _rawAtlasData = []; // Or some default empty list
     List<ui.Codec> codecs =
         await Future.wait(data.map(ui.instantiateImageCodec));
     List<ui.FrameInfo> frames =
@@ -692,8 +691,7 @@ class FlutterActor extends Actor {
   }
 
   @override
-  Future<Uint8List> readOutOfBandAsset(
-      String assetFilename, dynamic context) async {
+  Future<Uint8List> readOutOfBandAsset(String assetFilename, context) async {
     AssetBundleContext bundleContext = context as AssetBundleContext;
     int pathIdx = bundleContext.filename.lastIndexOf('/') + 1;
     String basePath = bundleContext.filename.substring(0, pathIdx);
@@ -705,10 +703,14 @@ class FlutterActor extends Actor {
 class FlutterActorArtboard extends ActorArtboard {
   FlutterActorArtboard(FlutterActor actor) : super(actor);
 
+  @override
   void draw(ui.Canvas canvas) {
-    for (final ActorDrawable drawable in drawableNodes) {
-      if (drawable is FlutterActorDrawable) {
-        (drawable as FlutterActorDrawable).draw(canvas);
+    List<ActorDrawable>? nodes = drawableNodes as List<ActorDrawable>?;
+    if (nodes != null) {
+      for (final ActorDrawable drawable in nodes) {
+        if (drawable is FlutterActorDrawable) {
+          (drawable as FlutterActorDrawable).draw(canvas);
+        }
       }
     }
   }
@@ -782,7 +784,7 @@ abstract class FlutterPath {
 /// use a different procedural backing call, they should implement
 /// FlutterPath and generate the path another way.
 abstract class FlutterPathPointsPath implements FlutterPath {
-  ui.Path _path;
+  late ui.Path _path;
   List<PathPoint> get deformedPoints;
   bool get isClosed;
   bool _isValid = false;
@@ -795,7 +797,7 @@ abstract class FlutterPathPointsPath implements FlutterPath {
   @override
   ui.Path get path {
     if (_isValid) {
-  late return _path;
+      return _path;
     }
     return _makePath();
   }
@@ -808,8 +810,8 @@ abstract class FlutterPathPointsPath implements FlutterPath {
     _isValid = true;
     _path.reset();
     List<PathPoint> pts = deformedPoints;
-    if (pts == null || pts.isEmpty) {
-  late return _path;
+    if (pts.isEmpty) {
+      return _path;
     }
 
     List<PathPoint> renderPoints = [];
@@ -817,7 +819,7 @@ abstract class FlutterPathPointsPath implements FlutterPath {
 
     const double arcConstant = 0.55;
     const double iarcConstant = 1.0 - arcConstant;
-    PathPoint previous = isClosed ? pts[pl - 1] : null;
+    PathPoint? previous = isClosed ? pts[pl - 1] : null;
     for (int i = 0; i < pl; i++) {
       PathPoint point = pts[i];
       switch (point.pointType) {
@@ -829,7 +831,7 @@ abstract class FlutterPathPointsPath implements FlutterPath {
               if (!isClosed && (i == 0 || i == pl - 1)) {
                 renderPoints.add(point);
                 previous = point;
-              } else {
+              } else if (previous != null) {
                 PathPoint next = pts[(i + 1) % pl];
                 Vec2D prevPoint = previous is CubicPathPoint
                     ? previous.outPoint
@@ -866,6 +868,9 @@ abstract class FlutterPathPointsPath implements FlutterPath {
                         Vec2D(), pos, toNext, iarcConstant * renderRadius),
                     translation);
                 renderPoints.add(previous);
+              } else {
+                renderPoints.add(point);
+                previous = point;
               }
             } else {
               renderPoints.add(point);
@@ -889,8 +894,8 @@ abstract class FlutterPathPointsPath implements FlutterPath {
         i++) {
       PathPoint point = renderPoints[i];
       PathPoint nextPoint = renderPoints[(i + 1) % pl];
-      Vec2D cin = nextPoint is CubicPathPoint ? nextPoint.inPoint : null;
-      Vec2D cout = point is CubicPathPoint ? point.outPoint : null;
+      Vec2D? cin = nextPoint is CubicPathPoint ? nextPoint.inPoint : null;
+      Vec2D? cout = point is CubicPathPoint ? point.outPoint : null;
       if (cin == null && cout == null) {
         _path.lineTo(nextPoint.translation[0], nextPoint.translation[1]);
       } else {
@@ -905,15 +910,15 @@ abstract class FlutterPathPointsPath implements FlutterPath {
     if (isClosed) {
       _path.close();
     }
-  late return _path;
+    return _path;
   }
 }
 
 class FlutterActorImage extends ActorImage with FlutterActorDrawable {
   late Float32List _vertexBuffer;
   late Float32List _uvBuffer;
-  ui.Paint _paint;
-  ui.Vertices _canvasVertices;
+  late ui.Paint _paint;
+  ui.Vertices? _canvasVertices;
   late Uint16List _indices;
 
   void onPaintUpdated(ui.Paint paint) {}
@@ -938,13 +943,11 @@ class FlutterActorImage extends ActorImage with FlutterActorDrawable {
 
   set textureIndex(int value) {
     if (textureIndex != value) {
-      List<ui.Image> images = (artboard.actor as FlutterActor).images;
+      List<ui.Image>? images = (artboard.actor as FlutterActor).images;
       _paint = ui.Paint()
         ..blendMode = blendMode
-        ..shader = images != null
-            ? ui.ImageShader(images[textureIndex], ui.TileMode.clamp,
-                ui.TileMode.clamp, _identityMatrix)
-            : null
+        ..shader = ui.ImageShader(images[textureIndex], ui.TileMode.clamp,
+            ui.TileMode.clamp, _identityMatrix)
         ..filterQuality = ui.FilterQuality.low
         ..isAntiAlias = true;
       onPaintUpdated(_paint);
@@ -952,59 +955,49 @@ class FlutterActorImage extends ActorImage with FlutterActorDrawable {
   }
 
   void dispose() {
-    _uvBuffer = null;
-    _vertexBuffer = null;
-    _indices = null;
-    _paint = null;
+    // _uvBuffer = null;
+    // _vertexBuffer = null;
+    // _indices = null;
+    // _paint = null;
   }
 
   @override
   void onBlendModeChanged(ui.BlendMode mode) {
-    if (_paint != null) {
-      _paint.blendMode = mode;
-      onPaintUpdated(_paint);
-    }
+    _paint.blendMode = mode;
+    onPaintUpdated(_paint);
   }
 
   @override
   void initializeGraphics() {
     super.initializeGraphics();
-    if (triangles == null) {
-      return;
-    }
     _vertexBuffer = makeVertexPositionBuffer();
     _uvBuffer = makeVertexUVBuffer();
     _indices = triangles;
     updateVertexUVBuffer(_uvBuffer);
     int count = vertexCount;
     int idx = 0;
-    List<ui.Image> images = (artboard.actor as FlutterActor).images;
-    ui.Image image;
-    if (images != null) {
-      image = (artboard.actor as FlutterActor).images[textureIndex];
+    List<ui.Image>? images = (artboard.actor as FlutterActor).images;
+    ui.Image? image;
+    image = (artboard.actor as FlutterActor).images[textureIndex];
 
-      // SKIA requires texture coordinates in full image space, not traditional
-      // normalized uv coordinates.
-      for (int i = 0; i < count; i++) {
-        _uvBuffer[idx] = _uvBuffer[idx] * image.width;
-        _uvBuffer[idx + 1] = _uvBuffer[idx + 1] * image.height;
-        idx += 2;
-      }
+    // SKIA requires texture coordinates in full image space, not traditional
+    // normalized uv coordinates.
+    for (int i = 0; i < count; i++) {
+      _uvBuffer[idx] = _uvBuffer[idx] * image.width;
+      _uvBuffer[idx + 1] = _uvBuffer[idx + 1] * image.height;
+      idx += 2;
+    }
 
-      if (sequenceUVs != null) {
-        for (int i = 0; i < sequenceUVs.length; i++) {
-          sequenceUVs[i++] *= image.width;
-          sequenceUVs[i] *= image.height;
-        }
-      }
+    Float32List? sequenceUVs = this.sequenceUVs;
+    for (int i = 0; i < sequenceUVs.length; i++) {
+      sequenceUVs[i++] *= image.width;
+      sequenceUVs[i] *= image.height;
     }
 
     _paint = ui.Paint()
       ..blendMode = blendMode
-      ..shader = image != null
-          ? ui.ImageShader(
-              image, ui.TileMode.clamp, ui.TileMode.clamp, _identityMatrix)
-          : null;
+      ..shader = ui.ImageShader(
+          image, ui.TileMode.clamp, ui.TileMode.clamp, _identityMatrix);
     _paint.filterQuality = ui.FilterQuality.low;
     _paint.isAntiAlias = true;
     onPaintUpdated(_paint);
@@ -1016,9 +1009,6 @@ class FlutterActorImage extends ActorImage with FlutterActorDrawable {
   }
 
   bool updateVertices() {
-    if (triangles == null) {
-      return false;
-    }
     updateVertexPositionBuffer(_vertexBuffer, false);
 
     _canvasVertices = ui.Vertices.raw(ui.VertexMode.triangles, _vertexBuffer,
@@ -1028,7 +1018,7 @@ class FlutterActorImage extends ActorImage with FlutterActorDrawable {
 
   @override
   void draw(ui.Canvas canvas) {
-    if (triangles == null || renderCollapsed || renderOpacity <= 0) {
+    if (renderCollapsed || renderOpacity <= 0) {
       return;
     }
 
@@ -1054,11 +1044,9 @@ class FlutterActorImage extends ActorImage with FlutterActorDrawable {
         _paint.color.withOpacity(renderOpacity.clamp(0.0, 1.0).toDouble());
 
     if (imageTransform != null) {
-      canvas.transform(imageTransform.mat4);
-      canvas.drawVertices(_canvasVertices, ui.BlendMode.srcOver, _paint);
-    } else {
-      canvas.drawVertices(_canvasVertices, ui.BlendMode.srcOver, _paint);
+      canvas.transform(imageTransform!.mat4);
     }
+    canvas.drawVertices(_canvasVertices!, ui.BlendMode.srcOver, _paint);
 
     canvas.restore();
   }
@@ -1073,24 +1061,22 @@ class FlutterActorImage extends ActorImage with FlutterActorDrawable {
     double maxY = double.negativeInfinity;
 
     int readIdx = 0;
-    if (_vertexBuffer != null) {
-      int nv = _vertexBuffer.length ~/ 2;
+    int nv = _vertexBuffer.length ~/ 2;
 
-      for (int i = 0; i < nv; i++) {
-        double x = _vertexBuffer[readIdx++];
-        double y = _vertexBuffer[readIdx++];
-        if (x < minX) {
-          minX = x;
-        }
-        if (y < minY) {
-          minY = y;
-        }
-        if (x > maxX) {
-          maxX = x;
-        }
-        if (y > maxY) {
-          maxY = y;
-        }
+    for (int i = 0; i < nv; i++) {
+      double x = _vertexBuffer[readIdx++];
+      double y = _vertexBuffer[readIdx++];
+      if (x < minX) {
+        minX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y > maxY) {
+        maxY = y;
       }
     }
 

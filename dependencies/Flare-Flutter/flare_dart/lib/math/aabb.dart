@@ -6,7 +6,7 @@ class AABB {
   late Float32List _buffer;
 
   Float32List get values {
-  late return _buffer;
+  return _buffer;
   }
 
   Vec2D get minimum {

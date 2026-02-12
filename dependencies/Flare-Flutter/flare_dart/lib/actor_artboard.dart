@@ -1,38 +1,39 @@
-import "actor_flags.dart";
-import "block_types.dart";
-import "actor_node.dart";
+import "dart:math";
+import "dart:typed_data";
+
+import "actor.dart";
 import "actor_bone.dart";
+import "actor_color.dart";
 import "actor_component.dart";
 import "actor_distance_constraint.dart";
-import "actor_event.dart";
-import "actor_node_solo.dart";
-import "actor_root_bone.dart";
-import "actor_jelly_bone.dart";
-import "actor_scale_constraint.dart";
-import "actor_skin.dart";
-import "actor_path.dart";
-import "actor_transform_constraint.dart";
-import "actor_translation_constraint.dart";
-import "jelly_component.dart";
-import "actor_ik_constraint.dart";
-import "actor_rotation_constraint.dart";
-import "actor_image.dart";
 import "actor_drawable.dart";
-import "actor_shape.dart";
 import "actor_ellipse.dart";
+import "actor_event.dart";
+import "actor_flags.dart";
+import "actor_ik_constraint.dart";
+import "actor_image.dart";
+import "actor_jelly_bone.dart";
+import "actor_node.dart";
+import "actor_node_solo.dart";
+import "actor_path.dart";
 import "actor_polygon.dart";
 import "actor_rectangle.dart";
+import "actor_root_bone.dart";
+import "actor_rotation_constraint.dart";
+import "actor_scale_constraint.dart";
+import "actor_shape.dart";
+import "actor_skin.dart";
 import "actor_star.dart";
+import "actor_transform_constraint.dart";
+import "actor_translation_constraint.dart";
 import "actor_triangle.dart";
-import "actor_color.dart";
 import "animation/actor_animation.dart";
+import "block_types.dart";
 import "dependency_sorter.dart";
-import "actor.dart";
-import "stream_reader.dart";
-import "math/vec2d.dart";
-import "dart:typed_data";
+import "jelly_component.dart";
 import "math/aabb.dart";
-import "dart:math";
+import "math/vec2d.dart";
+import "stream_reader.dart";
 
 class ActorArtboard {
   int _flags = ActorFlags.IsDrawOrderDirty;
@@ -150,7 +151,7 @@ class ActorArtboard {
     }
     List<ActorComponent>? dependents = component.dependents;
     if (dependents != null) {
-      for (ActorComponent d in dependents) {
+      for (final ActorComponent d in dependents) {
         addDirt(d, value, recurse);
       }
     }
@@ -372,7 +373,7 @@ class ActorArtboard {
         case BlockTypes.ActorImage:
           component = ActorImage.read(this, nodeBlock, actor.makeImageNode());
           if ((component as ActorImage).textureIndex > actor.maxTextureIndex) {
-            actor.maxTextureIndex = (component as ActorImage).textureIndex;
+            actor.maxTextureIndex = component.textureIndex;
           }
           break;
 
@@ -553,10 +554,8 @@ class ActorArtboard {
 
       if (c is ActorNode) {
         ActorNode? an = c;
-        if (an != null) {
-          _nodes[anIdx++] = an;
-        }
-      }
+        _nodes[anIdx++] = an;
+            }
     }
 
     for (int i = 1; i <= componentCount; i++) {
@@ -609,9 +608,6 @@ class ActorArtboard {
       // This is the axis aligned bounding box in the space
       // of the parent (this case our shape).
       AABB? pathAABB = drawable.computeAABB();
-      if (pathAABB == null) {
-        continue;
-      }
       if (aabb == null) {
         aabb = pathAABB;
       } else {

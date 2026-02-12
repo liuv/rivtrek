@@ -1,10 +1,10 @@
-import "stream_reader.dart";
 import "actor_artboard.dart";
-import "math/mat2d.dart";
-import "math/vec2d.dart";
 import "actor_component.dart";
 import "actor_constraint.dart";
 import "actor_flags.dart";
+import "math/mat2d.dart";
+import "math/vec2d.dart";
+import "stream_reader.dart";
 
 typedef bool NodeWalkCallback(ActorNode node);
 
@@ -190,10 +190,6 @@ class ActorNode extends ActorComponent {
   }
 
   void markTransformDirty() {
-    if (artboard == null) {
-      // Still loading?
-      return;
-    }
     if (!artboard.addDirt(this, TransformDirty, false)) {
       return;
     }
@@ -216,11 +212,12 @@ class ActorNode extends ActorComponent {
   void updateWorldTransform() {
     _renderOpacity = _opacity;
 
-    if (parent != null) {
-      _renderCollapsed = _isCollapsedVisibility || parent._renderCollapsed;
-      _renderOpacity *= parent._renderOpacity;
+    ActorNode? parentNode = parent;
+    if (parentNode != null) {
+      _renderCollapsed = _isCollapsedVisibility || parentNode._renderCollapsed;
+      _renderOpacity *= parentNode._renderOpacity;
       if (!_overrideWorldTransform) {
-        Mat2D.multiply(_worldTransform, parent._worldTransform, _transform);
+        Mat2D.multiply(_worldTransform, parentNode._worldTransform, _transform);
       }
     } else {
       Mat2D.copy(_worldTransform, _transform);
@@ -229,9 +226,7 @@ class ActorNode extends ActorComponent {
 
   static ActorNode read(
       ActorArtboard artboard, StreamReader reader, ActorNode? node) {
-    if (node == null) {
-      node = ActorNode();
-    }
+    node ??= ActorNode();
     ActorComponent.read(artboard, reader, node);
     Vec2D.copyFromList(
         node._translation, reader.readFloat32Array(2, "translation"));
@@ -253,13 +248,12 @@ class ActorNode extends ActorComponent {
   }
 
   void addChild(ActorNode node) {
-    if (node.parent != null) {
-      node.parent!._children!.remove(node);
+    ActorNode? oldParent = node.parent;
+    if (oldParent != null) {
+      oldParent._children?.remove(node);
     }
     node.parent = this;
-    if (_children == null) {
-      _children = <ActorNode>[];
-    }
+    _children ??= <ActorNode>[];
     _children!.add(node);
   }
 
@@ -267,6 +261,7 @@ class ActorNode extends ActorComponent {
     return _children;
   }
 
+  @override
   ActorComponent makeInstance(ActorArtboard resetArtboard) {
     ActorNode instanceNode = ActorNode();
     instanceNode.copyNode(this, resetArtboard);
@@ -294,12 +289,11 @@ class ActorNode extends ActorComponent {
     }
   }
 
+  @override
   void onDirty(int dirt) {}
 
   bool addConstraint(ActorConstraint constraint) {
-    if (_constraints == null) {
-      _constraints = <ActorConstraint>[];
-    }
+    _constraints ??= <ActorConstraint>[];
     if (_constraints!.contains(constraint)) {
       return false;
     }
@@ -308,9 +302,7 @@ class ActorNode extends ActorComponent {
   }
 
   bool addPeerConstraint(ActorConstraint constraint) {
-    if (_peerConstraints == null) {
-      _peerConstraints = <ActorConstraint>[];
-    }
+    _peerConstraints ??= <ActorConstraint>[];
     if (_peerConstraints!.contains(constraint)) {
       return false;
     }
@@ -326,6 +318,7 @@ class ActorNode extends ActorComponent {
               : _constraints! + _peerConstraints!) ??
       <ActorConstraint>[];
 
+  @override
   void update(int dirt) {
     if ((dirt & TransformDirty) == TransformDirty) {
       updateTransform();
@@ -333,7 +326,7 @@ class ActorNode extends ActorComponent {
     if ((dirt & WorldTransformDirty) == WorldTransformDirty) {
       updateWorldTransform();
       if (_constraints != null) {
-        for (ActorConstraint constraint in _constraints!) {
+        for (final ActorConstraint constraint in _constraints!) {
           if (constraint.isEnabled) {
             constraint.constrain(this);
           }
@@ -342,6 +335,7 @@ class ActorNode extends ActorComponent {
     }
   }
 
+  @override
   void resolveComponentIndices(List<ActorComponent?> components) {
     super.resolveComponentIndices(components);
 
@@ -349,18 +343,19 @@ class ActorNode extends ActorComponent {
       return;
     }
 
-    for (ActorClip clip in _clips!) {
+    for (final ActorClip clip in _clips!) {
       clip.node = components[clip.clipIdx] as ActorNode?;
     }
   }
 
+  @override
   void completeResolve() {
     // Nothing to complete for actornode.
   }
 
   bool eachChildRecursive(NodeWalkCallback cb) {
     if (_children != null) {
-      for (ActorNode child in _children!) {
+      for (final ActorNode child in _children!) {
         if (cb(child) == false) {
           return false;
         }
@@ -379,7 +374,7 @@ class ActorNode extends ActorComponent {
     }
 
     if (_children != null) {
-      for (ActorNode child in _children!) {
+      for (final ActorNode child in _children!) {
         if (cb(child) == false) {
           return false;
         }

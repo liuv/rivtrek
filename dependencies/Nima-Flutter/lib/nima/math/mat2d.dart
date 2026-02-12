@@ -7,7 +7,7 @@ class Mat2D {
   late Float32List _buffer;
 
   Float32List get values {
-  late return _buffer;
+  return _buffer;
   }
 
   Float64List get mat4 {

@@ -6,7 +6,7 @@ typedef CacheAsset AssetFactoryMethod();
 /// A base class for loading cached resources
 abstract class Cache<T extends CacheAsset> {
   final Map<String, T> _assets = {};
-  final Set<T> _toPrune = Set<T>();
+  final Set<T> _toPrune = <T>{};
   late Timer _pruneTimer;
 
   T makeAsset();
@@ -26,10 +26,8 @@ abstract class Cache<T extends CacheAsset> {
 
   void drop(T asset) {
     _toPrune.add(asset);
-    if (_pruneTimer != null) {
-      _pruneTimer.cancel();
-    }
-    if (isPruningEnabled) {
+    _pruneTimer.cancel();
+      if (isPruningEnabled) {
       _pruneTimer = Timer(pruneAfter, _prune);
     }
   }
@@ -39,7 +37,7 @@ abstract class Cache<T extends CacheAsset> {
   }
 
   Future<T> getAsset(String filename) async {
-    T asset = _assets[filename];
+    T? asset = _assets[filename];
     if (asset != null) {
       if (asset.isAvailable) {
         return asset;
@@ -47,19 +45,13 @@ abstract class Cache<T extends CacheAsset> {
         return await asset.onLoaded() as T;
       }
     }
-    int lastDot = filename.lastIndexOf(".");
-    if (lastDot != -1) {
-      asset = makeAsset();
-      if (asset != null) {
-        _assets[filename] = asset;
-        asset.load(this, filename);
-        if (asset.isAvailable) {
-          return asset;
-        } else {
-          return await asset.onLoaded() as T;
-        }
-      }
+    asset = makeAsset();
+    _assets[filename] = asset;
+    asset.load(this, filename);
+    if (asset.isAvailable) {
+      return asset;
+    } else {
+      return await asset.onLoaded() as T;
     }
-    return asset;
   }
 }

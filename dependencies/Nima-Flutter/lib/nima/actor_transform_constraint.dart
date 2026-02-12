@@ -19,10 +19,8 @@ class ActorTransformConstraint extends ActorTargetedConstraint {
   ActorTransformConstraint() : super();
 
   static ActorTransformConstraint read(
-      Actor actor, StreamReader reader, ActorTransformConstraint component) {
-    if (component == null) {
-      component = ActorTransformConstraint();
-    }
+      Actor actor, StreamReader reader, ActorTransformConstraint? component) {
+    component ??= ActorTransformConstraint();
     ActorTargetedConstraint.read(actor, reader, component);
 
     component._sourceSpace = reader.readUint8("sourceSpaceId");
@@ -47,17 +45,16 @@ class ActorTransformConstraint extends ActorTargetedConstraint {
 
   @override
   void constrain(ActorNode node) {
-    ActorNode t = target as ActorNode;
-    if (t == null) {
+    ActorNode? t = target as ActorNode?;
+    ActorNode? p = parent;
+    if (t == null || p == null) {
       return;
     }
 
-    ActorNode parent = this.parent;
-
-    Mat2D transformA = parent.worldTransform;
+    Mat2D transformA = p.worldTransform;
     Mat2D transformB = Mat2D.clone(t.worldTransform);
     if (_sourceSpace == TransformSpace.Local) {
-      ActorNode grandParent = target.parent;
+      ActorNode? grandParent = t.parent as ActorNode?;
       if (grandParent != null) {
         Mat2D inverse = Mat2D();
         Mat2D.invert(inverse, grandParent.worldTransform);
@@ -65,7 +62,7 @@ class ActorTransformConstraint extends ActorTargetedConstraint {
       }
     }
     if (_destSpace == TransformSpace.Local) {
-      ActorNode grandParent = parent.parent;
+      ActorNode? grandParent = p.parent as ActorNode?;
       if (grandParent != null) {
         Mat2D.multiply(transformB, grandParent.worldTransform, transformB);
       }
@@ -91,7 +88,7 @@ class ActorTransformConstraint extends ActorTargetedConstraint {
     _componentsB[3] = _componentsA[3] * ti + _componentsB[3] * strength;
     _componentsB[5] = _componentsA[5] * ti + _componentsB[5] * strength;
 
-    Mat2D.compose(parent.worldTransform, _componentsB);
+    Mat2D.compose(p.worldTransform, _componentsB);
   }
 
   @override

@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 import 'asset_bundle_cache.dart';
@@ -18,13 +17,9 @@ class FlareCacheAsset extends CacheAsset {
       cache.bundle.load(filename).then((ByteData data) {
         compute(FlutterActor.loadFromByteData, data).then((FlutterActor actor) {
           actor.loadImages().then((_) {
-            if (actor != null) {
-              _actor = actor;
-              completeLoad();
-            } else {
-              print("Failed to load flare file from $filename.");
-            }
-          });
+            _actor = actor;
+            completeLoad();
+                    });
         });
       });
     }

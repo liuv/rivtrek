@@ -31,7 +31,7 @@ abstract class JSONReader implements StreamReader {
 
   @override
   double readFloat32(String label) {
-    num? f = this.readProp(label);
+    num? f = readProp(label);
     return f?.toDouble() ?? 0.0;
   }
 
@@ -39,12 +39,12 @@ abstract class JSONReader implements StreamReader {
   @override
   Float32List readFloat32Array(int length, String label) {
     var ar = Float32List(length);
-    this._readArray(ar, label);
+    _readArray(ar, label);
     return ar;
   }
 
   void _readArray(List ar, String label) {
-    List? array = this.readProp(label);
+    List? array = readProp(label);
     if (array == null) return;
     for (int i = 0; i < ar.length; i++) {
       num val = array[i];
@@ -54,18 +54,18 @@ abstract class JSONReader implements StreamReader {
 
   @override
   double readFloat64(String label) {
-    num? f = this.readProp(label);
+    num? f = readProp(label);
     return f?.toDouble() ?? 0.0;
   }
 
   @override
   int readUint8(String label) {
-    return this.readProp(label) ?? 0;
+    return readProp(label) ?? 0;
   }
 
   @override
   int readUint8Length() {
-    return this._readLength();
+    return _readLength();
   }
 
   @override
@@ -75,77 +75,77 @@ abstract class JSONReader implements StreamReader {
 
   @override
   int readInt8(String label) {
-    return this.readProp(label) ?? 0;
+    return readProp(label) ?? 0;
   }
 
   @override
   int readUint16(String label) {
-    return this.readProp(label) ?? 0;
+    return readProp(label) ?? 0;
   }
 
   @override
   Uint8List readUint8Array(int length, String label) {
     var ar = Uint8List(length);
-    this._readArray(ar, label);
+    _readArray(ar, label);
     return ar;
   }
 
   @override
   Uint16List readUint16Array(int length, String label) {
     var ar = Uint16List(length);
-    this._readArray(ar, label);
+    _readArray(ar, label);
     return ar;
   }
 
   @override
   int readInt16(String label) {
-    return this.readProp(label) ?? 0;
+    return readProp(label) ?? 0;
   }
 
   @override
   int readUint16Length() {
-    return this._readLength();
+    return _readLength();
   }
 
   @override
   int readUint32Length() {
-    return this._readLength();
+    return _readLength();
   }
 
   @override
   int readUint32(String label) {
-    return this.readProp(label) ?? 0;
+    return readProp(label) ?? 0;
   }
 
   @override
   int readInt32(String label) {
-    return this.readProp(label) ?? 0;
+    return readProp(label) ?? 0;
   }
 
   @override
   int readVersion() {
-    return this.readProp("version") ?? 0;
+    return readProp("version") ?? 0;
   }
 
   @override
   String readString(String label) {
-    return this.readProp(label) ?? "";
+    return readProp(label) ?? "";
   }
 
   @override
   bool readBool(String label) {
-    return this.readProp(label) ?? false;
+    return readProp(label) ?? false;
   }
 
   @override
   int readId(String label) {
-    var val = this.readProp(label);
+    var val = readProp(label);
     return val is num ? (val.toInt() + 1) : 0;
   }
 
   @override
   void openArray(String label) {
-    var array = this.readProp(label);
+    var array = readProp(label);
     _context.addFirst(array);
   }
 
@@ -156,13 +156,13 @@ abstract class JSONReader implements StreamReader {
 
   @override
   void openObject(String label) {
-    var o = this.readProp(label);
+    var o = readProp(label);
     _context.addFirst(o);
   }
 
   @override
   void closeObject() {
-    this._context.removeFirst();
+    _context.removeFirst();
   }
 
   int _readLength() =>
@@ -171,9 +171,8 @@ abstract class JSONReader implements StreamReader {
   @override
   Uint8List readAsset() {
     String? encodedAsset =
-        readString("data"); // are we sure we need a label here?
-    if (encodedAsset == null) return Uint8List(0);
-    return Base64Decoder().convert(encodedAsset);
+        readString("data");
+    return const Base64Decoder().convert(encodedAsset);
   }
 
   @override

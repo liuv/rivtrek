@@ -1,11 +1,12 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flare_dart/math/aabb.dart';
 import 'package:flare_dart/math/mat2d.dart';
 import 'package:flare_dart/math/vec2d.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
+
 import 'flare.dart';
 import 'flare_cache.dart';
 import 'flare_cache_asset.dart';
@@ -15,7 +16,7 @@ abstract class FlareRenderBox extends RenderBox {
   late AssetBundle _assetBundle;
   late BoxFit _fit;
   late Alignment _alignment;
-  late int _frameCallbackID;
+  int? _frameCallbackID;
   double _lastFrameTime = 0.0;
   final List<FlareCacheAsset> _assets = [];
   bool _useIntrinsicSize = false;
@@ -30,7 +31,7 @@ abstract class FlareRenderBox extends RenderBox {
       markNeedsLayoutForSizedByParentChange();
     }
   }
-  late Size _intrinsicSize;
+  Size _intrinsicSize = Size.zero;
   Size get intrinsicSize => _intrinsicSize;
   set intrinsicSize(Size value) {
     if (_intrinsicSize == value) {
@@ -48,10 +49,8 @@ abstract class FlareRenderBox extends RenderBox {
       return;
     }
     _assetBundle = value;
-    if (_assetBundle != null) {
-      _load();
+    _load();
     }
-  }
 
   bool get isPlaying;
 
@@ -69,7 +68,8 @@ abstract class FlareRenderBox extends RenderBox {
     } else {
       _lastFrameTime = 0;
       if (_frameCallbackID != null) {
-        SchedulerBinding.instance.cancelFrameCallbackWithId(_frameCallbackID);
+        SchedulerBinding.instance.cancelFrameCallbackWithId(_frameCallbackID!);
+        _frameCallbackID = null;
       }
     }
   }
@@ -83,7 +83,7 @@ abstract class FlareRenderBox extends RenderBox {
   }
 
    @override
-   bool get sizedByParent => !_useIntrinsicSize || _intrinsicSize == null;
+   bool get sizedByParent => !_useIntrinsicSize;
 
   @override
   void performLayout() {
@@ -110,11 +110,12 @@ abstract class FlareRenderBox extends RenderBox {
   void attach(PipelineOwner owner) {
     super.attach(owner);
     updatePlayState();
-    if (_assets.isEmpty && assetBundle != null) {
+    if (_assets.isEmpty) {
       _load();
     }
   }
 
+  @override
   void dispose() {
     updatePlayState();
     _unload();
@@ -146,7 +147,7 @@ abstract class FlareRenderBox extends RenderBox {
     if (isPlaying) {
       // Paint again
       if (_frameCallbackID != null) {
-        SchedulerBinding.instance.cancelFrameCallbackWithId(_frameCallbackID);
+        SchedulerBinding.instance.cancelFrameCallbackWithId(_frameCallbackID!);
       }
       _frameCallbackID =
           SchedulerBinding.instance.scheduleFrameCallback(_beginFrame);
@@ -155,78 +156,76 @@ abstract class FlareRenderBox extends RenderBox {
     final Canvas canvas = context.canvas;
 
     AABB bounds = aabb;
-    if (bounds != null) {
-      double contentWidth = bounds[2] - bounds[0];
-      double contentHeight = bounds[3] - bounds[1];
-      double x = -1 * bounds[0] -
-          contentWidth / 2.0 -
-          (_alignment.x * contentWidth / 2.0);
-      double y = -1 * bounds[1] -
-          contentHeight / 2.0 -
-          (_alignment.y * contentHeight / 2.0);
+    double contentWidth = bounds[2] - bounds[0];
+    double contentHeight = bounds[3] - bounds[1];
+    double x = -1 * bounds[0] -
+        contentWidth / 2.0 -
+        (_alignment.x * contentWidth / 2.0);
+    double y = -1 * bounds[1] -
+        contentHeight / 2.0 -
+        (_alignment.y * contentHeight / 2.0);
 
-      double scaleX = 1.0, scaleY = 1.0;
+    double scaleX = 1.0, scaleY = 1.0;
 
-      canvas.save();
-      prePaint(canvas, offset);
+    canvas.save();
+    prePaint(canvas, offset);
 
-      switch (_fit) {
-        case BoxFit.fill:
-          scaleX = size.width / contentWidth;
-          scaleY = size.height / contentHeight;
-          break;
-        case BoxFit.contain:
-          double minScale =
-              min(size.width / contentWidth, size.height / contentHeight);
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.cover:
-          double maxScale =
-              max(size.width / contentWidth, size.height / contentHeight);
-          scaleX = scaleY = maxScale;
-          break;
-        case BoxFit.fitHeight:
-          double minScale = size.height / contentHeight;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.fitWidth:
-          double minScale = size.width / contentWidth;
-          scaleX = scaleY = minScale;
-          break;
-        case BoxFit.none:
-          scaleX = scaleY = 1.0;
-          break;
-        case BoxFit.scaleDown:
-          double minScale =
-              min(size.width / contentWidth, size.height / contentHeight);
-          scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
-          break;
-      }
-
-      Mat2D transform = Mat2D();
-      transform[4] =
-          offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
-      transform[5] =
-          offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
-      Mat2D.scale(transform, transform, Vec2D.fromValues(scaleX, scaleY));
-      Mat2D center = Mat2D();
-      center[4] = x;
-      center[5] = y;
-      Mat2D.multiply(transform, transform, center);
-
-      canvas.translate(
-        offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0),
-        offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0),
-      );
-
-      canvas.scale(scaleX, scaleY);
-      canvas.translate(x, y);
-
-      paintFlare(canvas, transform);
-
-      canvas.restore();
-      postPaint(canvas, offset);
+    switch (_fit) {
+      case BoxFit.fill:
+        scaleX = size.width / contentWidth;
+        scaleY = size.height / contentHeight;
+        break;
+      case BoxFit.contain:
+        double minScale =
+            min(size.width / contentWidth, size.height / contentHeight);
+        scaleX = scaleY = minScale;
+        break;
+      case BoxFit.cover:
+        double maxScale =
+            max(size.width / contentWidth, size.height / contentHeight);
+        scaleX = scaleY = maxScale;
+        break;
+      case BoxFit.fitHeight:
+        double minScale = size.height / contentHeight;
+        scaleX = scaleY = minScale;
+        break;
+      case BoxFit.fitWidth:
+        double minScale = size.width / contentWidth;
+        scaleX = scaleY = minScale;
+        break;
+      case BoxFit.none:
+        scaleX = scaleY = 1.0;
+        break;
+      case BoxFit.scaleDown:
+        double minScale =
+            min(size.width / contentWidth, size.height / contentHeight);
+        scaleX = scaleY = minScale < 1.0 ? minScale : 1.0;
+        break;
     }
+
+    Mat2D transform = Mat2D();
+    transform[4] =
+        offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0);
+    transform[5] =
+        offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0);
+    Mat2D.scale(transform, transform, Vec2D.fromValues(scaleX, scaleY));
+    Mat2D center = Mat2D();
+    center[4] = x;
+    center[5] = y;
+    Mat2D.multiply(transform, transform, center);
+
+    canvas.translate(
+      offset.dx + size.width / 2.0 + (_alignment.x * size.width / 2.0),
+      offset.dy + size.height / 2.0 + (_alignment.y * size.height / 2.0),
+    );
+
+    canvas.scale(scaleX, scaleY);
+    canvas.translate(x, y);
+
+    paintFlare(canvas, transform);
+
+    canvas.restore();
+    postPaint(canvas, offset);
   }
 
   /// Advance animations, physics, etc by elapsedSeconds.
@@ -259,18 +258,17 @@ abstract class FlareRenderBox extends RenderBox {
   void onUnload() {}
 
   /// Load a flare file from cache
-  Future<FlutterActor> loadFlare(String filename) async {
-    if (assetBundle == null || filename == null) {
+  Future<FlutterActor?> loadFlare(String filename) async {
+    FlareCacheAsset? asset = await cachedActor(assetBundle, filename);
+    if (asset == null) {
       return null;
     }
 
-    FlareCacheAsset asset = await cachedActor(assetBundle, filename);
-
-    if (!attached || asset == null) {
+    if (!attached) {
       return null;
     }
     _assets.add(asset);
     asset.ref();
-    return asset.actor;
+    return asset.actor as FlutterActor?;
   }
 }
