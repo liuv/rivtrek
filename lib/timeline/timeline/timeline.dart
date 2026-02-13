@@ -804,6 +804,16 @@ class Timeline {
     if (start != double.maxFinite && end != double.maxFinite) {
       _start = start;
       _end = end;
+      // Defensive normalization: callers may pass non-finite values (e.g. sparse
+      // entry navigation deriving Infinity range). Keep viewport finite.
+      if (!_start.isFinite && !_end.isFinite) {
+        _start = 0.0;
+        _end = _minViewportSpanForMode();
+      } else if (!_start.isFinite) {
+        _start = _end - _minViewportSpanForMode();
+      } else if (!_end.isFinite) {
+        _end = _start + _minViewportSpanForMode();
+      }
       _ensureNonZeroViewportSpan();
       if (pad && _height != 0.0) {
         double scale = computeScale(_start, _end);
