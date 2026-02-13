@@ -420,17 +420,27 @@ class Timeline {
 
     // 事件数据并入挑战记录时间线。
     for (final RiverEvent event in events) {
+      DailyWeather? eventWeather;
+      try {
+        eventWeather = weathers.firstWhere((w) => w.date == event.date);
+      } catch (_) {}
+
       final TimelineEntry eventEntry = TimelineEntry()
         ..type = TimelineEntryType.Incident
         ..start = _axisValueForEvent(event, axisMode)
-        ..end = _axisValueForEvent(event, axisMode);
+        ..end = _axisValueForEvent(event, axisMode)
+        ..weather = eventWeather;
 
       final String typeLabel = switch (event.type) {
         RiverEventType.pickup => "拾遗",
         RiverEventType.activity => "活动",
         RiverEventType.achievement => "成就",
       };
-      eventEntry.label = "${event.date}\n[$typeLabel] ${event.name}\n${event.description}";
+      final String weatherStr = eventWeather != null
+          ? " | ${eventWeather.currentTemp} ${eventWeather.cityName}"
+          : "";
+      eventEntry.label =
+          "${event.date}\n[$typeLabel] ${event.name}\n${event.description}$weatherStr";
       eventEntry.id = "event_${event.id ?? event.timestamp}";
       eventEntry.accent = switch (event.type) {
         RiverEventType.pickup => const Color(0xFF7BC8A4),

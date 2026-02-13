@@ -157,9 +157,9 @@ class _MainContainerState extends State<MainContainer> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildNavItem(Icons.waves_rounded, "徒步", 0),
-                _buildNavItem(Icons.map_outlined, "地图", 1),
-                _buildNavItem(Icons.person_outline_rounded, "我的", 2),
+                _buildNavItem(Icons.waves_rounded, "涉川", 0),
+                _buildNavItem(Icons.map_outlined, "览图", 1),
+                _buildNavItem(Icons.person_outline_rounded, "行者", 2),
               ],
             ),
           ),
