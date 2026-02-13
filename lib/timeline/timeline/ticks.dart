@@ -30,6 +30,21 @@ class Ticks {
     final double gutterWidth = timeline.gutterWidth;
     final double renderStart = timeline.renderStart;
     final double renderEnd = timeline.renderEnd;
+    final double range = renderEnd - renderStart;
+
+    // 防御性保护：避免初始/异常 viewport 造成 NaN/Infinity 进入绘制 API。
+    if (!scale.isFinite ||
+        scale == 0.0 ||
+        !height.isFinite ||
+        height <= 0.0 ||
+        !gutterWidth.isFinite ||
+        gutterWidth <= 0.0 ||
+        !renderStart.isFinite ||
+        !renderEnd.isFinite ||
+        !range.isFinite ||
+        range.abs() < 1e-9) {
+      return;
+    }
 
     // 按缩放动态选取“次刻度步长”，而不是固定除2/乘2，避免标签稀疏失真。
     double tickDistance;
@@ -65,11 +80,17 @@ class Ticks {
       final double s = timeline.computeScale(renderStart, renderEnd);
       final double y1 = ((tickColors.first.start ?? 0.0) - renderStart) * s;
       final double y2 = ((tickColors.last.start ?? 0.0) - renderStart) * s;
-      final ui.Paint paint = ui.Paint()
-        ..shader = ui.Gradient.linear(
-            ui.Offset(0.0, y1), ui.Offset(0.0, y2), colors, stops)
-        ..style = ui.PaintingStyle.fill;
-      canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height), paint);
+      if (s.isFinite && y1.isFinite && y2.isFinite) {
+        final ui.Paint paint = ui.Paint()
+          ..shader = ui.Gradient.linear(
+              ui.Offset(0.0, y1), ui.Offset(0.0, y2), colors, stops)
+          ..style = ui.PaintingStyle.fill;
+        canvas.drawRect(
+            Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height), paint);
+      } else {
+        canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height),
+            Paint()..color = const Color.fromRGBO(246, 246, 246, 0.95));
+      }
     } else {
       canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, gutterWidth, height),
           Paint()..color = const Color.fromRGBO(246, 246, 246, 0.95));
@@ -84,6 +105,9 @@ class Ticks {
         continue;
       }
       final double y = offset.dy + (tickValue - renderStart) * scale;
+      if (!y.isFinite) {
+        continue;
+      }
       if (y < offset.dy - 20 || y > offset.dy + height + 20) {
         continue;
       }
@@ -92,9 +116,15 @@ class Ticks {
         continue;
       }
       final bool isMajor = idx % majorEvery == 0;
+      final double x = offset.dx +
+          gutterWidth -
+          (isMajor ? TickSize : SmallTickSize);
+      if (!x.isFinite) {
+        continue;
+      }
       canvas.drawRect(
           Rect.fromLTWH(
-              offset.dx + gutterWidth - (isMajor ? TickSize : SmallTickSize),
+              x,
               y,
               isMajor ? TickSize : SmallTickSize,
               1.0),

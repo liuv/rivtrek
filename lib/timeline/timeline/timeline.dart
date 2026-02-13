@@ -292,7 +292,46 @@ class Timeline {
 
   /// Compute the viewport scale from the start/end times.
   double computeScale(double start, double end) {
-    return _height == 0.0 ? 1.0 : _height / (end - start);
+    if (_height == 0.0) {
+      return 1.0;
+    }
+    final double range = end - start;
+    if (!range.isFinite || range.abs() < 1e-9) {
+      return 1.0;
+    }
+    final double s = _height / range;
+    return s.isFinite && s != 0.0 ? s : 1.0;
+  }
+
+  double _minViewportSpanForMode() {
+    // Prevent degenerate viewport which can create Infinity scale and NaNs (0 * Infinity).
+    if (isCalendarMode) {
+      return 1.0; // 1 day
+    }
+    if (isDistanceMode) {
+      return 0.1; // 100 meters
+    }
+    return 1.0; // legacy year axis
+  }
+
+  void _ensureNonZeroViewportSpan() {
+    final double minSpan = _minViewportSpanForMode();
+    if (!_start.isFinite || !_end.isFinite) {
+      _start = 0.0;
+      _end = minSpan;
+      return;
+    }
+    if (_end < _start) {
+      final double tmp = _start;
+      _start = _end;
+      _end = tmp;
+    }
+    final double span = _end - _start;
+    if (!span.isFinite || span.abs() < minSpan) {
+      final double mid = (_start + _end) / 2.0;
+      _start = mid - minSpan / 2.0;
+      _end = mid + minSpan / 2.0;
+    }
   }
 
   /// Load all the resources from the database.
@@ -1115,25 +1154,39 @@ class Timeline {
     if (start != double.maxFinite && end != double.maxFinite) {
       _start = start;
       _end = end;
+      _ensureNonZeroViewportSpan();
       if (pad && _height != 0.0) {
-        double scale = _height / (_end - _start);
+        double scale = computeScale(_start, _end);
         _start = _start - padding.top / scale;
         _end = _end + padding.bottom / scale;
+        _ensureNonZeroViewportSpan();
       }
     } else {
       if (start != double.maxFinite) {
-        double scale = height / (_end - _start);
+        // Avoid Infinity when caller doesn't provide a valid height yet.
+        final double effectiveHeight =
+            height != double.maxFinite ? height : (_height == 0.0 ? 1.0 : _height);
+        final double denom = (_end - _start);
+        final double safeDenom = (!denom.isFinite || denom.abs() < 1e-9) ? 1.0 : denom;
+        double scale = effectiveHeight / safeDenom;
         _start = pad ? start - padding.top / scale : start;
+        _ensureNonZeroViewportSpan();
       }
       if (end != double.maxFinite) {
-        double scale = height / (_end - _start);
+        final double effectiveHeight =
+            height != double.maxFinite ? height : (_height == 0.0 ? 1.0 : _height);
+        final double denom = (_end - _start);
+        final double safeDenom = (!denom.isFinite || denom.abs() < 1e-9) ? 1.0 : denom;
+        double scale = effectiveHeight / safeDenom;
         _end = pad ? end + padding.bottom / scale : end;
+        _ensureNonZeroViewportSpan();
       }
     }
 
     /// If a velocity value has been passed, use the [ScrollPhysics] to create
     /// a simulation and perform scrolling natively to the current platform.
     if (velocity != double.maxFinite) {
+      _ensureNonZeroViewportSpan();
       double scale = computeScale(_start, _end);
       double padTop = _effectiveViewportTopPaddingPx() / computeScale(_start, _end);
       double padBottom =
@@ -1162,8 +1215,10 @@ class Timeline {
           _scrollPhysics?.createBallisticSimulation(_scrollMetrics!, velocity);
     }
     if (!animate) {
-      _renderStart = start;
-      _renderEnd = end;
+      // Use normalized fields, not raw parameters (which might be maxFinite or degenerate).
+      _ensureNonZeroViewportSpan();
+      _renderStart = _start;
+      _renderEnd = _end;
       advance(0.0, false);
       if (onNeedPaint != null) {
         onNeedPaint!();

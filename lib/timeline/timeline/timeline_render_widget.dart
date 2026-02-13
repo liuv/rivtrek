@@ -2,12 +2,10 @@ import 'dart:math';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
-import 'package:flare_dart/actor_image.dart' as flare;
 import 'package:flare_dart/math/aabb.dart' as flare;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
-import 'package:nima/nima/actor_image.dart' as nima;
 import 'package:nima/nima/math/aabb.dart' as nima;
 import 'package:rivtrek/timeline/colors.dart';
 import 'package:rivtrek/timeline/main_menu/menu_data.dart';
@@ -273,7 +271,15 @@ class TimelineRenderObject extends RenderBox {
     _tapTargets.clear();
     double renderStart = _timeline!.renderStart;
     double renderEnd = _timeline!.renderEnd;
-    double scale = size.height / (renderEnd - renderStart);
+    final double range = renderEnd - renderStart;
+    if (!range.isFinite || range.abs() < 1e-9) {
+      // Avoid NaN/Infinity during initial/degenerate viewport.
+      return;
+    }
+    double scale = size.height / range;
+    if (!scale.isFinite || scale == 0.0) {
+      return;
+    }
 
     if (timeline?.renderAssets != null) {
       canvas.save();
