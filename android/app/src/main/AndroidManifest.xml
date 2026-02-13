@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 网络：天气 API、地图瓦片等 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- 基础硬件访问权限 -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />

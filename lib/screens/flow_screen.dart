@@ -203,13 +203,35 @@ class _FlowScreenState extends State<FlowScreen>
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
-        Position pos = await Geolocator.getCurrentPosition();
-        if (mounted) {
-          context.read<FlowController>().fetchWeather(pos.latitude, pos.longitude);
+      if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) {
+        return;
+      }
+
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      Position? pos;
+
+      if (serviceEnabled) {
+        try {
+          // Android 上使用 medium 可更快拿到结果，减少超时
+          pos = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.medium,
+              timeLimit: Duration(seconds: 15),
+            ),
+          );
+        } catch (e) {
+          debugPrint("getCurrentPosition failed: $e");
         }
       }
-    } catch (_) {}
+
+      // 定位未开或 getCurrentPosition 超时/失败时，用上次缓存位置拉天气（Android 常见）
+      pos ??= await Geolocator.getLastKnownPosition();
+      if (pos != null && mounted) {
+        context.read<FlowController>().fetchWeather(pos.latitude, pos.longitude);
+      }
+    } catch (e) {
+      debugPrint("_refreshWeather error: $e");
+    }
   }
 
   void _updateLanterns(SubSection? sub) {
