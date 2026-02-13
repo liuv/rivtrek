@@ -1,27 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flare_flutter/flare.dart' as flare;
-import 'package:flare_dart/animation/actor_animation.dart' as flare;
-import 'package:flare_dart/math/aabb.dart' as flare;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter/widgets.dart';
 import 'package:nima/nima.dart' as nima;
-import 'package:nima/nima/math/aabb.dart' as nima;
 import 'package:rivtrek/timeline/timeline/timeline_utils.dart';
 
 import 'package:rive/rive.dart' as rive;
 // import 'package:rive/src/rive_core/math/aabb.dart' as rive;
 
 import 'package:rivtrek/models/daily_stats.dart';
-import 'package:rivtrek/services/database_service.dart';
-
-import '../main_menu/main_menu.dart';
+import 'timeline_asset_loader.dart';
 import 'timeline_entry.dart';
 
 typedef PaintCallback();
@@ -143,6 +135,7 @@ class Timeline {
   Map<String, nima.FlutterActor> _nimaResources = {};
   Map<String, flare.FlutterActor> _flareResources = {};
   Map<String, dynamic> _riveResources = {};
+  late final TimelineAssetLoader _assetLoader;
 
   /// Callback set by [TimelineRenderWidget] when adding a reference to this object.
   /// It'll trigger [RenderBox.markNeedsPaint()].
@@ -154,6 +147,11 @@ class Timeline {
   ChangeHeaderColorCallback? onHeaderColorsChanged;
 
   Timeline(this._platform) {
+    _assetLoader = TimelineAssetLoader(
+      nimaResources: _nimaResources,
+      flareResources: _flareResources,
+      riveResources: _riveResources,
+    );
     _backgroundColors = <TimelineBackgroundColor>[
       TimelineBackgroundColor()
         ..color = const Color.fromRGBO(37, 35, 41, 1.0)
@@ -523,7 +521,7 @@ class Timeline {
     /// The JSON decode doesn't provide strong typing, so we'll iterate
     /// on the dynamic entries in the [jsonEntries] list.
     for (dynamic entry in jsonEntries) {
-      Map map = entry as Map;
+      final Map<dynamic, dynamic>? map = entry as Map?;
 
       /// Sanity check.
       if (map != null) {
@@ -667,363 +665,15 @@ class Timeline {
           timelineEntry.articleFilename = map["article"] as String;
         }
 
-        /// The `asset` key in the current entry contains all the information
-        /// for the nima/flare animation file that'll be played on the timeline.
-        ///
-        /// `asset` is a JSON object thus made:
-        /// {
-        ///   - source: the name of the nima/flare file in the assets folder;
-        ///   - width/height/offset/bounds/gap: sizes of the animation to properly align it in the timeline, together with its Axis-Aligned Bounding Box container.
-        ///   - intro: some files have an 'intro' animation, to be played before idling.
-        ///   - idle: some files have one or more idle animations, and these are their names.
-        ///   - loop: some animations shouldn't loop (e.g. Big Bang) but just settle onto their idle animation. If that's the case, this flag is raised.
-        ///   - scale: a custom scale value.
-        /// }
         if (map.containsKey("asset")) {
-          TimelineAsset asset;
-          Map assetMap = map["asset"] as Map;
-          dynamic sourceAttr = assetMap["source"];
-          if (sourceAttr == null || sourceAttr == "") {
-            continue;
+          final Map assetMap = map["asset"] as Map;
+          final LoadedTimelineAsset? loadedAsset =
+              await _assetLoader.loadFromAssetMap(assetMap);
+          if (loadedAsset != null) {
+            loadedAsset.asset.entry = timelineEntry;
+            loadedAsset.asset.filename = loadedAsset.filename;
+            timelineEntry.asset = loadedAsset.asset;
           }
-          String source = sourceAttr as String;
-          String filename = "assets/timeline/" + source;
-          String extension = getExtension(source);
-
-          /// Instantiate the correct object based on the file extension.
-          switch (extension) {
-            case "flr":
-              TimelineFlare flareAsset = TimelineFlare();
-              asset = flareAsset;
-              flare.FlutterActor? actor = _flareResources[filename];
-              if (actor == null) {
-                actor = flare.FlutterActor();
-
-                /// Flare library function to load the [FlutterActor]
-                bool success = await actor.loadFromBundle(rootBundle, filename);
-                if (success) {
-                  /// Populate the Map.
-                  _flareResources[filename] = actor;
-                }
-              }
-              if (actor != null && actor.artboard != null) {
-                /// Distinguish between the actual actor, and its intance.
-                flareAsset.actorStatic =
-                    actor.artboard as flare.FlutterActorArtboard;
-                flareAsset.actorStatic?.initializeGraphics();
-                flareAsset.actor = actor.artboard!.makeInstance()
-                    as flare.FlutterActorArtboard;
-                flareAsset.actor?.initializeGraphics();
-
-                /// and the reference to their first animation is grabbed.
-                if (actor.artboard!.animations.isNotEmpty) {
-                  flareAsset.animation = actor.artboard!.animations[0];
-                }
-
-                dynamic name = assetMap["idle"] ?? assetMap["animations"];
-                if (name is String) {
-                  if ((flareAsset.idle =
-                          flareAsset.actor?.getAnimation(name)) !=
-                      null) {
-                    flareAsset.animation = flareAsset.idle;
-                  }
-                } else if (name is List) {
-                  for (String animationName in name) {
-                    flare.ActorAnimation? animation =
-                        flareAsset.actor?.getAnimation(animationName);
-                    if (animation != null) {
-                      flareAsset.idleAnimations ??= <flare.ActorAnimation>[];
-                      flareAsset.idleAnimations?.add(animation);
-                      flareAsset.animation = animation;
-                    }
-                  }
-                }
-
-                name = assetMap["intro"];
-                if (name is String) {
-                  if ((flareAsset.intro =
-                          flareAsset.actor?.getAnimation(name)) !=
-                      null) {
-                    flareAsset.animation = flareAsset.intro;
-                  }
-                }
-
-                /// Make sure that all the initial values are set for the actor and for the actor instance.
-                flareAsset.animationTime = 0.0;
-                flareAsset.actor?.advance(0.0);
-                flareAsset.setupAABB = flareAsset.actor?.computeAABB();
-                if (flareAsset.setupAABB == null ||
-                    (flareAsset.setupAABB![0] == 0 &&
-                        flareAsset.setupAABB![2] == 0)) {
-                  flareAsset.setupAABB = flare.AABB.fromValues(
-                      -flareAsset.width / 2,
-                      -flareAsset.height / 2,
-                      flareAsset.width / 2,
-                      flareAsset.height / 2);
-                }
-                if (flareAsset.animation != null) {
-                  flareAsset.animation!
-                      .apply(flareAsset.animationTime, flareAsset.actor!, 1.0);
-                  flareAsset.animation!.apply(flareAsset.animation!.duration,
-                      flareAsset.actorStatic!, 1.0);
-                }
-                flareAsset.actor?.advance(0.0);
-                flareAsset.actorStatic?.advance(0.0);
-
-                dynamic loop = assetMap["loop"];
-                flareAsset.loop = loop is bool ? loop : true;
-                dynamic offset = assetMap["offset"];
-                flareAsset.offset = offset == null
-                    ? 0.0
-                    : offset is int
-                        ? offset.toDouble()
-                        : offset;
-                dynamic gap = assetMap["gap"];
-                flareAsset.gap = gap == null
-                    ? 0.0
-                    : gap is int
-                        ? gap.toDouble()
-                        : gap;
-
-                dynamic bounds = assetMap["bounds"];
-                if (bounds is List) {
-                  /// Override the AABB for this entry with custom values.
-                  flareAsset.setupAABB = flare.AABB.fromValues(
-                      bounds[0] is int ? bounds[0].toDouble() : bounds[0],
-                      bounds[1] is int ? bounds[1].toDouble() : bounds[1],
-                      bounds[2] is int ? bounds[2].toDouble() : bounds[2],
-                      bounds[3] is int ? bounds[3].toDouble() : bounds[3]);
-                }
-              }
-              break;
-            case "nma":
-              TimelineNima nimaAsset = TimelineNima();
-              asset = nimaAsset;
-              nima.FlutterActor? actor = _nimaResources[filename];
-              if (actor == null) {
-                actor = nima.FlutterActor();
-
-                bool success = await actor.loadFromBundle(filename);
-                if (success) {
-                  _nimaResources[filename] = actor;
-                }
-              }
-              if (actor != null) {
-                nimaAsset.actorStatic = actor;
-                nimaAsset.actor = actor.makeInstance() as nima.FlutterActor;
-
-                dynamic name = assetMap["idle"];
-                if (name is String) {
-                  nimaAsset.animation = nimaAsset.actor?.getAnimation(name);
-                } else if (actor.animations.isNotEmpty) {
-                  nimaAsset.animation = actor.animations[0];
-                }
-                nimaAsset.animationTime = 0.0;
-                nimaAsset.actor?.advance(0.0);
-
-                nimaAsset.setupAABB = nimaAsset.actor?.computeAABB();
-                if (nimaAsset.setupAABB == null ||
-                    (nimaAsset.setupAABB![0] == 0 &&
-                        nimaAsset.setupAABB![2] == 0)) {
-                  nimaAsset.setupAABB = nima.AABB.fromValues(
-                      -nimaAsset.width / 2,
-                      -nimaAsset.height / 2,
-                      nimaAsset.width / 2,
-                      nimaAsset.height / 2);
-                }
-                if (nimaAsset.animation != null) {
-                  nimaAsset.animation!
-                      .apply(nimaAsset.animationTime, nimaAsset.actor!, 1.0);
-                  nimaAsset.animation!.apply(nimaAsset.animation!.duration,
-                      nimaAsset.actorStatic!, 1.0);
-                }
-                nimaAsset.actor?.advance(0.0);
-                nimaAsset.actorStatic?.advance(0.0);
-                dynamic loop = assetMap["loop"];
-                nimaAsset.loop = loop is bool ? loop : true;
-                dynamic offset = assetMap["offset"];
-                nimaAsset.offset = offset == null
-                    ? 0.0
-                    : offset is int
-                        ? offset.toDouble()
-                        : offset;
-                dynamic gap = assetMap["gap"];
-                nimaAsset.gap = gap == null
-                    ? 0.0
-                    : gap is int
-                        ? gap.toDouble()
-                        : gap;
-                dynamic bounds = assetMap["bounds"];
-                if (bounds is List) {
-                  nimaAsset.setupAABB = nima.AABB.fromValues(
-                      bounds[0] is int ? bounds[0].toDouble() : bounds[0],
-                      bounds[1] is int ? bounds[1].toDouble() : bounds[1],
-                      bounds[2] is int ? bounds[2].toDouble() : bounds[2],
-                      bounds[3] is int ? bounds[3].toDouble() : bounds[3]);
-                }
-              }
-              break;
-            case "riv":
-              TimelineRive riveAsset = TimelineRive();
-              asset = riveAsset;
-              dynamic actor = _riveResources[filename];
-              if (actor == null) {
-                ByteData data = await rootBundle.load(filename);
-                // 强制使用 0.12.4 的 import 语法
-                final file = rive.RiveFile.import(data);
-                final artboard = file.mainArtboard;
-                _riveResources[filename] = artboard;
-                actor = artboard;
-              }
-
-              if (actor != null) {
-                riveAsset.actorStatic = actor;
-                riveAsset.actor = actor.instance();
-
-                if (riveAsset.actor.animations.isNotEmpty) {
-                  riveAsset.animation = riveAsset.actor.animations[0];
-                }
-
-                dynamic name = assetMap["idle"];
-                if (name is String) {
-                  try {
-                    final anim = (riveAsset.actor.animations as Iterable)
-                        .firstWhere((a) => a.name == name, orElse: () => null);
-                    if (anim != null) {
-                      riveAsset.idle = anim;
-                      riveAsset.animation = anim;
-                    }
-                  } catch (e) {}
-                } else if (name is List) {
-                  for (String animationName in name) {
-                    try {
-                      final anim = (riveAsset.actor.animations as Iterable)
-                          .firstWhere((a) => a.name == animationName,
-                              orElse: () => null);
-                      if (anim != null) {
-                        riveAsset.idleAnimations ??= <dynamic>[];
-                        riveAsset.idleAnimations?.add(anim);
-                        riveAsset.animation = anim;
-                      }
-                    } catch (e) {}
-                  }
-                }
-                dynamic animationsNode = assetMap["animations"];
-                if (animationsNode is List) {
-                  for (final dynamic animationName in animationsNode) {
-                    if (animationName is! String) {
-                      continue;
-                    }
-                    try {
-                      final anim = (riveAsset.actor.animations as Iterable)
-                          .firstWhere((a) => a.name == animationName,
-                              orElse: () => null);
-                      if (anim != null) {
-                        riveAsset.idleAnimations ??= <dynamic>[];
-                        if (!riveAsset.idleAnimations!.contains(anim)) {
-                          riveAsset.idleAnimations!.add(anim);
-                        }
-                        riveAsset.animation = anim;
-                      }
-                    } catch (e) {}
-                  }
-                }
-                if ((riveAsset.idleAnimations == null ||
-                        riveAsset.idleAnimations!.isEmpty) &&
-                    riveAsset.actor.animations is Iterable &&
-                    (riveAsset.actor.animations as Iterable).length > 1) {
-                  // Rive 资源有时将“飞行动作”和“眨眼”拆为多轨，默认同时应用以避免只眨眼不飞行。
-                  riveAsset.idleAnimations = <dynamic>[];
-                  for (final dynamic anim in (riveAsset.actor.animations as Iterable)) {
-                    if (anim is rive.LinearAnimation) {
-                      riveAsset.idleAnimations!.add(anim);
-                    }
-                  }
-                }
-
-                name = assetMap["intro"];
-                if (name is String) {
-                  try {
-                    final anim = (riveAsset.actor.animations as Iterable)
-                        .firstWhere((a) => a.name == name, orElse: () => null);
-                    if (anim != null) {
-                      riveAsset.intro = anim;
-                      riveAsset.animation = anim;
-                      if (riveAsset.idleAnimations != null) {
-                        riveAsset.idleAnimations!.remove(anim);
-                      }
-                    }
-                  } catch (e) {}
-                }
-
-                riveAsset.animationTime = 0.0;
-                riveAsset.actor.advance(0.0);
-
-                if (riveAsset.animation != null) {
-                  riveAsset.animation
-                      .apply(0.0, coreContext: riveAsset.actor, mix: 1.0);
-                }
-
-                riveAsset.actor.advance(0.0);
-                riveAsset.actorStatic.advance(0.0);
-
-                dynamic loop = assetMap["loop"];
-                riveAsset.loop = loop is bool ? loop : true;
-                dynamic offset = assetMap["offset"];
-                riveAsset.offset = offset == null
-                    ? 0.0
-                    : offset is int
-                        ? offset.toDouble()
-                        : offset;
-                dynamic gap = assetMap["gap"];
-                riveAsset.gap = gap == null
-                    ? 0.0
-                    : gap is int
-                        ? gap.toDouble()
-                        : gap;
-
-                dynamic bounds = assetMap["bounds"];
-                if (bounds is List) {
-                  // Rive 0.12.4 不支持 computeAABB，使用 artboard 的尺寸
-                  riveAsset.setupAABB = [
-                    0.0,
-                    0.0,
-                    riveAsset.actor.width,
-                    riveAsset.actor.height
-                  ];
-                }
-              }
-              break;
-
-            default:
-
-              /// Legacy fallback case: some elements could have been just images.
-              TimelineImage imageAsset = TimelineImage();
-              asset = imageAsset;
-
-              ByteData data = await rootBundle.load(filename);
-              Uint8List list = Uint8List.view(data.buffer);
-              ui.Codec codec = await ui.instantiateImageCodec(list);
-              ui.FrameInfo frame = await codec.getNextFrame();
-              imageAsset.image = frame.image;
-
-              break;
-          }
-
-          double scale = 1.0;
-          if (assetMap.containsKey("scale")) {
-            dynamic s = assetMap["scale"];
-            scale = s is int ? s.toDouble() : s;
-          }
-
-          dynamic width = assetMap["width"];
-          asset.width = (width is int ? width.toDouble() : width) * scale;
-
-          dynamic height = assetMap["height"];
-          asset.height = (height is int ? height.toDouble() : height) * scale;
-          asset.entry = timelineEntry;
-          asset.filename = filename;
-          timelineEntry.asset = asset;
         }
 
         /// Add this entry to the list.
@@ -1140,7 +790,7 @@ class Timeline {
       bool animate = false}) {
     /// Calculate the current height.
     if (height != double.maxFinite) {
-      if (_height == 0.0 && _entries != null && _entries.length > 0) {
+      if (_height == 0.0 && _entries.isNotEmpty) {
         double scale = height / (_end - _start);
         _start = _start - padding.top / scale;
         _end = _end + padding.bottom / scale;
@@ -1261,7 +911,7 @@ class Timeline {
   }
 
   TickColors? findTickColors(double screen) {
-    if (_tickColors == null || _tickColors.isEmpty) {
+    if (_tickColors.isEmpty) {
       return null;
     }
     for (TickColors color in _tickColors.reversed) {
@@ -1276,7 +926,7 @@ class Timeline {
   }
 
   HeaderColors? _findHeaderColors(double screen) {
-    if (_headerColors == null || _headerColors.isEmpty) {
+    if (_headerColors.isEmpty) {
       return null;
     }
     for (HeaderColors color in _headerColors.reversed) {
@@ -1297,7 +947,7 @@ class Timeline {
     }
 
     /// The current scale based on the rendering area.
-    double scale = _height / (_renderEnd! - _renderStart!);
+    double scale = _height / (_renderEnd - _renderStart);
 
     bool doneRendering = true;
     bool stillScaling = true;
@@ -1337,8 +987,8 @@ class Timeline {
     /// Animate movement.
     double speed =
         min(1.0, elapsed * (_isInteracting ? MoveSpeedInteracting : MoveSpeed));
-    double ds = _start - _renderStart!;
-    double de = _end - _renderEnd!;
+    double ds = _start - _renderStart;
+    double de = _end - _renderEnd;
 
     /// If the current view is animating, adjust the [_renderStart]/[_renderEnd] based on the interaction speed.
     if (!animate || ((ds * scale).abs() < 1.0 && (de * scale).abs() < 1.0)) {
@@ -1356,7 +1006,7 @@ class Timeline {
     scale = _height / (_renderEnd - _renderStart);
 
     /// Update color screen positions.
-    if (_tickColors != null && _tickColors.isNotEmpty) {
+    if (_tickColors.isNotEmpty) {
       double lastStart = _tickColors.first.start ?? 0.0;
       for (TickColors color in _tickColors) {
         color.screenY = (lastStart +
@@ -1366,7 +1016,7 @@ class Timeline {
         lastStart = color.start ?? 0.0;
       }
     }
-    if (_headerColors != null && _headerColors.isNotEmpty) {
+    if (_headerColors.isNotEmpty) {
       double lastStart = _headerColors.first.start ?? 0.0;
       for (HeaderColors color in _headerColors) {
         color.screenY = (lastStart +
@@ -1420,18 +1070,16 @@ class Timeline {
     _currentEra = null;
     _nextEntry = null;
     _prevEntry = null;
-    if (_entries != null) {
-      /// Advance the items hierarchy one level at a time.
-      if (_advanceItems(
-          _entries, _gutterWidth + LineSpacing, scale, elapsed, animate, 0)) {
-        doneRendering = false;
-      }
+    /// Advance the items hierarchy one level at a time.
+    if (_advanceItems(
+        _entries, _gutterWidth + LineSpacing, scale, elapsed, animate, 0)) {
+      doneRendering = false;
+    }
 
-      /// Advance all the assets and add the rendered ones into [_renderAssets].
-      _renderAssets = <TimelineAsset>[];
-      if (_advanceAssets(_entries, elapsed, animate, _renderAssets)) {
-        doneRendering = false;
-      }
+    /// Advance all the assets and add the rendered ones into [_renderAssets].
+    _renderAssets = <TimelineAsset>[];
+    if (_advanceAssets(_entries, elapsed, animate, _renderAssets)) {
+      doneRendering = false;
     }
 
     if (_nextEntryOpacity == 0.0) {
@@ -1937,103 +1585,12 @@ class Timeline {
     }
     final String filename =
         source.startsWith("assets/") ? source : "assets/timeline/$source";
-    final TimelineRive? asset = await _loadRiveAssetFromMap(filename, assetNode);
+    final TimelineRive? asset =
+        await _assetLoader.loadRiveAssetFromMap(filename, assetNode);
     if (asset != null) {
       asset.entry = entry;
       asset.filename = filename;
       entry.asset = asset;
     }
-  }
-
-  Future<TimelineRive?> _loadRiveAssetFromMap(String filename, Map assetMap) async {
-    final TimelineRive riveAsset = TimelineRive();
-    dynamic actor = _riveResources[filename];
-    if (actor == null) {
-      try {
-        final ByteData data = await rootBundle.load(filename);
-        final rive.RiveFile file = rive.RiveFile.import(data);
-        actor = file.mainArtboard;
-        _riveResources[filename] = actor;
-      } catch (_) {
-        return null;
-      }
-    }
-    if (actor == null) {
-      return null;
-    }
-    riveAsset.actorStatic = actor;
-    riveAsset.actor = actor.instance();
-    if (riveAsset.actor.animations.isNotEmpty) {
-      riveAsset.animation = riveAsset.actor.animations[0];
-    }
-
-    dynamic name = assetMap["idle"];
-    if (name is String) {
-      try {
-        final anim = (riveAsset.actor.animations as Iterable)
-            .firstWhere((a) => a.name == name, orElse: () => null);
-        if (anim != null) {
-          riveAsset.idle = anim;
-          riveAsset.animation = anim;
-        }
-      } catch (_) {}
-    }
-
-    name = assetMap["intro"];
-    if (name is String) {
-      try {
-        final anim = (riveAsset.actor.animations as Iterable)
-            .firstWhere((a) => a.name == name, orElse: () => null);
-        if (anim != null) {
-          riveAsset.intro = anim;
-          riveAsset.animation = anim;
-        }
-      } catch (_) {}
-    }
-
-    riveAsset.animationTime = 0.0;
-    riveAsset.actor.advance(0.0);
-    if (riveAsset.animation != null) {
-      riveAsset.animation.apply(0.0, coreContext: riveAsset.actor, mix: 1.0);
-    }
-    riveAsset.actor.advance(0.0);
-    riveAsset.actorStatic.advance(0.0);
-
-    final dynamic loop = assetMap["loop"];
-    riveAsset.loop = loop is bool ? loop : true;
-    final dynamic offset = assetMap["offset"];
-    riveAsset.offset = offset == null
-        ? 0.0
-        : offset is int
-            ? offset.toDouble()
-            : offset;
-    final dynamic gap = assetMap["gap"];
-    riveAsset.gap = gap == null
-        ? 0.0
-        : gap is int
-            ? gap.toDouble()
-            : gap;
-
-    final dynamic width = assetMap["width"];
-    final dynamic height = assetMap["height"];
-    final double scale = assetMap["scale"] is num
-        ? (assetMap["scale"] as num).toDouble()
-        : 1.0;
-    riveAsset.width = width is num ? width.toDouble() * scale : 300.0 * scale;
-    riveAsset.height =
-        height is num ? height.toDouble() * scale : 300.0 * scale;
-
-    final dynamic bounds = assetMap["bounds"];
-    if (bounds is List && bounds.length >= 4) {
-      riveAsset.setupAABB = [
-        (bounds[0] as num).toDouble(),
-        (bounds[1] as num).toDouble(),
-        (bounds[2] as num).toDouble(),
-        (bounds[3] as num).toDouble()
-      ];
-    } else {
-      riveAsset.setupAABB = [0.0, 0.0, riveAsset.width, riveAsset.height];
-    }
-    return riveAsset;
   }
 }
