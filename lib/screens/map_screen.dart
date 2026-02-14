@@ -9,6 +9,9 @@ import '../services/geo_service.dart';
 import '../models/river_data.dart';
 import '../providers/challenge_provider.dart';
 
+/// 底图来源：天地图 / 高德
+enum MapProvider { tianditu, amap }
+
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -18,6 +21,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final String tiandituKey = '1e3ac648e1213f4c6ebc1248e9c8ba0d';
+  MapProvider mapProvider = MapProvider.tianditu;
   bool isSatellite = false;
   
   RiverFullData? fullData;
@@ -86,6 +90,45 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     if (index < currentSubSectionIdx) return const Color(0xFF4CAF50);
     if (index == currentSubSectionIdx) return const Color(0xFF2196F3);
     return const Color(0xFFFF9800).withOpacity(0.6);
+  }
+
+  List<Widget> _buildTileLayers() {
+    const userAgent = 'cn.lindenliu.rivtrek';
+    final cache = CachedTileProvider(store: _cacheStore!);
+
+    if (mapProvider == MapProvider.tianditu) {
+      return [
+        TileLayer(
+          urlTemplate: isSatellite
+              ? 'https://t{s}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey'
+              : 'https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey',
+          subdomains: const ['0', '1', '2', '3', '4', '5', '6', '7'],
+          userAgentPackageName: userAgent,
+          tileProvider: cache,
+        ),
+        TileLayer(
+          urlTemplate: isSatellite
+              ? 'https://t{s}.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey'
+              : 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey',
+          subdomains: const ['0', '1', '2', '3', '4', '5', '6', '7'],
+          userAgentPackageName: userAgent,
+          tileProvider: cache,
+        ),
+      ];
+    }
+
+    // 高德：矢量 style=7，卫星 style=6，XYZ 与 flutter_map 一致
+    final amapBaseUrl = isSatellite
+        ? 'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}'
+        : 'http://wprd0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7';
+    return [
+      TileLayer(
+        urlTemplate: amapBaseUrl,
+        subdomains: const ['1', '2', '3', '4'],
+        userAgentPackageName: userAgent,
+        tileProvider: cache,
+      ),
+    ];
   }
 
   @override
@@ -190,22 +233,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               onTap: (tapPosition, point) => _handleMapTap(point),
             ),
             children: [
-              TileLayer(
-                urlTemplate: isSatellite 
-                  ? 'https://t{s}.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey'
-                  : 'https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey',
-                subdomains: const ['0', '1', '2', '3', '4', '5', '6', '7'],
-                userAgentPackageName: 'cn.lindenliu.rivtrek',
-                tileProvider: CachedTileProvider(store: _cacheStore!),
-              ),
-              TileLayer(
-                urlTemplate: isSatellite
-                  ? 'https://t{s}.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey'
-                  : 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=$tiandituKey',
-                subdomains: const ['0', '1', '2', '3', '4', '5', '6', '7'],
-                userAgentPackageName: 'cn.lindenliu.rivtrek',
-                tileProvider: CachedTileProvider(store: _cacheStore!),
-              ),
+              ..._buildTileLayers(),
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
             ],
@@ -214,17 +242,49 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           Positioned(
             right: 20,
             bottom: 150,
-            child: FloatingActionButton(
-              mini: true,
-              backgroundColor: Colors.white.withOpacity(0.8),
-              onPressed: () => setState(() => isSatellite = !isSatellite),
-              child: Icon(isSatellite ? Icons.map : Icons.satellite_alt, color: Colors.black87),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildMapProviderChip(),
+                const SizedBox(height: 8),
+                FloatingActionButton(
+                  mini: true,
+                  backgroundColor: Colors.white.withOpacity(0.8),
+                  onPressed: () => setState(() => isSatellite = !isSatellite),
+                  child: Icon(isSatellite ? Icons.map : Icons.satellite_alt, color: Colors.black87),
+                ),
+              ],
             ),
           ),
 
           _buildHeader(challenge.activeRiver?.name ?? "徒步地图"),
           if (selectedSubSectionIdx != -1) _buildSectionInfo(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMapProviderChip() {
+    return Material(
+      color: Colors.white.withOpacity(0.8),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: () => setState(() {
+          mapProvider = mapProvider == MapProvider.tianditu ? MapProvider.amap : MapProvider.tianditu;
+        }),
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(mapProvider == MapProvider.tianditu ? Icons.public : Icons.map, size: 18, color: Colors.black87),
+              const SizedBox(width: 6),
+              Text(mapProvider == MapProvider.tianditu ? '天地图' : '高德', style: const TextStyle(fontSize: 13, color: Colors.black87)),
+            ],
+          ),
+        ),
       ),
     );
   }
