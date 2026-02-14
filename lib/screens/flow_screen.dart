@@ -53,6 +53,10 @@ class _FlowScreenState extends State<FlowScreen>
   String? _milestoneMedalPath;
   late AnimationController _milestoneController;
 
+  // 当前里程对应 POI（按行进距离查最近点，约 0.5 km 刷新一次）
+  RiverPoi? _currentPoi;
+  double? _lastPoiRequestKm;
+
   late AnimationController _timeController;
   late AnimationController _pulseController;
   Offset _pulseCenter = Offset.zero;
@@ -97,6 +101,8 @@ class _FlowScreenState extends State<FlowScreen>
       context.read<FlowController>().init();
       context.read<FlowController>().startStepListening();
       _refreshWeather();
+      // 进入涉川首页即触发一次 POI 查询，不依赖定时器
+      _updateFrame();
     });
     
     _loadShaders();
@@ -125,6 +131,18 @@ class _FlowScreenState extends State<FlowScreen>
 
     if (challenge.activeRiver != null && _loadedPointsRiverId != challenge.activeRiver!.id) {
       _loadRealRiverPath(challenge.activeRiver!.pointsJsonPath, challenge.activeRiver!.id);
+      _lastPoiRequestKm = null;
+      _currentPoi = null;
+    }
+
+    // 按当前行进距离查最近 POI，约 0.5 km 更新一次
+    final river = challenge.activeRiver;
+    final km = challenge.currentDistance;
+    if (river != null && (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5)) {
+      _lastPoiRequestKm = km;
+      DatabaseService.instance.getNearestPoi(river.id, km).then((p) {
+        if (mounted) setState(() => _currentPoi = p);
+      });
     }
 
     _updateLanterns(challenge.currentSubSection);
@@ -518,6 +536,8 @@ class _FlowScreenState extends State<FlowScreen>
                 SafeArea(child: Column(children: [
                   const SizedBox(height: 25),
                   _buildHeader(sub, controller),
+                  const SizedBox(height: 20),
+                  _buildPoiCard(sub),
                   const Spacer(flex: 3),
                   _buildStepsAndProgress(controller, challenge, _visualDistance),
                   const Spacer(flex: 4),
@@ -624,6 +644,109 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
+  Widget _buildPoiCard(SubSection? sub) {
+    final poi = _currentPoi;
+    final themeColor = sub?.color ?? const Color(0xFF2196F3);
+    final isLight = themeColor.computeLuminance() > 0.4;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(isLight ? 0.78 : 0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: themeColor.withOpacity(0.18),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: themeColor.withOpacity(0.06),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: themeColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.place_rounded,
+                    size: 22,
+                    color: themeColor.withOpacity(0.85),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "此刻行至",
+                        style: TextStyle(
+                          color: const Color(0xFF222222).withOpacity(0.45),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 2.2,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (poi != null) ...[
+                        Text(
+                          poi.shortLabel.isNotEmpty ? poi.shortLabel : (poi.formattedAddress ?? "江畔"),
+                          style: const TextStyle(
+                            color: Color(0xFF222222),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 0.5,
+                            height: 1.35,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (poi.primaryPoi?.distance != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            "距此 ${(poi.primaryPoi!.distance! * 1000).round()} m",
+                            style: TextStyle(
+                              color: const Color(0xFF555555).withOpacity(0.7),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ],
+                      ] else
+                        Text(
+                          "江心云水间",
+                          style: TextStyle(
+                            color: const Color(0xFF222222).withOpacity(0.35),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w300,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ),
+    );
+  }
+
   Widget _buildHeader(SubSection? sub, FlowController controller) {
     final weatherType = _mapWeatherCode(controller.wmoCode);
     final medalIcon = sub?.medalIcon;
@@ -664,9 +787,20 @@ class _FlowScreenState extends State<FlowScreen>
 
   Widget _buildStepsAndProgress(FlowController controller, ChallengeProvider challenge, double visualDistance) {
     String steps = controller.displaySteps.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    final poi = _currentPoi;
+    final locationLine = poi != null && poi.shortLabel.isNotEmpty
+        ? poi.shortLabel
+        : (poi?.formattedAddress?.isNotEmpty == true ? poi!.formattedAddress! : null);
     return Column(children: [
       Text(steps, style: TextStyle(color: const Color(0xFF222222), fontSize: steps.length > 7 ? 82 : 105, fontWeight: FontWeight.w100, letterSpacing: -2)),
       Text("已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, letterSpacing: 1.2)),
+      if (locationLine != null) ...[
+        const SizedBox(height: 10),
+        Text("此刻 · $locationLine", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w300, letterSpacing: 0.8)),
+      ] else ...[
+        const SizedBox(height: 10),
+        Text("此刻 · 江心云水间", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.4), fontSize: 14, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic)),
+      ],
     ]);
   }
 }

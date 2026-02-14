@@ -144,7 +144,13 @@ def _reverse_geocode_amap(lat: float, lon: float, key: str) -> dict | None:
         if "CERTIFICATE_VERIFY_FAILED" in msg or "SSL" in msg:
             print("  若遇 SSL 证书错误，可执行: pip install certifi")
         return None
-    if data.get("status") != "1" or "regeocode" not in data:
+    status = data.get("status")
+    info = data.get("info", "")
+    if status != "1":
+        print(f"  [WARN] 高德返回异常 status={status!r} info={info!r} → 请检查 Key 是否有效、是否超出日配额、控制台是否勾选「Web 服务」")
+        return None
+    if "regeocode" not in data or not data["regeocode"]:
+        print(f"  [WARN] 高德无 regeocode status={status!r} info={info!r}")
         return None
     r = data["regeocode"]
     out = {"formatted_address": r.get("formatted_address")}
@@ -228,7 +234,7 @@ def main():
 
     points_path = args.points or resolve_config_path(river_cfg["points_json_path"])
     master_path = args.master or resolve_config_path(river_cfg["master_json_path"])
-    out_path = args.out or os.path.join(ROOT, "tools", "out", "river_pois.db")
+    out_path = args.out or os.path.join(ROOT, "tools", "out", "rivtrek_base.db")
     numeric_id = int(river_cfg["numeric_id"])
 
     for p in (points_path, master_path):
@@ -250,6 +256,14 @@ def main():
         to_i = len(full_sampled)
     sampled = full_sampled[from_i:to_i]
     print(f"  高德逆地理  按 {args.step} km 采样共 {len(full_sampled)} 个点；本次第 {from_i}～{to_i - 1} 个，共 {len(sampled)} 次请求")
+
+    if sampled:
+        lat0, lon0, _ = sampled[0]
+        probe = _reverse_geocode_amap(lat0, lon0, args.key)
+        if probe is None:
+            print("  [提示] 首点逆地理返回空，后续请求可能均为空。请检查 Key、配额与「Web 服务」权限。")
+        else:
+            print(f"  首点探路成功: {probe.get('formatted_address') or '(无地址)'}")
 
     river_slug = river_cfg["id"]  # 字符型 id，如 yangtze
     cols = (

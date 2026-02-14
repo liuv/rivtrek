@@ -38,7 +38,7 @@ python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY" --f
 python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY"
 
 # 指定输出 DB、请求间隔等
-python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY" --out tools/out/river_pois.db --delay 0.5
+python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY" --out tools/out/rivtrek_base.db --delay 0.5
 ```
 
 参数说明：
@@ -51,7 +51,7 @@ python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY" --o
 | `--from`   | 采样段起点（含）             | 0 |
 | `--to`     | 采样段终点（含）             | 到末尾 |
 | `--delay`  | 每次请求间隔（秒）           | 0.3 |
-| `--out`    | 输出 SQLite 文件路径         | tools/out/river_pois.db |
+| `--out`    | 输出 SQLite 文件路径         | tools/out/rivtrek_base.db |
 | `--points` / `--master` | 可选，覆盖 config 中的 JSON 路径 | 从 config 读 |
 
 **配置来源**：河流 id、数字 id（numeric_id）、points/master JSON 路径均从 **`assets/json/rivers/rivers_config.json`** 读取，与 App 共用同一配置。新增或下线江河只需改该配置文件并保证对应 JSON 存在。
@@ -67,7 +67,7 @@ python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY" --o
 
 按「距起点距离」线性存储：每行一个采样点，主键 (numeric_id, distance_km)。  
 查询时取「距离 path_km 最近」的一条：前后各查一次（≤ path_km 最大 / ≥ path_km 最小），比较 \|d - path_km\| 取更近者，避免只取「≤ 当前里程最大」导致 105 km 点比 80 km 更近却被忽略的问题。  
-若做数据压缩，可只保留「POI/地址发生变化」的里程点，同一查询逻辑仍然成立（返回该里程所在段的代表点）。运行 **compress_river_pois.py** 对已生成的 DB 做变化点压缩：`python3 tools/compress_river_pois.py [--db tools/out/river_pois.db]`，支持 `--dry-run` 仅查看保留行数。
+若做数据压缩，可只保留「POI/地址发生变化」的里程点，同一查询逻辑仍然成立（返回该里程所在段的代表点）。运行 **compress_river_pois.py** 对已生成的 DB 做变化点压缩：`python3 tools/compress_river_pois.py [--db tools/out/rivtrek_base.db]`，支持 `--dry-run` 仅查看保留行数。
 
 - **缩放因子**：行进距离与路径地理距离可能不一致，App 从各河流 **master JSON**（如 `yangtze_master.json`）的 `correction_coefficient` 自动读取，查库前做 `path_km = accumulated_km * correction_coefficient`，无需在 config 里手配。
 
@@ -82,19 +82,14 @@ CREATE TABLE river_pois (
 -- 查询: 取 distance_km <= path_km 最大一条 与 distance_km >= path_km 最小一条，选 |d - path_km| 更小者
 ```
 
-## 5. 接入 App（用脚本生成的数据，避免产品里再请求 POI）
+## 5. 接入 App（POI 独立库，不与主库合并）
 
-- App 里已有 **river_pois** 表（主库）和 **getNearestPoi(riverId, distanceKm)** 查询。
-- 一次性采集到的数据需要进主库，有两种常见方式：
+- **数据分离**：基础数据（POI 及今后其他静态数据）使用独立库 **`rivtrek_base.db`**；程序主库 `rivtrek_v1.db` 只存动态数据（步数、天气、事件）。不合并、解耦。
+- **getNearestPoi** 是**本地 SQLite 查询**（查基础库），不是网络请求。
 
-**方式 A：把脚本输出的 DB 打包进 App，首次启动时导入主库**
+**接入步骤：**
 
-1. 脚本输出到 `tools/out/river_pois.db`
-2. 把 `river_pois.db` 放到 `assets/db/`（需在 `pubspec.yaml` 的 `assets` 里声明）
-3. 在 App 首次启动或首次打开某河流时：把该 asset 复制到临时路径，打开临时 DB，把 `river_pois` 表里所有行插入到主库的 `river_pois` 表，然后删临时文件。之后一律用 **getNearestPoi** 查主库即可，不再请求天地图。
-
-**方式 B：本地/CI 预生成主库，再打包进 App**
-
-在本地或 CI 用脚本生成 `river_pois.db` 后，用 SQLite 或脚本把其中的 `river_pois` 表合并进 App 使用的主库（如 `rivtrek_v1.db`），然后把带 POI 的主库放进 assets，App 首次启动时用该库覆盖或初始化。这样 App 无需再做“从 asset 导入 river_pois”的逻辑，直接查主库即可。
-
-任选其一后，产品里就只做：根据当前行进距离查 **getNearestPoi(riverId, distanceKm)**，用返回的 `shortLabel`（或 `formatted_address`）做「行进了 X km，正在 XX 地区」等展示，无需再向天地图发 POI 请求。
+1. 运行 POI 脚本，输出到 `tools/out/rivtrek_base.db`（可多河多次跑，或合并成单文件；可选再跑 compress 做变化点压缩）
+2. **将 `tools/out/` 下生成的 `rivtrek_base.db` 拷贝到 `assets/db/`**（已在 `pubspec.yaml` 声明）
+3. App 首次需要基础数据时：若本地无该文件则从 asset 复制到应用目录并打开，之后直接查该库
+4. 产品里根据当前行进距离调 **getNearestPoi(riverId, accumulatedKm)**，用返回的 `shortLabel` 做「此刻行至 XXX」等展示，无需请求天地图。

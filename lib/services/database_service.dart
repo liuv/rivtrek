@@ -1,28 +1,37 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/daily_stats.dart';
 import '../repositories/river_repository.dart';
 
+/// 主库：仅存动态数据（步数、天气、事件）。基础数据（POI 等）使用独立库 [baseDatabase]（rivtrek_base.db），不合并、解耦。
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
   static Database? _database;
+  static Database? _baseDatabase;
+
+  /// 基础数据库文件名，可存 POI、今后其他静态/配置数据等
+  static const String _baseDbFileName = 'rivtrek_base.db';
+  static const String _baseDbAssetPath = 'assets/db/rivtrek_base.db';
 
   DatabaseService._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('rivtrek_v1.db');
+    _database = await _initMainDB('rivtrek_v1.db');
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  Future<Database> _initMainDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
     return await openDatabase(
       path,
-      version: 5,
-      onCreate: _createDB,
+      version: 6,
+      onCreate: _createMainDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute('ALTER TABLE daily_weather ADD COLUMN aqi TEXT DEFAULT "--"');
@@ -30,50 +39,14 @@ class DatabaseService {
         if (oldVersion < 3) {
           await db.execute('ALTER TABLE daily_activities ADD COLUMN river_id TEXT DEFAULT "yangtze"');
         }
-        if (oldVersion < 4) {
-          await db.execute('''
-            CREATE TABLE river_pois (
-              river_id TEXT NOT NULL,
-              distance_km REAL NOT NULL,
-              latitude REAL NOT NULL,
-              longitude REAL NOT NULL,
-              formatted_address TEXT,
-              admin_area TEXT,
-              locality TEXT,
-              name TEXT,
-              PRIMARY KEY (river_id, distance_km)
-            )
-          ''');
-        }
-        if (oldVersion < 5) {
+        if (oldVersion < 6) {
           await db.execute('DROP TABLE IF EXISTS river_pois');
-          await db.execute('''
-            CREATE TABLE river_pois (
-              numeric_id INTEGER NOT NULL,
-              river_id TEXT NOT NULL,
-              distance_km REAL NOT NULL,
-              latitude REAL NOT NULL,
-              longitude REAL NOT NULL,
-              formatted_address TEXT,
-              country TEXT,
-              province TEXT,
-              city TEXT,
-              citycode TEXT,
-              district TEXT,
-              adcode TEXT,
-              township TEXT,
-              towncode TEXT,
-              pois_json TEXT,
-              PRIMARY KEY (numeric_id, distance_km)
-            )
-          ''');
         }
       },
     );
   }
 
-  Future _createDB(Database db, int version) async {
-    // 1. 每日步数统计 (高频写)
+  Future _createMainDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE daily_activities (
         date TEXT,
@@ -84,8 +57,6 @@ class DatabaseService {
         PRIMARY KEY (date, river_id)
       )
     ''');
-
-    // 2. 每日天气快照 (每天更新 1-3 次，记录最新)
     await db.execute('''
       CREATE TABLE daily_weather (
         date TEXT PRIMARY KEY,
@@ -100,8 +71,6 @@ class DatabaseService {
         aqi TEXT
       )
     ''');
-
-    // 3. 河流事件记录 (拾遗、祭祀等行为流)
     await db.execute('''
       CREATE TABLE river_events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -116,28 +85,25 @@ class DatabaseService {
         extra_data TEXT
       )
     ''');
+  }
 
-    // 4. 河流里程-POI 表（numeric_id 主键便于索引，river_id 保留字符型便于可读）
-    await db.execute('''
-      CREATE TABLE river_pois (
-        numeric_id INTEGER NOT NULL,
-        river_id TEXT NOT NULL,
-        distance_km REAL NOT NULL,
-        latitude REAL NOT NULL,
-        longitude REAL NOT NULL,
-        formatted_address TEXT,
-        country TEXT,
-        province TEXT,
-        city TEXT,
-        citycode TEXT,
-        district TEXT,
-        adcode TEXT,
-        township TEXT,
-        towncode TEXT,
-        pois_json TEXT,
-        PRIMARY KEY (numeric_id, distance_km)
-      )
-    ''');
+  /// 基础数据库（POI 等静态数据，今后可扩展）。先读本地文件，无则从 asset 复制后打开。
+  Future<Database?> get baseDatabase async => _getBaseDatabase();
+
+  Future<Database?> _getBaseDatabase() async {
+    if (_baseDatabase != null) return _baseDatabase;
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, _baseDbFileName);
+    try {
+      if (!await File(path).exists()) {
+        final byteData = await rootBundle.load(_baseDbAssetPath);
+        await File(path).writeAsBytes(byteData.buffer.asUint8List());
+      }
+      _baseDatabase = await openDatabase(path);
+      return _baseDatabase;
+    } catch (_) {
+      return null;
+    }
   }
 
   // --- 写入方法 ---
@@ -159,8 +125,10 @@ class DatabaseService {
     return await db.insert('river_events', event.toMap());
   }
 
+  /// 写入基础数据库的 river_pois 表（脚本生成后一般不需在 App 内写入，仅当有运行时导入需求时使用）。
   Future<void> insertRiverPois(List<RiverPoi> pois) async {
-    final db = await instance.database;
+    final db = await instance.baseDatabase;
+    if (db == null) return;
     final batch = db.batch();
     for (final p in pois) {
       batch.insert('river_pois', p.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
@@ -235,14 +203,15 @@ class DatabaseService {
         .toList();
   }
 
-  /// 按「路径距离」查最近 POI：先按河流缩放因子把行进距离转为 path_km，再取 |distance_km - path_km| 最小的那条（前后各查一次，取更近者），支持线性存储与按变化点压缩
+  /// 按「路径距离」查最近 POI（本地 POI 库查询，非网络请求）。path_km = accumulated_km * correctionCoefficient，前后各查一次取更近者。
   Future<RiverPoi?> getNearestPoi(String riverId, double accumulatedKm) async {
     await RiverRepository.instance.ensureLoaded();
     final river = RiverRepository.instance.getRiverById(riverId);
     final numericId = RiverRepository.instance.getRiverSlugToNumericId()[riverId];
     if (numericId == null) return null;
     final pathKm = accumulatedKm * (river?.correctionCoefficient ?? 1.0);
-    final db = await instance.database;
+    final db = await instance.baseDatabase;
+    if (db == null) return null;
     final before = await db.query(
       'river_pois',
       where: 'numeric_id = ? AND distance_km <= ?',

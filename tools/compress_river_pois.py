@@ -5,8 +5,8 @@
 
 用法:
   python3 compress_river_pois.py
-  python3 compress_river_pois.py --db tools/out/river_pois.db
-  python3 compress_river_pois.py --db tools/out/river_pois.db --dry-run
+  python3 compress_river_pois.py --db tools/out/rivtrek_base.db
+  python3 compress_river_pois.py --db tools/out/rivtrek_base.db --dry-run
 """
 
 import argparse
@@ -20,7 +20,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="按变化点压缩 river_pois，减少行数")
     parser.add_argument(
         "--db",
-        default=os.path.join(ROOT, "tools", "out", "river_pois.db"),
+        default=os.path.join(ROOT, "tools", "out", "rivtrek_base.db"),
         help="SQLite 文件路径",
     )
     parser.add_argument("--dry-run", action="store_true", help="只打印将保留的行数，不写回")

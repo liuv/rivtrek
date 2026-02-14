@@ -1,0 +1,1 @@
+# 将 tools/out 下生成的基础库 rivtrek_base.db 拷贝到此目录，App 会从 asset 复制到本地后查询（基础数据独立于主库）
