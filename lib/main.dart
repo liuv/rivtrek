@@ -12,6 +12,7 @@ import 'screens/map_screen.dart';
 import 'screens/me_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'controllers/flow_controller.dart';
+import 'repositories/river_repository.dart';
 
 import 'services/step_sync_service.dart';
 
@@ -52,6 +53,9 @@ void main() async {
       networkType: NetworkType.connected,
     ),
   );
+
+  // 江河挑战列表从配置文件加载，需在 UI 使用前完成
+  await RiverRepository.instance.ensureLoaded();
 
   runApp(
     MultiProvider(

@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/daily_stats.dart';
+import '../repositories/river_repository.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
@@ -20,7 +21,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3, 
+      version: 5,
       onCreate: _createDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -28,6 +29,44 @@ class DatabaseService {
         }
         if (oldVersion < 3) {
           await db.execute('ALTER TABLE daily_activities ADD COLUMN river_id TEXT DEFAULT "yangtze"');
+        }
+        if (oldVersion < 4) {
+          await db.execute('''
+            CREATE TABLE river_pois (
+              river_id TEXT NOT NULL,
+              distance_km REAL NOT NULL,
+              latitude REAL NOT NULL,
+              longitude REAL NOT NULL,
+              formatted_address TEXT,
+              admin_area TEXT,
+              locality TEXT,
+              name TEXT,
+              PRIMARY KEY (river_id, distance_km)
+            )
+          ''');
+        }
+        if (oldVersion < 5) {
+          await db.execute('DROP TABLE IF EXISTS river_pois');
+          await db.execute('''
+            CREATE TABLE river_pois (
+              numeric_id INTEGER NOT NULL,
+              river_id TEXT NOT NULL,
+              distance_km REAL NOT NULL,
+              latitude REAL NOT NULL,
+              longitude REAL NOT NULL,
+              formatted_address TEXT,
+              country TEXT,
+              province TEXT,
+              city TEXT,
+              citycode TEXT,
+              district TEXT,
+              adcode TEXT,
+              township TEXT,
+              towncode TEXT,
+              pois_json TEXT,
+              PRIMARY KEY (numeric_id, distance_km)
+            )
+          ''');
         }
       },
     );
@@ -77,6 +116,28 @@ class DatabaseService {
         extra_data TEXT
       )
     ''');
+
+    // 4. 河流里程-POI 表（numeric_id 主键便于索引，river_id 保留字符型便于可读）
+    await db.execute('''
+      CREATE TABLE river_pois (
+        numeric_id INTEGER NOT NULL,
+        river_id TEXT NOT NULL,
+        distance_km REAL NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        formatted_address TEXT,
+        country TEXT,
+        province TEXT,
+        city TEXT,
+        citycode TEXT,
+        district TEXT,
+        adcode TEXT,
+        township TEXT,
+        towncode TEXT,
+        pois_json TEXT,
+        PRIMARY KEY (numeric_id, distance_km)
+      )
+    ''');
   }
 
   // --- 写入方法 ---
@@ -96,6 +157,15 @@ class DatabaseService {
   Future<int> recordEvent(RiverEvent event) async {
     final db = await instance.database;
     return await db.insert('river_events', event.toMap());
+  }
+
+  Future<void> insertRiverPois(List<RiverPoi> pois) async {
+    final db = await instance.database;
+    final batch = db.batch();
+    for (final p in pois) {
+      batch.insert('river_pois', p.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    await batch.commit(noResult: true);
   }
 
   // --- 查询方法 ---
@@ -163,5 +233,35 @@ class DatabaseService {
               extraData: json['extra_data'] as String? ?? "{}",
             ))
         .toList();
+  }
+
+  /// 按「路径距离」查最近 POI：先按河流缩放因子把行进距离转为 path_km，再取 |distance_km - path_km| 最小的那条（前后各查一次，取更近者），支持线性存储与按变化点压缩
+  Future<RiverPoi?> getNearestPoi(String riverId, double accumulatedKm) async {
+    await RiverRepository.instance.ensureLoaded();
+    final river = RiverRepository.instance.getRiverById(riverId);
+    final numericId = RiverRepository.instance.getRiverSlugToNumericId()[riverId];
+    if (numericId == null) return null;
+    final pathKm = accumulatedKm * (river?.correctionCoefficient ?? 1.0);
+    final db = await instance.database;
+    final before = await db.query(
+      'river_pois',
+      where: 'numeric_id = ? AND distance_km <= ?',
+      whereArgs: [numericId, pathKm],
+      orderBy: 'distance_km DESC',
+      limit: 1,
+    );
+    final after = await db.query(
+      'river_pois',
+      where: 'numeric_id = ? AND distance_km >= ?',
+      whereArgs: [numericId, pathKm],
+      orderBy: 'distance_km ASC',
+      limit: 1,
+    );
+    RiverPoi? pick(Map<String, dynamic> row) => RiverPoi.fromMap(row);
+    if (before.isEmpty) return after.isEmpty ? null : pick(after.first);
+    if (after.isEmpty) return pick(before.first);
+    final dBefore = (before.first['distance_km'] as num).toDouble();
+    final dAfter = (after.first['distance_km'] as num).toDouble();
+    return pick((pathKm - dBefore) <= (dAfter - pathKm) ? before.first : after.first);
   }
 }

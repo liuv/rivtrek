@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 /// 遵循 WMO (World Meteorological Organization) 标准的天气分类
@@ -202,4 +204,151 @@ class RiverEvent {
     'distance_at_km': distanceAtKm,
     'extra_data': extraData,
   };
+}
+
+/// 高德逆地理返回的单个 POI 项（pois_json 数组中元素）
+class PoiItem {
+  final String? id;
+  final String? name;
+  final String? type;
+  final String? tel;
+  final double? distance;
+  final String? direction;
+  final String? address;
+  final String? location;
+  final String? businessarea;
+
+  const PoiItem({
+    this.id,
+    this.name,
+    this.type,
+    this.tel,
+    this.distance,
+    this.direction,
+    this.address,
+    this.location,
+    this.businessarea,
+  });
+
+  factory PoiItem.fromJson(Map<String, dynamic> json) => PoiItem(
+        id: json['id'] as String?,
+        name: json['name'] as String?,
+        type: json['type'] as String?,
+        tel: json['tel'] as String?,
+        distance: (json['distance'] as num?)?.toDouble(),
+        direction: json['direction'] as String?,
+        address: json['address'] as String?,
+        location: json['location'] as String?,
+        businessarea: json['businessarea'] as String?,
+      );
+}
+
+/// 河流里程对应 POI，高德逆地理结构直接映射（一列一字段，便于检索）；pois_json 存完整兴趣点列表
+class RiverPoi {
+  final int? numericId;
+  final String riverId;
+  final double distanceKm;
+  final double latitude;
+  final double longitude;
+  final String? formattedAddress;
+  final String? country;
+  final String? province;
+  final String? city;
+  final String? citycode;
+  final String? district;
+  final String? adcode;
+  final String? township;
+  final String? towncode;
+  final String? poisJson;
+
+  RiverPoi({
+    this.numericId,
+    required this.riverId,
+    required this.distanceKm,
+    required this.latitude,
+    required this.longitude,
+    this.formattedAddress,
+    this.country,
+    this.province,
+    this.city,
+    this.citycode,
+    this.district,
+    this.adcode,
+    this.township,
+    this.towncode,
+    this.poisJson,
+  });
+
+  /// 解析 pois_json 得到的兴趣点列表，供虚拟徒步多兴趣点展示；空或解析失败返回空列表
+  List<PoiItem> get poisList {
+    final raw = poisJson;
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final list = (jsonDecode(raw) as List<dynamic>?) ?? [];
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map((e) => PoiItem.fromJson(e))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Map<String, dynamic> toMap() {
+    final m = <String, dynamic>{
+      'river_id': riverId,
+      'distance_km': distanceKm,
+      'latitude': latitude,
+        'longitude': longitude,
+        'formatted_address': formattedAddress,
+        'country': country,
+        'province': province,
+        'city': city,
+        'citycode': citycode,
+        'district': district,
+        'adcode': adcode,
+        'township': township,
+        'towncode': towncode,
+        'pois_json': poisJson,
+    };
+    if (numericId != null) m['numeric_id'] = numericId;
+    return m;
+  }
+
+  factory RiverPoi.fromMap(Map<String, dynamic> map) => RiverPoi(
+        numericId: map['numeric_id'] as int?,
+        riverId: (map['river_id'] ?? 'yangtze') as String,
+        distanceKm: (map['distance_km'] as num).toDouble(),
+        latitude: (map['latitude'] as num).toDouble(),
+        longitude: (map['longitude'] as num).toDouble(),
+        formattedAddress: map['formatted_address'] as String?,
+        country: map['country'] as String?,
+        province: map['province'] as String?,
+        city: map['city'] as String?,
+        citycode: map['citycode'] as String?,
+        district: map['district'] as String?,
+        adcode: map['adcode'] as String?,
+        township: map['township'] as String?,
+        towncode: map['towncode'] as String?,
+        poisJson: map['pois_json'] as String?,
+      );
+
+  /// 从 poisList 取距离最近的一个（用于简短标题）；无 POI 则只返回地区
+  PoiItem? get primaryPoi {
+    final list = poisList;
+    if (list.isEmpty) return null;
+    final withDist = list.where((p) => p.distance != null).toList();
+    if (withDist.isEmpty) return list.first;
+    withDist.sort((a, b) => (a.distance!.compareTo(b.distance!)));
+    return withDist.first;
+  }
+
+  /// 简短展示用，如「青海省 玉树市」「四川省 宜宾市 · 某某景区」；主 POI 名从 poisList 解析
+  String get shortLabel {
+    final parts = [province, city, district, township].whereType<String>().where((s) => s.isNotEmpty).toList();
+    final region = parts.isEmpty ? (formattedAddress ?? '') : parts.join(' ');
+    final name = primaryPoi?.name;
+    if (name != null && name.isNotEmpty) return '$region · $name';
+    return region;
+  }
 }

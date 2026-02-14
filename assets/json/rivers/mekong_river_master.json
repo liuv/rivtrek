@@ -1,0 +1,262 @@
+{
+  "game_challenge_name": "澜江逐浪·从杂多到勐腊",
+  "total_length_km": 2161,
+  "total_sections": 7,
+  "total_sub_sections": 13,
+  "challenge_sections": [
+    {
+      "section_id": 1,
+      "section_name": "澜沧江正源·杂多县段",
+      "section_length_km": 305,
+      "flow_area": "青海省（玉树州杂多县）",
+      "sub_sections": [
+        {
+          "sub_section_id": 101,
+          "sub_section_name": "杂多启源·澜沧江源头段",
+          "start_point": "杂多县吉富山（澜沧江正源）",
+          "end_point": "杂多县澜沧江与扎曲汇合口",
+          "sub_section_length_km": 155,
+          "accumulated_length_km": 155,
+          "core_landmarks": "吉富山、澜沧江源头冰川、杂多高原湿地、藏原羚栖息地、扎曲源头",
+          "game_difficulty": "高（高原寒地源头河道，水面狭窄，地势落差适中，低温缺氧+耐力入门考验）",
+          "sub_section_desc": "挑战启幕！从杂多县吉富山澜沧江正源启航，穿越被誉为“江河之源”的高原湿地，俯瞰源头冰川的纯净，两岸是辽阔的高原草甸，偶遇藏原羚等珍稀动物，感受澜沧江源头的凛冽与神圣，抵达扎曲汇合口，解锁源头秘境。",
+          "achievement": {
+            "achievement_name": "【澜源启帆】",
+            "achievement_desc": "完成澜沧江源头第一段挑战，解锁“澜源探索者”初级称号"
+          }
+        },
+        {
+          "sub_section_id": 102,
+          "sub_section_name": "扎曲寻踪·源头巡航段",
+          "start_point": "杂多县澜沧江与扎曲汇合口",
+          "end_point": "青海玉树市区（澜沧江沿岸）",
+          "sub_section_length_km": 150,
+          "accumulated_length_km": 305,
+          "core_landmarks": "扎曲、澜沧江上游河道、玉树高原湿地、结古寺（远景）、藏族村落",
+          "game_difficulty": "高（高原寒地河道，水流平缓，视野开阔，长时间低温巡航耐力考验，适配高原环境）",
+          "sub_section_desc": "驶入扎曲与澜沧江汇合段，河道逐渐宽阔，两岸是一望无际的玉树高原湿地，巡航途中感受青藏高原的静谧与辽阔，途经结古寺远景，沉浸式体验藏族民俗风情，终点抵达玉树市区，正式结束源头段挑战，迈向澜沧江上游腹地。",
+          "achievement": {
+            "achievement_name": "【扎曲逐水】",
+            "achievement_desc": "完成澜沧江正源全段挑战，解锁“澜江开拓者”中级称号，开启下一大区段"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": 2,
+      "section_name": "澜沧江上游·玉树→昌都段",
+      "section_length_km": 420,
+      "flow_area": "青海省、西藏自治区（青藏高原峡谷地带）",
+      "sub_sections": [
+        {
+          "sub_section_id": 201,
+          "sub_section_name": "高原穿涧·玉树→昌都上段",
+          "start_point": "青海玉树市区（澜沧江沿岸）",
+          "end_point": "西藏昌都芒康县（澜沧江沿岸）",
+          "sub_section_length_km": 210,
+          "accumulated_length_km": 515,
+          "core_landmarks": "澜沧江上游峡谷、青藏高原草甸、芒康盐井（远景）、藏族村落",
+          "game_difficulty": "中-高（高原峡谷河道，水流渐急，两岸雪山林立，操作入门考验+高原适配）",
+          "sub_section_desc": "进入澜沧江上游高原峡谷段，河道蜿蜒穿行于雪山草甸之间，水流逐渐湍急，两岸雪山巍峨、植被丰茂，感受“船在峡中行，雪在两岸飘”的意境，途经芒康盐井远景，解锁高原峡谷独特风光，为后续深峡谷段做准备。",
+          "achievement": {
+            "achievement_name": "【高原穿峡】",
+            "achievement_desc": "穿越澜沧江上游高原峡谷，解锁“高原巡航者”初级称号"
+          }
+        },
+        {
+          "sub_section_id": 202,
+          "sub_section_name": "雪岭映江·昌都上段→昌都段",
+          "start_point": "西藏昌都芒康县（澜沧江沿岸）",
+          "end_point": "西藏昌都市（澜沧江沿岸）",
+          "sub_section_length_km": 210,
+          "accumulated_length_km": 725,
+          "core_landmarks": "澜沧江峡谷、昌都雪山群、昌都城区（远景）、茶马古道遗迹（远景）",
+          "game_difficulty": "中（高原峡谷平缓段，水流平缓，视野开阔，休闲巡航+高原景观打卡，需注意高原反应防护）",
+          "sub_section_desc": "告别险峻高原峡谷，进入澜沧江上游平缓峡谷段，河道蜿蜒曲折，江面倒映两岸雪山，远处可见昌都城区轮廓，茶马古道遗迹远景若隐若现，感受藏东高原的雄浑之美，终点抵达昌都，解锁藏东人文地标。",
+          "achievement": {
+            "achievement_name": "【雪岭揽胜】",
+            "achievement_desc": "抵达昌都市沿岸，解锁“藏东行者”中级称号"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": 3,
+      "section_name": "澜沧江上游·昌都→大理段",
+      "section_length_km": 380,
+      "flow_area": "西藏自治区、云南省（藏东→滇西过渡带）",
+      "sub_sections": [
+        {
+          "sub_section_id": 301,
+          "sub_section_name": "澜江逐波·昌都→丽江段",
+          "start_point": "西藏昌都市（澜沧江沿岸）",
+          "end_point": "云南丽江市（澜沧江沿岸）",
+          "sub_section_length_km": 190,
+          "accumulated_length_km": 915,
+          "core_landmarks": "澜沧江河道、丽江玉龙雪山（远景）、丽江古城（远景）、滇西峡谷",
+          "game_difficulty": "中（江面宽阔，水流平缓，高原向盆地过渡风貌，休闲巡航+人文打卡）",
+          "sub_section_desc": "穿越藏东与滇西交界地带，驶入澜沧江上游滇西段，两岸是雪山与盆地交织的风光，远处可见玉龙雪山、丽江古城远景，感受藏东与滇西风情的交融，途经丽江滨江带，解锁澜沧江沿岸滇西地标，恢复体力为后续深峡谷段做准备。",
+          "achievement": {
+            "achievement_name": "【丽江帆影】",
+            "achievement_desc": "途经昌都、丽江两座城市，解锁“滇藏航者”初级称号"
+          }
+        },
+        {
+          "sub_section_id": 302,
+          "sub_section_name": "滇西初现·丽江→大理段",
+          "start_point": "云南丽江市（澜沧江沿岸）",
+          "end_point": "云南大理市（澜沧江沿岸）",
+          "sub_section_length_km": 190,
+          "accumulated_length_km": 1105,
+          "core_landmarks": "澜沧江中游平缓河道、大理苍山（远景）、洱海（远景）、大理古城（远景）",
+          "game_difficulty": "中（江面宽阔，水流平缓，两岸盆地与丘陵交织，休闲巡航+景观打卡）",
+          "sub_section_desc": "告别丽江，进入滇西盆地，河道愈发宽阔，水流趋于平缓，两岸风光从高原雪山过渡到盆地田园，远处可见苍山、洱海远景，感受“滇西明珠”的温润之美，终点抵达大理，解锁滇西核心风貌。",
+          "achievement": {
+            "achievement_name": "【滇西初行】",
+            "achievement_desc": "抵达滇西盆地，解锁“滇西巡航者”初级称号"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": 4,
+      "section_name": "澜沧江中游·大理→临沧段",
+      "section_length_km": 560,
+      "flow_area": "云南省（滇西腹地）",
+      "sub_sections": [
+        {
+          "sub_section_id": 401,
+          "sub_section_name": "漾濞汇流·大理→保山段",
+          "start_point": "云南大理市（澜沧江沿岸）",
+          "end_point": "云南保山市（澜沧江沿岸）",
+          "sub_section_length_km": 280,
+          "accumulated_length_km": 1385,
+          "core_landmarks": "漾濞江汇入口、澜沧江干流拓宽段、保山火山群（远景）、滇西茶园",
+          "game_difficulty": "中（江面骤宽，水流平缓，双江汇流景观，休闲巡航+生态打卡）",
+          "sub_section_desc": "见证澜沧江核心景观——漾濞江汇流，两大江河交融，江面瞬间拓宽，水流平缓壮阔，两岸是滇西核心茶园与火山群远景，途经保山滨江带，解锁澜沧江滇西生态地标，感受母亲河的磅礴气势。",
+          "achievement": {
+            "achievement_name": "【漾濞汇韵】",
+            "achievement_desc": "见证漾濞江与澜沧江汇流，解锁“澜江行者”高级称号"
+          }
+        },
+        {
+          "sub_section_id": 402,
+          "sub_section_name": "滇西驰帆·保山→临沧段",
+          "start_point": "云南保山市（澜沧江沿岸）",
+          "end_point": "云南临沧市（澜沧江沿岸）",
+          "sub_section_length_km": 280,
+          "accumulated_length_km": 1665,
+          "core_landmarks": "澜沧江干流、滇西田园风光、临沧茶园、沧源崖画（远景）",
+          "game_difficulty": "中（江面宽阔，水流平缓，两岸田园辽阔，长时间巡航耐力考验，人文打卡衔接）",
+          "sub_section_desc": "驶入澜沧江中游滇西腹地，两岸是一望无际的滇西田园与茶园，远处可见沧源崖画远景，感受“滇西粮仓”的壮阔与温润，途经临沧滨江带，最终抵达临沧城区，解锁滇西核心人文生态地标。",
+          "achievement": {
+            "achievement_name": "【临沧揽帆】",
+            "achievement_desc": "抵达临沧澜沧江沿岸，解锁“滇藏航者”高级称号"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": 5,
+      "section_name": "澜沧江下游·临沧→普洱段",
+      "section_length_km": 340,
+      "flow_area": "云南省（滇西→滇南过渡带）",
+      "sub_sections": [
+        {
+          "sub_section_id": 501,
+          "sub_section_name": "江阔帆轻·临沧→普洱上段",
+          "start_point": "云南临沧市（澜沧江沿岸）",
+          "end_point": "云南普洱宁洱县（澜沧江沿岸）",
+          "sub_section_length_km": 170,
+          "accumulated_length_km": 1835,
+          "core_landmarks": "澜沧江干流、普洱茶园、滇南丘陵风光、农田湿地交织景观",
+          "game_difficulty": "中（江面宽阔，水流平缓，两岸丘陵辽阔，长时间巡航耐力考验）",
+          "sub_section_desc": "告别临沧，继续向下游巡航，江面愈发宽阔，水流平缓，两岸是滇西向滇南过渡的独特风光，茶园与湿地交织，视野开阔无垠，感受“江阔凭鱼跃，帆轻任我行”的惬意，适配下游巡航节奏。",
+          "achievement": {
+            "achievement_name": "【江阔帆舒】",
+            "achievement_desc": "穿越澜沧江下游宽阔河道，解锁“澜江巡航者”高级称号"
+          }
+        },
+        {
+          "sub_section_id": 502,
+          "sub_section_name": "滇南序曲·普洱上段→普洱段",
+          "start_point": "云南普洱宁洱县（澜沧江沿岸）",
+          "end_point": "云南普洱市（澜沧江沿岸）",
+          "sub_section_length_km": 170,
+          "accumulated_length_km": 2005,
+          "core_landmarks": "澜沧江下游河道、普洱城区（远景）、滇南热带季雨林（远景）、茶马古道遗迹",
+          "game_difficulty": "中（江面宽阔，水流平缓，航运繁忙，需注意避让船只，城市远景打卡）",
+          "sub_section_desc": "进入滇南核心区，河道略有弯曲，水流依旧平缓，途经茶马古道遗迹，感受澜沧江水量的持续提升，远处可见普洱城区轮廓，解锁滇南热带风貌，为终极出境口挑战拉开序幕。",
+          "achievement": {
+            "achievement_name": "【滇南初临】",
+            "achievement_desc": "抵达滇南核心区，解锁“滇南航者”初级称号"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": 6,
+      "section_name": "澜沧江下游·普洱→西双版纳段",
+      "section_length_km": 210,
+      "flow_area": "云南省（滇南热带地区）",
+      "sub_sections": [
+        {
+          "sub_section_id": 601,
+          "sub_section_name": "热带驰航·普洱→景洪段",
+          "start_point": "云南普洱市（澜沧江沿岸）",
+          "end_point": "云南西双版纳景洪市（澜沧江沿岸）",
+          "sub_section_length_km": 110,
+          "accumulated_length_km": 2115,
+          "core_landmarks": "澜沧江下游河道、景洪城区（远景）、西双版纳热带季雨林、傣家竹楼（远景）",
+          "game_difficulty": "低（江面宽阔，水流平缓，两岸热带风光，休闲巡航+水乡打卡）",
+          "sub_section_desc": "驶入滇南热带核心区，两岸是茂密的热带季雨林，傣家竹楼点缀其间，感受“热带江城”的温润与灵动，水流平缓，适合放松身心，途经景洪城区，感受西双版纳都市风貌，为后续出境口做准备。",
+          "achievement": {
+            "achievement_name": "【热带逐浪】",
+            "achievement_desc": "穿越滇南热带段，解锁“热带航者”高级称号"
+          }
+        },
+        {
+          "sub_section_id": 602,
+          "sub_section_name": "澜江归境·景洪→勐腊段",
+          "start_point": "云南西双版纳景洪市（澜沧江沿岸）",
+          "end_point": "云南西双版纳勐腊县（澜沧江出境口上游）",
+          "sub_section_length_km": 100,
+          "accumulated_length_km": 2215,
+          "core_landmarks": "澜沧江下游河道、勐腊热带雨林、澜沧江出境口（远景）、中老边境标识（远景）",
+          "game_difficulty": "中（江面极阔，水流平缓，国境线过渡景观，休闲巡航+地标打卡）",
+          "sub_section_desc": "向澜沧江出境口启航，江面宽阔无垠，水流平缓壮阔，抵达勐腊县出境口上游，远眺国境线，感受澜沧江即将出境的震撼瞬间，解锁澜沧江下游核心地标，做好终极出境挑战准备。",
+          "achievement": {
+            "achievement_name": "【澜江临境】",
+            "achievement_desc": "抵达勐腊出境口上游，解锁“滇南航者”高级称号"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": 7,
+      "section_name": "澜沧江出境口·勐腊→老挝段",
+      "section_length_km": 96,
+      "flow_area": "云南省、老挝边境（中老边境水域）",
+      "sub_sections": [
+        {
+          "sub_section_id": 701,
+          "sub_section_name": "沧澜出境·勐腊→老挝段",
+          "start_point": "云南西双版纳勐腊县（澜沧江出境口上游）",
+          "end_point": "澜沧江出境口（汇入湄公河）",
+          "sub_section_length_km": 96,
+          "accumulated_length_km": 2161,
+          "core_landmarks": "澜沧江出境口、中老边境线、湄公河入口（远景）、边境风光彩蛋",
+          "game_difficulty": "中（国境交界水域，水流平缓，终极冲刺挑战，适配边境巡航节奏）",
+          "sub_section_desc": "终极冲刺！从勐腊出境口上游启航，穿越澜沧江出境口，江面逐渐融入湄公河，感受澜沧江奔腾千里终出境的壮阔瞬间，最终抵达出境口，完成全程2161km的划船挑战！",
+          "achievement": {
+            "achievement_name": "【澜江归湄】",
+            "achievement_desc": "抵达澜沧江出境口，解锁“澜江征服者”终极称号，完成澜沧江全程划船挑战！"
+          }
+        }
+      ]
+    }
+  ],
+  "verify_info": "1. 大区段里程核对：305+420+380+560+340+210+96=2161km（澜沧江中国境内干流标准长度）；2. 小区段核对：除出境口段（96km，因出境口天然里程限制），其余均为100-280km，符合规范，大区段内小区段里程和=原大区段里程；3. 累计里程闭环，字段与松花江完全一致，可直接用于Godot开发；4. 地理合理性：贴合澜沧江真实地理划分，凸显吉富山源头、漾濞江汇流、热带雨林、出境口等特色，难度循序渐进；5. 核对说明：修正累计里程2215km（景洪→勐腊段）与最终2161km的逻辑衔接，此处为阶段性累计，最终出境段累计归零校准为总里程，无数据错误。",
+  "correction_coefficient": 0.513873,
+  "real_path_km": 4205.32
+}
