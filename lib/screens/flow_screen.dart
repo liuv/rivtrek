@@ -707,6 +707,41 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
+  /// 多个 POI 名称用顿号拼接，前加兴趣点图标
+  List<Widget> _buildPoiNamesRow(List<PoiItem> poisList, Color themeColor) {
+    final names = poisList
+        .map((p) => p.name?.trim())
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .toList();
+    if (names.isEmpty) return [];
+    final label = names.join('、');
+    return [
+      const SizedBox(height: 6),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.explore_rounded, size: 16, color: themeColor.withOpacity(0.8)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: const Color(0xFF555555).withOpacity(0.9),
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.3,
+                height: 1.35,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    ];
+  }
+
   Widget _buildPoiCard(SubSection? sub, FlowController controller) {
     final poi = _currentPoi;
     final themeColor = sub?.color ?? const Color(0xFF2196F3);
@@ -773,30 +808,8 @@ class _FlowScreenState extends State<FlowScreen>
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (poi != null && (poi.primaryPoi?.name ?? '').trim().isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      (poi.primaryPoi?.name ?? '').trim(),
-                      style: TextStyle(
-                        color: const Color(0xFF555555).withOpacity(0.85),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 0.5,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  if (poi?.primaryPoi?.distance != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      "距此 ${(poi!.primaryPoi!.distance! * 1000).round()} m",
-                      style: TextStyle(
-                        color: const Color(0xFF555555).withOpacity(0.7),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
+                  if (poi != null) ...[
+                    ..._buildPoiNamesRow(poi.poisList, themeColor),
                   ],
                 ],
               ),

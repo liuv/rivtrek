@@ -234,13 +234,21 @@ class PoiItem {
         id: json['id'] as String?,
         name: json['name'] as String?,
         type: json['type'] as String?,
-        tel: json['tel'] as String?,
+        tel: _optString(json['tel']),
         distance: (json['distance'] as num?)?.toDouble(),
         direction: json['direction'] as String?,
         address: json['address'] as String?,
-        location: json['location'] as String?,
-        businessarea: json['businessarea'] as String?,
+        location: json['location'] is String ? json['location'] as String? : null,
+        businessarea: _optString(json['businessarea']),
       );
+}
+
+/// 高德 API 可能返回 String 或 List（如 tel: [], businessarea: []），统一成 String?
+String? _optString(dynamic v) {
+  if (v == null) return null;
+  if (v is String) return v.isEmpty ? null : v;
+  if (v is List) return v.isEmpty ? null : v.map((e) => e.toString()).join(', ');
+  return v.toString();
 }
 
 /// 河流里程对应 POI，高德逆地理结构直接映射（一列一字段，便于检索）；pois_json 存完整兴趣点列表
