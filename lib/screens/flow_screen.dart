@@ -4,8 +4,10 @@ import 'dart:io' show Platform;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:vibration/vibration.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/river_settings.dart';
 import '../models/daily_stats.dart';
 import '../services/database_service.dart';
@@ -141,31 +143,46 @@ class _FlowScreenState extends State<FlowScreen>
     if (river != null && (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5)) {
       _lastPoiRequestKm = km;
       DatabaseService.instance.getNearestPoi(river.id, km).then((p) {
-        if (mounted) setState(() => _currentPoi = p);
+        if (!mounted) return;
+        // 仅在有结果时更新，避免查询抛错被 catch 成 null 后把之前有效的 POI 清掉
+        if (p != null) setState(() => _currentPoi = p);
       });
     }
 
     _updateLanterns(challenge.currentSubSection);
   }
 
-  void _triggerMilestone(SubSection sub) {
-    if (sub.medalIcon == null) return;
-    
-    setState(() {
-      _milestoneMedalPath = sub.medalIcon;
-    });
-    
-    _pulseController.reset();
-    _pulseController.forward();
-    
-    _milestoneController.reset();
-    _milestoneController.forward();
-    
+  /// 轻震：祭江、放河灯等事件用，比跨河段震感更轻
+  void _triggerLightHaptic() {
     if (Platform.isAndroid) {
-      HapticFeedback.mediumImpact();
+      Vibration.hasVibrator().then((has) {
+        if (has == true) Vibration.vibrate(duration: 20);
+      });
+    } else {
+      HapticFeedback.lightImpact();
+    }
+  }
+
+  void _triggerMilestone(SubSection sub) {
+    // 进入新河段即震动。iOS 保持系统 HapticFeedback；Android 上 Flutter 的 HapticFeedback 常无感，改用原生 Vibrator 保证有震感。
+    if (Platform.isAndroid) {
+      // 使用原生 Vibrator，避免 Flutter HapticFeedback 在部分 Android 设备上无感
+      Vibration.hasVibrator().then((has) {
+        if (has == true) Vibration.vibrate(duration: 40);
+      });
     } else {
       HapticFeedback.heavyImpact();
     }
+
+    if (sub.medalIcon == null) return;
+
+    setState(() {
+      _milestoneMedalPath = sub.medalIcon;
+    });
+    _pulseController.reset();
+    _pulseController.forward();
+    _milestoneController.reset();
+    _milestoneController.forward();
   }
 
   void _animateTo(double target) {
@@ -239,13 +256,50 @@ class _FlowScreenState extends State<FlowScreen>
           );
         } catch (e) {
           debugPrint("getCurrentPosition failed: $e");
+          // Android 授权后有时需稍等再取位置，重试一次
+          if (Platform.isAndroid) {
+            await Future.delayed(const Duration(milliseconds: 800));
+            try {
+              pos = await Geolocator.getCurrentPosition(
+                locationSettings: const LocationSettings(
+                  accuracy: LocationAccuracy.low,
+                  timeLimit: Duration(seconds: 10),
+                ),
+              );
+            } catch (e2) {
+              debugPrint("getCurrentPosition retry failed: $e2");
+            }
+          }
         }
       }
 
       // 定位未开或 getCurrentPosition 超时/失败时，用上次缓存位置拉天气（Android 常见）
       pos ??= await Geolocator.getLastKnownPosition();
-      if (pos != null && mounted) {
-        context.read<FlowController>().fetchWeather(pos.latitude, pos.longitude);
+
+      double? lat;
+      double? lon;
+      if (pos != null) {
+        lat = pos.latitude;
+        lon = pos.longitude;
+      } else {
+        // 仍无位置时用上次天气缓存的坐标拉一次（Android 上常出现首次/室内无定位）
+        final prefs = await SharedPreferences.getInstance();
+        final String? cached = prefs.getString('cached_weather_v2');
+        if (cached != null) {
+          try {
+            final data = json.decode(cached) as Map<String, dynamic>;
+            final latNum = data['lat'];
+            final lonNum = data['lon'];
+            if (latNum != null && lonNum != null) {
+              lat = (latNum as num).toDouble();
+              lon = (lonNum as num).toDouble();
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (lat != null && lon != null && mounted) {
+        context.read<FlowController>().fetchWeather(lat, lon);
       }
     } catch (e) {
       debugPrint("_refreshWeather error: $e");
@@ -285,6 +339,7 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _addBlessing(Offset position) {
+    _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     final words = ["安", "顺", "福", "宁", "和"];
@@ -313,6 +368,7 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _addLantern() {
+    _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     setState(() {
@@ -505,10 +561,17 @@ class _FlowScreenState extends State<FlowScreen>
               onPointerMove: (e) {
                 if (_pointers.length == 2) {
                   if (_distanceController.isAnimating) _distanceController.stop();
+                  final prevSubName = challenge.currentSubSection?.name;
                   challenge.updateVirtualDistance(challenge.currentDistance - e.delta.dy * 0.5);
                   _visualDistance = challenge.currentDistance;
                   if (settings.pathMode == RiverPathMode.realPath) {
                     _updatePathOffsets(_visualDistance);
+                  }
+                  // 双指滑动后立即检测是否跨河段，立即震动（不依赖定时器）
+                  final nowSub = challenge.currentSubSection;
+                  if (nowSub != null && nowSub.name != prevSubName && prevSubName != null) {
+                    _lastTriggeredSubSectionName = nowSub.name;
+                    _triggerMilestone(nowSub);
                   }
                 }
               },
@@ -537,7 +600,7 @@ class _FlowScreenState extends State<FlowScreen>
                   const SizedBox(height: 25),
                   _buildHeader(sub, controller),
                   const SizedBox(height: 20),
-                  _buildPoiCard(sub),
+                  _buildPoiCard(sub, controller),
                   const Spacer(flex: 3),
                   _buildStepsAndProgress(controller, challenge, _visualDistance),
                   const Spacer(flex: 4),
@@ -644,10 +707,18 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
-  Widget _buildPoiCard(SubSection? sub) {
+  Widget _buildPoiCard(SubSection? sub, FlowController controller) {
     final poi = _currentPoi;
     final themeColor = sub?.color ?? const Color(0xFF2196F3);
     final isLight = themeColor.computeLuminance() > 0.4;
+    // 地址主文案：有 POI 时用数据库里 RiverPoi 的省市区乡镇（或 formattedAddress）；无 POI 用天气城市名兜底
+    final addressParts = poi != null
+        ? [poi.province, poi.city, poi.district, poi.township].whereType<String>().where((s) => s.isNotEmpty).toList()
+        : <String>[];
+    final addressLine = poi != null
+        ? (addressParts.isEmpty ? (poi.formattedAddress ?? '') : addressParts.join(' '))
+        : (controller.cityName.isNotEmpty && controller.cityName != "待定位" ? controller.cityName : "江心云水间");
+    final hasAddress = addressLine.trim().isNotEmpty && addressLine != "江心云水间";
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -655,95 +726,84 @@ class _FlowScreenState extends State<FlowScreen>
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(isLight ? 0.78 : 0.9),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: themeColor.withOpacity(0.18),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: themeColor.withOpacity(0.06),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: themeColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Icons.place_rounded,
-                    size: 22,
-                    color: themeColor.withOpacity(0.85),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "此刻行至",
-                        style: TextStyle(
-                          color: const Color(0xFF222222).withOpacity(0.45),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 2.2,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      if (poi != null) ...[
-                        Text(
-                          poi.shortLabel.isNotEmpty ? poi.shortLabel : (poi.formattedAddress ?? "江畔"),
-                          style: const TextStyle(
-                            color: Color(0xFF222222),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 0.5,
-                            height: 1.35,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (poi.primaryPoi?.distance != null) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            "距此 ${(poi.primaryPoi!.distance! * 1000).round()} m",
-                            style: TextStyle(
-                              color: const Color(0xFF555555).withOpacity(0.7),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ],
-                      ] else
-                        Text(
-                          "江心云水间",
-                          style: TextStyle(
-                            color: const Color(0xFF222222).withOpacity(0.35),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w300,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: themeColor.withOpacity(0.18), width: 1),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 8)),
+            BoxShadow(color: themeColor.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 4)),
+          ],
         ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: themeColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.place_rounded, size: 22, color: themeColor.withOpacity(0.85)),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "此刻行至",
+                    style: TextStyle(
+                      color: const Color(0xFF222222).withOpacity(0.45),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 2.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    addressLine,
+                    style: TextStyle(
+                      color: Color(0xFF222222).withOpacity(hasAddress ? 0.95 : 0.35),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.5,
+                      height: 1.35,
+                      fontStyle: hasAddress ? FontStyle.normal : FontStyle.italic,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (poi != null && (poi.primaryPoi?.name ?? '').trim().isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      (poi.primaryPoi?.name ?? '').trim(),
+                      style: TextStyle(
+                        color: const Color(0xFF555555).withOpacity(0.85),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  if (poi?.primaryPoi?.distance != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      "距此 ${(poi!.primaryPoi!.distance! * 1000).round()} m",
+                      style: TextStyle(
+                        color: const Color(0xFF555555).withOpacity(0.7),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

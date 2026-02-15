@@ -204,33 +204,38 @@ class DatabaseService {
   }
 
   /// 按「路径距离」查最近 POI（本地 POI 库查询，非网络请求）。path_km = accumulated_km * correctionCoefficient，前后各查一次取更近者。
+  /// 若基础库未就绪或无 river_pois 表（未导入 POI 资源），静默返回 null，不抛错。
   Future<RiverPoi?> getNearestPoi(String riverId, double accumulatedKm) async {
-    await RiverRepository.instance.ensureLoaded();
-    final river = RiverRepository.instance.getRiverById(riverId);
-    final numericId = RiverRepository.instance.getRiverSlugToNumericId()[riverId];
-    if (numericId == null) return null;
-    final pathKm = accumulatedKm * (river?.correctionCoefficient ?? 1.0);
-    final db = await instance.baseDatabase;
-    if (db == null) return null;
-    final before = await db.query(
-      'river_pois',
-      where: 'numeric_id = ? AND distance_km <= ?',
-      whereArgs: [numericId, pathKm],
-      orderBy: 'distance_km DESC',
-      limit: 1,
-    );
-    final after = await db.query(
-      'river_pois',
-      where: 'numeric_id = ? AND distance_km >= ?',
-      whereArgs: [numericId, pathKm],
-      orderBy: 'distance_km ASC',
-      limit: 1,
-    );
-    RiverPoi? pick(Map<String, dynamic> row) => RiverPoi.fromMap(row);
-    if (before.isEmpty) return after.isEmpty ? null : pick(after.first);
-    if (after.isEmpty) return pick(before.first);
-    final dBefore = (before.first['distance_km'] as num).toDouble();
-    final dAfter = (after.first['distance_km'] as num).toDouble();
-    return pick((pathKm - dBefore) <= (dAfter - pathKm) ? before.first : after.first);
+    try {
+      await RiverRepository.instance.ensureLoaded();
+      final river = RiverRepository.instance.getRiverById(riverId);
+      final numericId = RiverRepository.instance.getRiverSlugToNumericId()[riverId];
+      if (numericId == null) return null;
+      final pathKm = accumulatedKm * (river?.correctionCoefficient ?? 1.0);
+      final db = await instance.baseDatabase;
+      if (db == null) return null;
+      final before = await db.query(
+        'river_pois',
+        where: 'numeric_id = ? AND distance_km <= ?',
+        whereArgs: [numericId, pathKm],
+        orderBy: 'distance_km DESC',
+        limit: 1,
+      );
+      final after = await db.query(
+        'river_pois',
+        where: 'numeric_id = ? AND distance_km >= ?',
+        whereArgs: [numericId, pathKm],
+        orderBy: 'distance_km ASC',
+        limit: 1,
+      );
+      RiverPoi? pick(Map<String, dynamic> row) => RiverPoi.fromMap(row);
+      if (before.isEmpty) return after.isEmpty ? null : pick(after.first);
+      if (after.isEmpty) return pick(before.first);
+      final dBefore = (before.first['distance_km'] as num).toDouble();
+      final dAfter = (after.first['distance_km'] as num).toDouble();
+      return pick((pathKm - dBefore) <= (dAfter - pathKm) ? before.first : after.first);
+    } catch (_) {
+      return null;
+    }
   }
 }

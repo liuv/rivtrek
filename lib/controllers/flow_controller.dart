@@ -159,45 +159,66 @@ class FlowController extends ChangeNotifier {
   }
 
   Future<void> fetchWeather(double lat, double lon) async {
-    _lat = lat; _lon = lon;
+    _lat = lat;
+    _lon = lon;
+    // 1. 主天气请求：成功即更新 UI，不因 AQI/城市接口失败而整段失败（Android 常见单接口不可达）
     try {
-      // 1. 获取增强版实时天气
-      final url = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto');
+      final url = Uri.parse(
+          'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto');
       final res = await http.get(url);
-      
-      // 2. 获取实时空气质量
-      final aqUrl = Uri.parse('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=$lat&longitude=$lon&current=european_aqi,pm2_5');
+      if (res.statusCode != 200) {
+        debugPrint("Fetch weather HTTP ${res.statusCode}: ${res.body.length} bytes");
+        return;
+      }
+      final data = json.decode(res.body) as Map<String, dynamic>;
+      final current = data['current'] as Map<String, dynamic>;
+      _temp = "${current['temperature_2m']}°";
+      _apparentTemp = "${current['apparent_temperature']}°";
+      _humidity = "${current['relative_humidity_2m']}%";
+      _wmoCode = (current['weather_code'] as num).toInt();
+      _windSpeed = (current['wind_speed_10m'] as num).toDouble();
+      final daily = data['daily'] as Map<String, dynamic>;
+      _maxTemp = "${(daily['temperature_2m_max'] as List)[0]}°";
+      _minTemp = "${(daily['temperature_2m_min'] as List)[0]}°";
+
+      _saveWeatherToCache();
+      await saveWeatherToDatabase();
+      notifyListeners();
+    } catch (e, stack) {
+      debugPrint("Fetch weather error: $e");
+      if (kDebugMode) debugPrint("$stack");
+      return;
+    }
+
+    // 2. AQI 可选：失败仅保留默认，不影响主天气展示
+    try {
+      final aqUrl = Uri.parse(
+          'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=$lat&longitude=$lon&current=european_aqi,pm2_5');
       final aqRes = await http.get(aqUrl);
-
-      if (res.statusCode == 200) {
-        final data = json.decode(res.body);
-        final current = data['current'];
-        _temp = "${current['temperature_2m']}°";
-        _apparentTemp = "${current['apparent_temperature']}°";
-        _humidity = "${current['relative_humidity_2m']}%";
-        _wmoCode = current['weather_code'];
-        _windSpeed = current['wind_speed_10m'];
-        _maxTemp = "${data['daily']['temperature_2m_max'][0]}°";
-        _minTemp = "${data['daily']['temperature_2m_min'][0]}°";
-        
-        if (aqRes.statusCode == 200) {
-          final aqData = json.decode(aqRes.body);
-          _aqi = aqData['current']['european_aqi'].toString();
-          _pm2_5 = aqData['current']['pm2_5'].toString();
-        }
-
-        final cityUrl = Uri.parse('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=zh');
-        final cityRes = await http.get(cityUrl);
-        if (cityRes.statusCode == 200) {
-          _cityName = json.decode(cityRes.body)['city'] ?? "未知地点";
-        }
-        
-        _saveWeatherToCache();
-        await saveWeatherToDatabase();
+      if (aqRes.statusCode == 200) {
+        final aqData = json.decode(aqRes.body) as Map<String, dynamic>;
+        final aqCurrent = aqData['current'] as Map<String, dynamic>;
+        _aqi = aqCurrent['european_aqi'].toString();
+        _pm2_5 = aqCurrent['pm2_5'].toString();
         notifyListeners();
       }
     } catch (e) {
-      debugPrint("Fetch weather error: $e");
+      debugPrint("Fetch AQI error: $e");
+    }
+
+    // 3. 城市名可选：失败保留默认
+    try {
+      final cityUrl = Uri.parse(
+          'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=zh');
+      final cityRes = await http.get(cityUrl);
+      if (cityRes.statusCode == 200) {
+        final cityData = json.decode(cityRes.body) as Map<String, dynamic>;
+        _cityName = cityData['city'] ?? "未知地点";
+        _saveWeatherToCache();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Fetch city error: $e");
     }
   }
 
@@ -205,12 +226,18 @@ class FlowController extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final String? cached = prefs.getString('cached_weather_v2');
     if (cached != null) {
-      final data = json.decode(cached);
-      _temp = data['temp'];
-      _cityName = data['city'];
-      _wmoCode = data['wmo_code'];
-      _maxTemp = data['max_temp'];
-      _minTemp = data['min_temp'];
+      final data = json.decode(cached) as Map<String, dynamic>;
+      _temp = data['temp'] ?? _temp;
+      _cityName = data['city'] ?? _cityName;
+      _wmoCode = (data['wmo_code'] as num?)?.toInt() ?? _wmoCode;
+      _maxTemp = data['max_temp'] ?? _maxTemp;
+      _minTemp = data['min_temp'] ?? _minTemp;
+      final latNum = data['lat'];
+      final lonNum = data['lon'];
+      if (latNum != null && lonNum != null) {
+        _lat = (latNum as num).toDouble();
+        _lon = (lonNum as num).toDouble();
+      }
       notifyListeners();
     }
   }
