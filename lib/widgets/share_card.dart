@@ -39,34 +39,40 @@ class ShareCardWidget extends StatelessWidget {
     final hasLocation = (locationLabel != null && locationLabel!.trim().isNotEmpty) ||
         (poiNames != null && poiNames!.trim().isNotEmpty);
 
-    return RepaintBoundary(
-      key: repaintBoundaryKey,
-      child: Container(
-        width: 375,
-        height: 560,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-          color: hasCover ? null : themeColor,
-          gradient: hasCover ? null : LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              themeColor.withOpacity(0.85),
-              themeColor.withOpacity(0.95),
-              Color.lerp(themeColor, Colors.black, 0.25) ?? themeColor,
-            ],
+    final cornerColor = Color.lerp(themeColor, Colors.black, 0.25) ?? themeColor;
+
+    // 展示层：圆角 + 阴影；截图层：RepaintBoundary 内为完整矩形，分享出去无白边、无圆角
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Stack(
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: RepaintBoundary(
+          key: repaintBoundaryKey,
+          child: Container(
+            width: 375,
+            height: 560,
+            decoration: BoxDecoration(
+              color: hasCover ? null : themeColor,
+              gradient: hasCover ? null : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  themeColor.withOpacity(0.85),
+                  themeColor.withOpacity(0.95),
+                  cornerColor,
+                ],
+              ),
+            ),
+            child: Stack(
             fit: StackFit.expand,
             children: [
               // 背景：封面图或纯渐变
@@ -299,6 +305,7 @@ class ShareCardWidget extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 
