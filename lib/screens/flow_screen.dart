@@ -787,19 +787,25 @@ class _FlowScreenState extends State<FlowScreen>
 
   Widget _buildStepsAndProgress(FlowController controller, ChallengeProvider challenge, double visualDistance) {
     String steps = controller.displaySteps.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
-    final poi = _currentPoi;
-    final locationLine = poi != null && poi.shortLabel.isNotEmpty
-        ? poi.shortLabel
-        : (poi?.formattedAddress?.isNotEmpty == true ? poi!.formattedAddress! : null);
+    final sub = challenge.currentSubSection;
+    final all = challenge.allSubSections;
+    double segmentStartKm = 0;
+    double segmentLengthKm = 0;
+    if (sub != null && all.isNotEmpty) {
+      final idx = all.indexOf(sub);
+      segmentStartKm = idx > 0 ? all[idx - 1].accumulatedLength : 0;
+      segmentLengthKm = sub.accumulatedLength - segmentStartKm;
+    }
+    final segmentTraveledKm = (visualDistance - segmentStartKm).clamp(0.0, segmentLengthKm);
+    final segmentLine = segmentLengthKm > 0
+        ? "本段已行 ${segmentTraveledKm.toStringAsFixed(1)} km / 本段 ${segmentLengthKm.toStringAsFixed(0)} km"
+        : null;
     return Column(children: [
       Text(steps, style: TextStyle(color: const Color(0xFF222222), fontSize: steps.length > 7 ? 82 : 105, fontWeight: FontWeight.w100, letterSpacing: -2)),
       Text("已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, letterSpacing: 1.2)),
-      if (locationLine != null) ...[
+      if (segmentLine != null) ...[
         const SizedBox(height: 10),
-        Text("此刻 · $locationLine", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w300, letterSpacing: 0.8)),
-      ] else ...[
-        const SizedBox(height: 10),
-        Text("此刻 · 江心云水间", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.4), fontSize: 14, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic)),
+        Text(segmentLine, style: TextStyle(color: const Color(0xFF555555).withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w300, letterSpacing: 0.8)),
       ],
     ]);
   }

@@ -50,6 +50,7 @@ flutter:
     - assets/timeline/
     - assets/json/rivers/
     - assets/icons/
+    - assets/images/
     - assets/geo/rivers/yangtze/
     - assets/db/
   shaders:

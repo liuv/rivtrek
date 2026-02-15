@@ -14,6 +14,8 @@ class River {
   final String pointsJsonPath;
   final int difficulty; // 1-5
   final String iconPath;
+  /// 江河挑战卡封面图，在 rivers_config.json 中配置实际路径，如 assets/images/cover_yangtze.png
+  final String coverPath;
   /// 行进距离 → 路径距离：path_km = app_accumulated_km * correctionCoefficient。由各河流 master JSON 的 correction_coefficient 加载，不依赖 config 手配。
   final double correctionCoefficient;
 
@@ -28,6 +30,7 @@ class River {
     required this.pointsJsonPath,
     this.difficulty = 3,
     required this.iconPath,
+    required this.coverPath,
     this.correctionCoefficient = 1.0,
   });
 
@@ -43,6 +46,7 @@ class River {
       pointsJsonPath: pointsJsonPath,
       difficulty: difficulty,
       iconPath: iconPath,
+      coverPath: coverPath,
       correctionCoefficient: correctionCoefficient ?? this.correctionCoefficient,
     );
   }
@@ -61,6 +65,7 @@ class River {
       pointsJsonPath: json['points_json_path'],
       difficulty: json['difficulty'] ?? 3,
       iconPath: json['icon_path'] ?? '',
+      coverPath: json['cover_path'] ?? '',
       correctionCoefficient: (json['correction_coefficient'] as num?)?.toDouble() ?? 1.0,
     );
   }

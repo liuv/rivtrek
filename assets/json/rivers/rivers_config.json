@@ -2,10 +2,70 @@
   "version": "1.0",
   "description": "江河挑战列表配置，新增/下线江河只需修改此文件并保证对应 master/points 资源存在。numeric_id 为数字主键，便于高效检索。",
   "rivers": [
-    {"numeric_id":1,"id":"yangtze","name":"长江","description":"唯见长江天际流，从雪山走来，向东海奔腾，横贯中华大地。","total_length_km":6387,"theme_color":"#2196F3","master_json_path":"assets/json/rivers/yangtze_master.json","points_json_path":"assets/json/rivers/yangtze_points.json","difficulty":4,"icon_path":"assets/icons/river_yangtze.png"},
-    {"numeric_id":2,"id":"yellow_river","name":"黄河","description":"九曲黄河万里沙，奔流到海不复回，中华民族的摇篮。","total_length_km":5464,"theme_color":"#FF9800","master_json_path":"assets/json/rivers/yellow_river_master.json","points_json_path":"assets/json/rivers/yellow_river_points.json","difficulty":5,"icon_path":"assets/icons/river_yellow.png"},
-    {"numeric_id":3,"id":"songhua_river","name":"松花江","description":"北国明珠，穿越林海雪原，感受冰雪与森林的交响。","total_length_km":2309,"theme_color":"#00BCD4","master_json_path":"assets/json/rivers/songhua_river_master.json","points_json_path":"assets/json/rivers/songhua_river_points.json","difficulty":3,"icon_path":"assets/icons/river_songhua.png"},
-    {"numeric_id":4,"id":"nu_river","name":"怒江","description":"怒水奔腾，从安多到瑞丽，穿越横断山脉，一江连滇藏。","total_length_km":2013,"theme_color":"#4CAF50","master_json_path":"assets/json/rivers/nu_river_master.json","points_json_path":"assets/json/rivers/nu_river_points.json","difficulty":4,"icon_path":"assets/icons/river_nu.png"},
-    {"numeric_id":5,"id":"mekong_river","name":"澜沧江","description":"澜江逐浪，从杂多到勐腊，一江连六国。","total_length_km":2161,"theme_color":"#009688","master_json_path":"assets/json/rivers/mekong_river_master.json","points_json_path":"assets/json/rivers/mekong_river_points.json","difficulty":4,"icon_path":"assets/icons/river_mekong.png"}
+    {
+      "numeric_id": 1,
+      "id": "yangtze",
+      "name": "长江",
+      "description": "唯见长江天际流，从雪山走来，向东海奔腾，横贯中华大地。",
+      "total_length_km": 6387,
+      "theme_color": "#2196F3",
+      "master_json_path": "assets/json/rivers/yangtze_master.json",
+      "points_json_path": "assets/json/rivers/yangtze_points.json",
+      "difficulty": 4,
+      "icon_path": "assets/icons/river_yangtze.png",
+      "cover_path": "assets/images/cover_yangtze.png"
+    },
+    {
+      "numeric_id": 2,
+      "id": "yellow_river",
+      "name": "黄河",
+      "description": "九曲黄河万里沙，奔流到海不复回，中华民族的摇篮。",
+      "total_length_km": 5464,
+      "theme_color": "#FF9800",
+      "master_json_path": "assets/json/rivers/yellow_river_master.json",
+      "points_json_path": "assets/json/rivers/yellow_river_points.json",
+      "difficulty": 5,
+      "icon_path": "assets/icons/river_yellow.png",
+      "cover_path": "assets/images/cover_yellow_river.png"
+    },
+    {
+      "numeric_id": 3,
+      "id": "songhua_river",
+      "name": "松花江",
+      "description": "北国明珠，穿越林海雪原，感受冰雪与森林的交响。",
+      "total_length_km": 2309,
+      "theme_color": "#00BCD4",
+      "master_json_path": "assets/json/rivers/songhua_river_master.json",
+      "points_json_path": "assets/json/rivers/songhua_river_points.json",
+      "difficulty": 3,
+      "icon_path": "assets/icons/river_songhua.png",
+      "cover_path": "assets/images/cover_songhua_river.png"
+    },
+    {
+      "numeric_id": 4,
+      "id": "nu_river",
+      "name": "怒江",
+      "description": "怒水奔腾，从安多到瑞丽，穿越横断山脉，一江连滇藏。",
+      "total_length_km": 2013,
+      "theme_color": "#4CAF50",
+      "master_json_path": "assets/json/rivers/nu_river_master.json",
+      "points_json_path": "assets/json/rivers/nu_river_points.json",
+      "difficulty": 4,
+      "icon_path": "assets/icons/river_nu.png",
+      "cover_path": "assets/images/cover_nu_river.png"
+    },
+    {
+      "numeric_id": 5,
+      "id": "mekong_river",
+      "name": "澜沧江",
+      "description": "澜江逐浪，从杂多到勐腊，一江连六国。",
+      "total_length_km": 2161,
+      "theme_color": "#009688",
+      "master_json_path": "assets/json/rivers/mekong_river_master.json",
+      "points_json_path": "assets/json/rivers/mekong_river_points.json",
+      "difficulty": 4,
+      "icon_path": "assets/icons/river_mekong.png",
+      "cover_path": "assets/images/cover_mekong_river.png"
+    }
   ]
 }

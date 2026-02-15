@@ -133,6 +133,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
   }
 
   Widget _buildRiverCard(River river, bool isSelected) {
+    const radius = 24.0;
     return AnimatedScale(
       scale: isSelected ? 1.0 : 0.9,
       duration: const Duration(milliseconds: 300),
@@ -140,8 +141,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(radius),
           boxShadow: [
             BoxShadow(
               color: river.color.withOpacity(0.15),
@@ -150,71 +150,90 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            // 卡片内容
-            Padding(
-              padding: const EdgeInsets.all(30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: river.color.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          "难度 ${'★' * river.difficulty}",
-                          style: TextStyle(
-                            color: river.color,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (context.watch<ChallengeProvider>().activeRiver?.id == river.id)
-                        const Icon(Icons.check_circle_rounded, color: Colors.green, size: 28),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(radius),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // 封面图背景，路径在 rivers_config.json 的 cover_path 中配置
+              Image.asset(
+                river.coverPath,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: river.color.withOpacity(0.15),
+                  child: Icon(Icons.waves_rounded, size: 120, color: river.color.withOpacity(0.3)),
+                ),
+              ),
+              // 渐变遮罩，保证文字可读
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.2),
+                      Colors.black.withOpacity(0.5),
+                      Colors.black.withOpacity(0.75),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    river.name,
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w200,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    river.description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black.withOpacity(0.5),
-                      height: 1.6,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  const Spacer(),
-                  _buildStatRow(Icons.straighten_rounded, "全程长度", "${river.totalLengthKm.round()} km"),
-                  const SizedBox(height: 12),
-                  _buildStatRow(Icons.timer_outlined, "预计耗时", "${(river.totalLengthKm / 10).round()} 天"),
-                ],
+                ),
               ),
-            ),
-            // 背景装饰 (写意轮廓)
-            Positioned(
-              right: -20,
-              bottom: 60,
-              child: Opacity(
-                opacity: 0.05,
-                child: Icon(Icons.waves_rounded, size: 200, color: river.color),
+              // 卡片内容
+              Padding(
+                padding: const EdgeInsets.all(30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: river.color.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            "难度 ${'★' * river.difficulty}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (context.watch<ChallengeProvider>().activeRiver?.id == river.id)
+                          const Icon(Icons.check_circle_rounded, color: Colors.greenAccent, size: 28),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      river.name,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w200,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      river.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.85),
+                        height: 1.6,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildStatRow(Icons.straighten_rounded, "全程长度", "${river.totalLengthKm.round()} km"),
+                    const SizedBox(height: 12),
+                    _buildStatRow(Icons.timer_outlined, "预计耗时", "${(river.totalLengthKm / 10).round()} 天"),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -223,16 +242,16 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
   Widget _buildStatRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: Colors.black26),
+        Icon(icon, size: 18, color: Colors.white70),
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: Colors.black38, fontWeight: FontWeight.w300),
+          style: const TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w300),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Colors.white),
         ),
       ],
     );
