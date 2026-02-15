@@ -317,8 +317,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   Widget _buildSectionInfo() {
     int subIdx = selectedSubSectionIdx;
     SubSection? target;
-    int currentTotal = 0;
-    
+
     // 扁平化所有子路段以便索引
     List<SubSection> allFlattened = [];
     for (var section in fullData!.challengeSections) {
@@ -383,12 +382,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 4),
                         Text("${target.startPoint} → ${target.endPoint}", style: const TextStyle(fontSize: 12, color: Colors.black45)),
-                        const SizedBox(height: 8),
-                        Text(target.subSectionDesc, style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.6), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(target.subSectionDesc, style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.6), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
               ),
               const SizedBox(height: 16),
               const Divider(height: 1, color: Colors.black12),
@@ -427,11 +429,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     final isUnlocked = selectedSubSectionIdx <= currentSubSectionIdx;
 
     return Container(
-      width: 80, height: 80,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(16),
-      ),
+      width: 80,
+      height: 80,
       child: Stack(
         alignment: Alignment.center,
         children: [

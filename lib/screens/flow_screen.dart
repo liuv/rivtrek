@@ -707,8 +707,8 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
-  /// 多个 POI 名称用顿号拼接，前加兴趣点图标
-  List<Widget> _buildPoiNamesRow(List<PoiItem> poisList, Color themeColor) {
+  /// 多个 POI 名称用顿号拼接，图标与文字同色且同一行
+  List<Widget> _buildPoiNamesRow(List<PoiItem> poisList) {
     final names = poisList
         .map((p) => p.name?.trim())
         .whereType<String>()
@@ -716,26 +716,27 @@ class _FlowScreenState extends State<FlowScreen>
         .toList();
     if (names.isEmpty) return [];
     final label = names.join('、');
+    const textColor = Color(0xFF555555);
+    const textOpacity = 0.9;
+    final style = TextStyle(
+      color: textColor.withOpacity(textOpacity),
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0.3,
+      height: 1.35,
+    );
     return [
       const SizedBox(height: 6),
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.explore_rounded, size: 16, color: themeColor.withOpacity(0.8)),
-          const SizedBox(width: 6),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.explore_rounded, size: 14, color: textColor.withOpacity(textOpacity)),
+          ),
+          const SizedBox(width: 4),
           Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: const Color(0xFF555555).withOpacity(0.9),
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.3,
-                height: 1.35,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: Text(label, style: style, maxLines: 2, overflow: TextOverflow.ellipsis),
           ),
         ],
       ),
@@ -809,7 +810,7 @@ class _FlowScreenState extends State<FlowScreen>
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (poi != null) ...[
-                    ..._buildPoiNamesRow(poi.poisList, themeColor),
+                    ..._buildPoiNamesRow(poi.poisList),
                   ],
                 ],
               ),
