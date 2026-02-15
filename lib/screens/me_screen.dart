@@ -6,6 +6,7 @@ import 'settings_screen.dart';
 import 'package:rivtrek/services/database_service.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline_page.dart';
+import 'package:rivtrek/screens/share_preview_sheet.dart';
 
 class MeScreen extends StatelessWidget {
   const MeScreen({super.key});
@@ -173,6 +174,14 @@ class MeScreen extends StatelessWidget {
                   const Divider(color: Color(0xFFEEEEEE)),
                   const SizedBox(height: 20),
                   // Settings/Menu
+                  _buildMenuItem("分享进度", Icons.share_rounded, onTap: () {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      isScrollControlled: true,
+                      builder: (ctx) => const SharePreviewSheet(),
+                    );
+                  }),
                   _buildMenuItem("挑战记录（公里）", Icons.history_rounded,
                       onTap: () => _navigateToChallengeRecords(
                           context, TimelineAxisMode.distanceKm)),
