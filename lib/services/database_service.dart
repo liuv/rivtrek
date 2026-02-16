@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/daily_stats.dart';
-import '../repositories/river_repository.dart';
 
 /// 主库：仅存动态数据（步数、天气、事件）。基础数据（POI 等）使用独立库 [baseDatabase]（rivtrek_base.db），不合并、解耦。
 class DatabaseService {
@@ -34,10 +34,12 @@ class DatabaseService {
       onCreate: _createMainDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
-          await db.execute('ALTER TABLE daily_weather ADD COLUMN aqi TEXT DEFAULT "--"');
+          await db.execute(
+              'ALTER TABLE daily_weather ADD COLUMN aqi TEXT DEFAULT "--"');
         }
         if (oldVersion < 3) {
-          await db.execute('ALTER TABLE daily_activities ADD COLUMN river_id TEXT DEFAULT "yangtze"');
+          await db.execute(
+              'ALTER TABLE daily_activities ADD COLUMN river_id TEXT DEFAULT "yangtze"');
         }
         if (oldVersion < 6) {
           await db.execute('DROP TABLE IF EXISTS river_pois');
@@ -123,48 +125,45 @@ class DatabaseService {
     return await db.insert('river_events', event.toMap());
   }
 
-  /// 写入基础数据库的 river_pois 表（脚本生成后一般不需在 App 内写入，仅当有运行时导入需求时使用）。
-  Future<void> insertRiverPois(List<RiverPoi> pois) async {
-    final db = await instance.baseDatabase;
-    if (db == null) return;
-    final batch = db.batch();
-    for (final p in pois) {
-      batch.insert('river_pois', p.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-    await batch.commit(noResult: true);
-  }
+  // 基础库 rivtrek_base.db 为只读（从 asset 复制后仅做查询），App 内不写入。POI 数据由 tools/fetch_river_pois.py 生成后放入 assets/db/。
 
   // --- 查询方法 ---
 
   Future<DailyActivity?> getActivityByDate(String date) async {
     final db = await instance.database;
-    final maps = await db.query('daily_activities', where: 'date = ?', whereArgs: [date]);
+    final maps = await db
+        .query('daily_activities', where: 'date = ?', whereArgs: [date]);
     if (maps.isNotEmpty) return DailyActivity.fromMap(maps.first);
     return null;
   }
 
   Future<DailyWeather?> getWeatherByDate(String date) async {
     final db = await instance.database;
-    final maps = await db.query('daily_weather', where: 'date = ?', whereArgs: [date]);
+    final maps =
+        await db.query('daily_weather', where: 'date = ?', whereArgs: [date]);
     if (maps.isNotEmpty) return DailyWeather.fromMap(maps.first);
     return null;
   }
 
   Future<List<RiverEvent>> getEventsByDate(String date) async {
     final db = await instance.database;
-    final result = await db.query('river_events', where: 'date = ?', whereArgs: [date]);
-    return result.map((json) => RiverEvent(
-      id: json['id'] as int,
-      date: json['date'] as String,
-      timestamp: json['timestamp'] as int,
-      type: RiverEventType.values.firstWhere((e) => e.name == json['type']),
-      name: json['name'] as String,
-      description: json['description'] as String,
-      latitude: json['latitude'] as double,
-      longitude: json['longitude'] as double,
-      distanceAtKm: json['distance_at_km'] as double,
-      extraData: json['extra_data'] as String,
-    )).toList();
+    final result =
+        await db.query('river_events', where: 'date = ?', whereArgs: [date]);
+    return result
+        .map((json) => RiverEvent(
+              id: json['id'] as int,
+              date: json['date'] as String,
+              timestamp: json['timestamp'] as int,
+              type: RiverEventType.values
+                  .firstWhere((e) => e.name == json['type']),
+              name: json['name'] as String,
+              description: json['description'] as String,
+              latitude: json['latitude'] as double,
+              longitude: json['longitude'] as double,
+              distanceAtKm: json['distance_at_km'] as double,
+              extraData: json['extra_data'] as String,
+            ))
+        .toList();
   }
 
   Future<List<DailyActivity>> getAllActivities() async {
@@ -201,17 +200,21 @@ class DatabaseService {
         .toList();
   }
 
-  /// 按「路径距离」查最近 POI（本地 POI 库查询，非网络请求）。path_km = accumulated_km * correctionCoefficient，前后各查一次取更近者。
-  /// 若基础库未就绪或无 river_pois 表（未导入 POI 资源），静默返回 null，不抛错。
-  Future<RiverPoi?> getNearestPoi(String riverId, double accumulatedKm) async {
+  /// 按「行进距离」（挑战累计里程）查最近 POI，使用数字主键 [numericId] 查库，避免字符串 id 的精确匹配/空格等问题。
+  /// river_pois.distance_km 与 fetch_river_pois 写入一致，为挑战里程，故直接用 accumulatedKm 查，不乘修正系数。
+  /// 若基础库未就绪、无 river_pois 表，静默返回 null，不抛错。
+  Future<RiverPoi?> getNearestPoi(int numericId, double accumulatedKm) async {
+    const _tag = '[POI]';
+    if (kDebugMode)
+      debugPrint(
+          '$_tag getNearestPoi(numericId=$numericId, accumulatedKm=$accumulatedKm)');
     try {
-      await RiverRepository.instance.ensureLoaded();
-      final river = RiverRepository.instance.getRiverById(riverId);
-      final numericId = RiverRepository.instance.getRiverSlugToNumericId()[riverId];
-      if (numericId == null) return null;
-      final pathKm = accumulatedKm * (river?.correctionCoefficient ?? 1.0);
+      final pathKm = accumulatedKm;
       final db = await instance.baseDatabase;
-      if (db == null) return null;
+      if (db == null) {
+        if (kDebugMode) debugPrint('$_tag baseDatabase is null, return null');
+        return null;
+      }
       final before = await db.query(
         'river_pois',
         where: 'numeric_id = ? AND distance_km <= ?',
@@ -226,13 +229,38 @@ class DatabaseService {
         orderBy: 'distance_km ASC',
         limit: 1,
       );
+      if (kDebugMode)
+        debugPrint('$_tag before=${before.length} after=${after.length}');
       RiverPoi? pick(Map<String, dynamic> row) => RiverPoi.fromMap(row);
-      if (before.isEmpty) return after.isEmpty ? null : pick(after.first);
-      if (after.isEmpty) return pick(before.first);
+      if (before.isEmpty && after.isEmpty) {
+        if (kDebugMode) debugPrint('$_tag both empty, return null');
+        return null;
+      }
+      if (before.isEmpty) {
+        final p = pick(after.first);
+        if (kDebugMode)
+          debugPrint('$_tag picked after distance_km=${p!.distanceKm}');
+        return p;
+      }
+      if (after.isEmpty) {
+        final p = pick(before.first);
+        if (kDebugMode)
+          debugPrint('$_tag picked before distance_km=${p!.distanceKm}');
+        return p;
+      }
       final dBefore = (before.first['distance_km'] as num).toDouble();
       final dAfter = (after.first['distance_km'] as num).toDouble();
-      return pick((pathKm - dBefore) <= (dAfter - pathKm) ? before.first : after.first);
-    } catch (_) {
+      final useBefore = (pathKm - dBefore) <= (dAfter - pathKm);
+      final p = pick(useBefore ? before.first : after.first);
+      if (kDebugMode)
+        debugPrint(
+            '$_tag picked ${useBefore ? "before" : "after"} distance_km=${p!.distanceKm}');
+      return p;
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('$_tag getNearestPoi failed: $e');
+        debugPrint('$_tag $st');
+      }
       return null;
     }
   }

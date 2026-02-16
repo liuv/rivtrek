@@ -31,7 +31,6 @@ class _FlowScreenState extends State<FlowScreen>
         TickerProviderStateMixin,
         WidgetsBindingObserver,
         AutomaticKeepAliveClientMixin {
-  
   // 视觉距离（用于动画过渡）
   double _visualDistance = 0.0;
   late AnimationController _distanceController;
@@ -45,7 +44,7 @@ class _FlowScreenState extends State<FlowScreen>
   List<double> _cumulativeDistances = [];
   List<double> _currentPathOffsets = List.filled(32, 0.0);
   String? _loadedPointsRiverId;
-  
+
   final List<Lantern> _lanterns = [];
   final List<Blessing> _blessings = [];
   double _lastFrameTime = 0;
@@ -81,9 +80,9 @@ class _FlowScreenState extends State<FlowScreen>
       duration: const Duration(milliseconds: 2500),
     );
 
-    _timeController = AnimationController(
-        vsync: this, duration: const Duration(seconds: 10))
-      ..repeat();
+    _timeController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 10))
+          ..repeat();
     _timeController.addListener(() {
       if (mounted) {
         _updateFrame();
@@ -98,7 +97,7 @@ class _FlowScreenState extends State<FlowScreen>
     });
 
     _stopwatch = Stopwatch()..start();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FlowController>().init();
       context.read<FlowController>().startStepListening();
@@ -106,13 +105,13 @@ class _FlowScreenState extends State<FlowScreen>
       // 进入涉川首页即触发一次 POI 查询，不依赖定时器
       _updateFrame();
     });
-    
+
     _loadShaders();
   }
 
   void _updateFrame() {
     final challenge = context.read<ChallengeProvider>();
-    
+
     // 同步视觉距离
     if (!_distanceController.isAnimating) {
       if ((_visualDistance - challenge.currentDistance).abs() > 5.0) {
@@ -131,8 +130,10 @@ class _FlowScreenState extends State<FlowScreen>
       _lastTriggeredSubSectionName = currentSub.name;
     }
 
-    if (challenge.activeRiver != null && _loadedPointsRiverId != challenge.activeRiver!.id) {
-      _loadRealRiverPath(challenge.activeRiver!.pointsJsonPath, challenge.activeRiver!.id);
+    if (challenge.activeRiver != null &&
+        _loadedPointsRiverId != challenge.activeRiver!.id) {
+      _loadRealRiverPath(
+          challenge.activeRiver!.pointsJsonPath, challenge.activeRiver!.id);
       _lastPoiRequestKm = null;
       _currentPoi = null;
     }
@@ -140,9 +141,10 @@ class _FlowScreenState extends State<FlowScreen>
     // 按当前行进距离查最近 POI，约 0.5 km 更新一次
     final river = challenge.activeRiver;
     final km = challenge.currentDistance;
-    if (river != null && (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5)) {
+    if (river != null &&
+        (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5)) {
       _lastPoiRequestKm = km;
-      DatabaseService.instance.getNearestPoi(river.id, km).then((p) {
+      DatabaseService.instance.getNearestPoi(river.numericId, km).then((p) {
         if (!mounted) return;
         // 仅在有结果时更新，避免查询抛错被 catch 成 null 后把之前有效的 POI 清掉
         if (p != null) setState(() => _currentPoi = p);
@@ -188,10 +190,10 @@ class _FlowScreenState extends State<FlowScreen>
   void _animateTo(double target) {
     final start = _visualDistance;
     _distanceController.reset();
-    final Animation<double> animation = Tween<double>(begin: start, end: target).animate(
-      CurvedAnimation(parent: _distanceController, curve: Curves.easeInOutCubic)
-    );
-    
+    final Animation<double> animation = Tween<double>(begin: start, end: target)
+        .animate(CurvedAnimation(
+            parent: _distanceController, curve: Curves.easeInOutCubic));
+
     animation.addListener(() {
       if (mounted) {
         setState(() {
@@ -238,7 +240,8 @@ class _FlowScreenState extends State<FlowScreen>
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-      if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) {
+      if (permission != LocationPermission.always &&
+          permission != LocationPermission.whileInUse) {
         return;
       }
 
@@ -317,14 +320,18 @@ class _FlowScreenState extends State<FlowScreen>
 
     if (sub == null) return;
 
-    final double currentSpeed = (RiverSettings.instance.speed + (sub.baseFlowSpeed * 0.1)) * 0.5;
+    final double currentSpeed =
+        (RiverSettings.instance.speed + (sub.baseFlowSpeed * 0.1)) * 0.5;
 
     for (int i = _lanterns.length - 1; i >= 0; i--) {
       final l = _lanterns[i];
       l.localY += currentSpeed * dt;
       double combinedWobbleSpeed = l.wobbleSpeed * (1.0 + currentSpeed * 2.0);
-      double noise = math.sin(currentTime * combinedWobbleSpeed + l.wobblePhase) * 0.7
-                   + math.sin(currentTime * combinedWobbleSpeed * 2.1 + l.wobblePhase * 1.3) * 0.3;
+      double noise =
+          math.sin(currentTime * combinedWobbleSpeed + l.wobblePhase) * 0.7 +
+              math.sin(currentTime * combinedWobbleSpeed * 2.1 +
+                      l.wobblePhase * 1.3) *
+                  0.3;
       l.rotation = noise * (math.pi / 4) * (currentSpeed * 4.0).clamp(0.4, 1.2);
       if (l.localY > 1.2) _lanterns.removeAt(i);
     }
@@ -345,7 +352,8 @@ class _FlowScreenState extends State<FlowScreen>
     final words = ["安", "顺", "福", "宁", "和"];
     final size = MediaQuery.of(context).size;
     setState(() {
-      _pulseCenter = Offset(position.dx / size.width, position.dy / size.height);
+      _pulseCenter =
+          Offset(position.dx / size.width, position.dy / size.height);
       _blessings.add(Blessing(
         text: words[math.Random().nextInt(words.length)],
         localY: (position.dy / size.height) * 2.0 - 1.0,
@@ -354,7 +362,7 @@ class _FlowScreenState extends State<FlowScreen>
     });
     _pulseController.reset();
     _pulseController.forward();
-    
+
     DatabaseService.instance.recordEvent(RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
@@ -380,7 +388,7 @@ class _FlowScreenState extends State<FlowScreen>
         scaleBase: 0.8 + math.Random().nextDouble() * 0.4,
       ));
     });
-    
+
     DatabaseService.instance.recordEvent(RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
@@ -394,9 +402,14 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   Future<void> _loadShaders() async {
-    _proceduralShader = (await ui.FragmentProgram.fromAsset('shaders/river.frag')).fragmentShader();
-    _inkShader = (await ui.FragmentProgram.fromAsset('shaders/river_ink.frag')).fragmentShader();
-    _auroraShader = (await ui.FragmentProgram.fromAsset('shaders/river_aurora.frag')).fragmentShader();
+    _proceduralShader =
+        (await ui.FragmentProgram.fromAsset('shaders/river.frag'))
+            .fragmentShader();
+    _inkShader = (await ui.FragmentProgram.fromAsset('shaders/river_ink.frag'))
+        .fragmentShader();
+    _auroraShader =
+        (await ui.FragmentProgram.fromAsset('shaders/river_aurora.frag'))
+            .fragmentShader();
     if (mounted) setState(() {});
   }
 
@@ -410,18 +423,22 @@ class _FlowScreenState extends State<FlowScreen>
       List<double> dists = [0.0];
       double total = 0.0;
       for (int i = 1; i < pts.length; i++) {
-        total += Geolocator.distanceBetween(pts[i-1].dy, pts[i-1].dx, pts[i].dy, pts[i].dx) / 1000.0;
+        total += Geolocator.distanceBetween(
+                pts[i - 1].dy, pts[i - 1].dx, pts[i].dy, pts[i].dx) /
+            1000.0;
         dists.add(total);
       }
       if (mounted) {
-        setState(() { 
-          _riverPoints = pts; 
-          _cumulativeDistances = dists; 
+        setState(() {
+          _riverPoints = pts;
+          _cumulativeDistances = dists;
           _loadedPointsRiverId = riverId;
         });
         _updatePathOffsets(_visualDistance);
       }
-    } catch (e) { debugPrint("Path Error: $e"); }
+    } catch (e) {
+      debugPrint("Path Error: $e");
+    }
   }
 
   void _updatePathOffsets(double dist) {
@@ -442,56 +459,90 @@ class _FlowScreenState extends State<FlowScreen>
     int l = 0, h = _cumulativeDistances.length - 1;
     while (l <= h) {
       int m = (l + h) ~/ 2;
-      if (_cumulativeDistances[m] < d) l = m + 1; else h = m - 1;
+      if (_cumulativeDistances[m] < d)
+        l = m + 1;
+      else
+        h = m - 1;
     }
     return l;
   }
 
-  double _getRiverPathAt(double py, RiverSettings settings, SubSection? sub, double currentDistance) {
+  double _getRiverPathAt(double py, RiverSettings settings, SubSection? sub,
+      double currentDistance) {
     final double scrollY = py + (currentDistance / 10.0) * 2.0;
-    double path = (settings.pathMode == RiverPathMode.realPath && _riverPoints.isNotEmpty)
-        ? _getInterpolatedOffset(py) * 0.5 : math.sin(scrollY * 1.5) * 0.25;
-    return path + math.cos(scrollY * 3.5) * 0.05 * (settings.turbulence + ((sub?.difficulty ?? 3) * 0.1));
+    double path =
+        (settings.pathMode == RiverPathMode.realPath && _riverPoints.isNotEmpty)
+            ? _getInterpolatedOffset(py) * 0.5
+            : math.sin(scrollY * 1.5) * 0.25;
+    return path +
+        math.cos(scrollY * 3.5) *
+            0.05 *
+            (settings.turbulence + ((sub?.difficulty ?? 3) * 0.1));
   }
 
   double _getInterpolatedOffset(double py) {
     double idx = (py * 0.5 + 0.5) * 31.0;
     int i = idx.floor().clamp(0, 31);
     int j = (i + 1).clamp(0, 31);
-    return _currentPathOffsets[i] * (1 - (idx - i)) + _currentPathOffsets[j] * (idx - i);
+    return _currentPathOffsets[i] * (1 - (idx - i)) +
+        _currentPathOffsets[j] * (idx - i);
   }
 
   void _showWeatherDetail(FlowController controller) {
     final weatherType = _mapWeatherCode(controller.wmoCode);
-    showDialog(context: context, builder: (c) => AlertDialog(
-      backgroundColor: Colors.white.withOpacity(0.9),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      title: const Text("环境详情", style: TextStyle(fontWeight: FontWeight.w300)),
-      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(
-          children: [
-            const Icon(Icons.location_on_outlined, size: 18, color: Colors.blueGrey),
-            const SizedBox(width: 8),
-            Expanded(child: Text("${controller.cityName}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400))),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 26, top: 4),
-          child: Text(
-            "经纬度: ${controller.lat.toStringAsFixed(4)}, ${controller.lon.toStringAsFixed(4)}",
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontFamily: 'monospace'),
-          ),
-        ),
-        const Divider(height: 30),
-        _buildWeatherRow(weatherType.icon, "当前天气", "${controller.temp} (${weatherType.label})"),
-        _buildWeatherRow(Icons.thermostat_outlined, "体感温度", controller.apparentTemp),
-        _buildWeatherRow(Icons.wb_sunny_outlined, "今日温差", "${controller.minTemp} ~ ${controller.maxTemp}"),
-        _buildWeatherRow(Icons.air_rounded, "实时风速", "${controller.windSpeed} km/h"),
-        _buildWeatherRow(Icons.water_drop_outlined, "相对湿度", controller.humidity),
-        _buildWeatherRow(Icons.cloud_circle_outlined, "空气质量", "AQI ${controller.aqi} (PM2.5: ${controller.pm2_5})"),
-      ]),
-      actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text("确定"))],
-    ));
+    showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+              backgroundColor: Colors.white.withOpacity(0.9),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25)),
+              title: const Text("环境详情",
+                  style: TextStyle(fontWeight: FontWeight.w300)),
+              content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined,
+                            size: 18, color: Colors.blueGrey),
+                        const SizedBox(width: 8),
+                        Expanded(
+                            child: Text("${controller.cityName}",
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400))),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 26, top: 4),
+                      child: Text(
+                        "经纬度: ${controller.lat.toStringAsFixed(4)}, ${controller.lon.toStringAsFixed(4)}",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                            fontFamily: 'monospace'),
+                      ),
+                    ),
+                    const Divider(height: 30),
+                    _buildWeatherRow(weatherType.icon, "当前天气",
+                        "${controller.temp} (${weatherType.label})"),
+                    _buildWeatherRow(Icons.thermostat_outlined, "体感温度",
+                        controller.apparentTemp),
+                    _buildWeatherRow(Icons.wb_sunny_outlined, "今日温差",
+                        "${controller.minTemp} ~ ${controller.maxTemp}"),
+                    _buildWeatherRow(Icons.air_rounded, "实时风速",
+                        "${controller.windSpeed} km/h"),
+                    _buildWeatherRow(
+                        Icons.water_drop_outlined, "相对湿度", controller.humidity),
+                    _buildWeatherRow(Icons.cloud_circle_outlined, "空气质量",
+                        "AQI ${controller.aqi} (PM2.5: ${controller.pm2_5})"),
+                  ]),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(c), child: const Text("确定"))
+              ],
+            ));
   }
 
   Widget _buildWeatherRow(IconData icon, String label, String value) {
@@ -501,9 +552,12 @@ class _FlowScreenState extends State<FlowScreen>
         children: [
           Icon(icon, size: 20, color: Colors.blueGrey.shade700),
           const SizedBox(width: 12),
-          Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+          Text(label,
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
           const Spacer(),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+          Text(value,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
         ],
       ),
     );
@@ -527,14 +581,16 @@ class _FlowScreenState extends State<FlowScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
+
     final controller = context.watch<FlowController>();
     final challenge = context.watch<ChallengeProvider>();
-    
-    if (challenge.isLoading || challenge.allSubSections.isEmpty || _proceduralShader == null) {
+
+    if (challenge.isLoading ||
+        challenge.allSubSections.isEmpty ||
+        _proceduralShader == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    
+
     // 初始化视觉距离
     if (_visualDistance == 0 && challenge.currentDistance != 0) {
       _visualDistance = challenge.currentDistance;
@@ -546,9 +602,11 @@ class _FlowScreenState extends State<FlowScreen>
       listenable: RiverSettings.instance,
       builder: (context, _) {
         final settings = RiverSettings.instance;
-        final shader = settings.style == RiverStyle.ink ? (_inkShader ?? _proceduralShader!)
-                     : settings.style == RiverStyle.aurora ? (_auroraShader ?? _proceduralShader!)
-                     : _proceduralShader!;
+        final shader = settings.style == RiverStyle.ink
+            ? (_inkShader ?? _proceduralShader!)
+            : settings.style == RiverStyle.aurora
+                ? (_auroraShader ?? _proceduralShader!)
+                : _proceduralShader!;
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -560,28 +618,35 @@ class _FlowScreenState extends State<FlowScreen>
               onPointerUp: (e) => setState(() => _pointers.remove(e.pointer)),
               onPointerMove: (e) {
                 if (_pointers.length == 2) {
-                  if (_distanceController.isAnimating) _distanceController.stop();
+                  if (_distanceController.isAnimating)
+                    _distanceController.stop();
                   final prevSubName = challenge.currentSubSection?.name;
-                  challenge.updateVirtualDistance(challenge.currentDistance - e.delta.dy * 0.5);
+                  challenge.updateVirtualDistance(
+                      challenge.currentDistance - e.delta.dy * 0.5);
                   _visualDistance = challenge.currentDistance;
                   if (settings.pathMode == RiverPathMode.realPath) {
                     _updatePathOffsets(_visualDistance);
                   }
                   // 双指滑动后立即检测是否跨河段，立即震动（不依赖定时器）
                   final nowSub = challenge.currentSubSection;
-                  if (nowSub != null && nowSub.name != prevSubName && prevSubName != null) {
+                  if (nowSub != null &&
+                      nowSub.name != prevSubName &&
+                      prevSubName != null) {
                     _lastTriggeredSubSectionName = nowSub.name;
                     _triggerMilestone(nowSub);
                   }
                 }
               },
               child: Stack(children: [
-                Positioned.fill(child: CustomPaint(painter: RiverShaderPainter(
+                Positioned.fill(
+                    child: CustomPaint(
+                        painter: RiverShaderPainter(
                   shader: shader,
                   useRealPath: settings.pathMode == RiverPathMode.realPath,
                   pathOffsets: _currentPathOffsets,
                   time: _stopwatch.elapsedMilliseconds / 1000.0,
-                  turbulence: settings.turbulence + ((sub?.difficulty ?? 3) * 0.1),
+                  turbulence:
+                      settings.turbulence + ((sub?.difficulty ?? 3) * 0.1),
                   width: settings.width + ((sub?.baseFlowSpeed ?? 0.5) * 0.02),
                   speed: settings.speed + ((sub?.baseFlowSpeed ?? 0.5) * 0.1),
                   themeColor: sub?.color ?? Colors.blue,
@@ -590,19 +655,23 @@ class _FlowScreenState extends State<FlowScreen>
                   pulseX: _pulseCenter.dx,
                   pulseY: _pulseCenter.dy,
                 ))),
-                ..._blessings.map((b) => _buildBlessingWidget(b, settings, sub, _visualDistance)),
-                ..._lanterns.map((l) => _buildLanternWidget(l, settings, sub, _visualDistance)),
-                
+                ..._blessings.map((b) =>
+                    _buildBlessingWidget(b, settings, sub, _visualDistance)),
+                ..._lanterns.map((l) =>
+                    _buildLanternWidget(l, settings, sub, _visualDistance)),
+
                 // 里程碑勋章浮现层
                 if (_milestoneMedalPath != null) _buildMilestoneOverlay(),
 
-                SafeArea(child: Column(children: [
+                SafeArea(
+                    child: Column(children: [
                   const SizedBox(height: 25),
                   _buildHeader(sub, controller),
                   const SizedBox(height: 20),
                   _buildPoiCard(sub, controller),
                   const Spacer(flex: 3),
-                  _buildStepsAndProgress(controller, challenge, _visualDistance),
+                  _buildStepsAndProgress(
+                      controller, challenge, _visualDistance),
                   const Spacer(flex: 4),
                 ])),
               ]),
@@ -619,10 +688,10 @@ class _FlowScreenState extends State<FlowScreen>
       builder: (context, child) {
         final double val = _milestoneController.value;
         if (val <= 0 || val >= 1.0) return const SizedBox();
-        
+
         double opacity = 1.0;
         double scale = 1.0;
-        
+
         if (val < 0.2) {
           opacity = val / 0.2;
           scale = 0.5 + (val / 0.2) * 0.5;
@@ -653,7 +722,10 @@ class _FlowScreenState extends State<FlowScreen>
                     ),
                     child: Image.asset(
                       'assets/$_milestoneMedalPath',
-                      errorBuilder: (_, __, ___) => const Icon(Icons.military_tech, size: 100, color: Colors.white),
+                      errorBuilder: (_, __, ___) => const Icon(
+                          Icons.military_tech,
+                          size: 100,
+                          color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -664,7 +736,12 @@ class _FlowScreenState extends State<FlowScreen>
                       fontSize: 24,
                       fontWeight: FontWeight.w200,
                       letterSpacing: 4,
-                      shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+                      shadows: [
+                        Shadow(
+                            color: Colors.black26,
+                            blurRadius: 10,
+                            offset: Offset(0, 4))
+                      ],
                     ),
                   ),
                 ],
@@ -676,34 +753,58 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
-  Widget _buildBlessingWidget(Blessing b, RiverSettings settings, SubSection? sub, double currentDistance) {
-    final x = (_getRiverPathAt(b.localY, settings, sub, currentDistance) + b.randomX) / (MediaQuery.of(context).size.aspectRatio);
+  Widget _buildBlessingWidget(Blessing b, RiverSettings settings,
+      SubSection? sub, double currentDistance) {
+    final x = (_getRiverPathAt(b.localY, settings, sub, currentDistance) +
+            b.randomX) /
+        (MediaQuery.of(context).size.aspectRatio);
     return Positioned(
       left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
       top: (b.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
-      child: Opacity(opacity: b.opacity, child: ImageFiltered(
-        imageFilter: ui.ImageFilter.blur(sigmaX: b.blur, sigmaY: b.blur),
-        child: Text(b.text, style: const TextStyle(fontSize: 52, color: Color(0xFFFFD700), fontWeight: FontWeight.w600, shadows: [
-          Shadow(color: Colors.orangeAccent, blurRadius: 15),
-          Shadow(color: Colors.black45, blurRadius: 5, offset: Offset(2, 2)),
-        ])),
-      )),
+      child: Opacity(
+          opacity: b.opacity,
+          child: ImageFiltered(
+            imageFilter: ui.ImageFilter.blur(sigmaX: b.blur, sigmaY: b.blur),
+            child: Text(b.text,
+                style: const TextStyle(
+                    fontSize: 52,
+                    color: Color(0xFFFFD700),
+                    fontWeight: FontWeight.w600,
+                    shadows: [
+                      Shadow(color: Colors.orangeAccent, blurRadius: 15),
+                      Shadow(
+                          color: Colors.black45,
+                          blurRadius: 5,
+                          offset: Offset(2, 2)),
+                    ])),
+          )),
     );
   }
 
-  Widget _buildLanternWidget(Lantern l, RiverSettings settings, SubSection? sub, double currentDistance) {
-    final x = (_getRiverPathAt(l.localY, settings, sub, currentDistance) + l.randomX) / (MediaQuery.of(context).size.aspectRatio);
+  Widget _buildLanternWidget(Lantern l, RiverSettings settings, SubSection? sub,
+      double currentDistance) {
+    final x = (_getRiverPathAt(l.localY, settings, sub, currentDistance) +
+            l.randomX) /
+        (MediaQuery.of(context).size.aspectRatio);
     final scale = l.scaleBase * (0.8 + (l.localY + 1.0) * 0.2);
     return Positioned(
       left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
       top: (l.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
-      child: Transform.rotate(angle: l.rotation, child: Opacity(
-        opacity: (1.0 - (l.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
-        child: Image.asset('assets/icons/light.png', width: 50 * scale, height: 50 * scale,
-          color: settings.style == RiverStyle.aurora ? Colors.white.withOpacity(0.9) : null,
-          colorBlendMode: settings.style == RiverStyle.aurora ? BlendMode.plus : null,
-        ),
-      )),
+      child: Transform.rotate(
+          angle: l.rotation,
+          child: Opacity(
+            opacity: (1.0 - (l.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
+            child: Image.asset(
+              'assets/icons/light.png',
+              width: 50 * scale,
+              height: 50 * scale,
+              color: settings.style == RiverStyle.aurora
+                  ? Colors.white.withOpacity(0.9)
+                  : null,
+              colorBlendMode:
+                  settings.style == RiverStyle.aurora ? BlendMode.plus : null,
+            ),
+          )),
     );
   }
 
@@ -732,11 +833,13 @@ class _FlowScreenState extends State<FlowScreen>
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 2),
-            child: Icon(Icons.explore_rounded, size: 14, color: textColor.withOpacity(textOpacity)),
+            child: Icon(Icons.explore_rounded,
+                size: 14, color: textColor.withOpacity(textOpacity)),
           ),
           const SizedBox(width: 4),
           Expanded(
-            child: Text(label, style: style, maxLines: 2, overflow: TextOverflow.ellipsis),
+            child: Text(label,
+                style: style, maxLines: 2, overflow: TextOverflow.ellipsis),
           ),
         ],
       ),
@@ -747,13 +850,12 @@ class _FlowScreenState extends State<FlowScreen>
     final poi = _currentPoi;
     final themeColor = sub?.color ?? const Color(0xFF2196F3);
     final isLight = themeColor.computeLuminance() > 0.4;
-    // 地址主文案：有 POI 时用数据库里 RiverPoi 的省市区乡镇（或 formattedAddress）；无 POI 用天气城市名兜底
-    final addressParts = poi != null
-        ? [poi.province, poi.city, poi.district, poi.township].whereType<String>().where((s) => s.isNotEmpty).toList()
-        : <String>[];
+    // 地址主文案：有 POI 时用 shortLabel（省市区 + 最近 POI 名，如「青海省 海西 格尔木市 唐古拉山镇 · 沱沱河」）；无 POI 用天气城市名兜底
     final addressLine = poi != null
-        ? (addressParts.isEmpty ? (poi.formattedAddress ?? '') : addressParts.join(' '))
-        : (controller.cityName.isNotEmpty && controller.cityName != "待定位" ? controller.cityName : "江心云水间");
+        ? poi.shortLabel
+        : (controller.cityName.isNotEmpty && controller.cityName != "待定位"
+            ? controller.cityName
+            : "江心云水间");
     final hasAddress = addressLine.trim().isNotEmpty && addressLine != "江心云水间";
 
     return Padding(
@@ -765,8 +867,14 @@ class _FlowScreenState extends State<FlowScreen>
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: themeColor.withOpacity(0.18), width: 1),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 8)),
-            BoxShadow(color: themeColor.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 4)),
+            BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 24,
+                offset: const Offset(0, 8)),
+            BoxShadow(
+                color: themeColor.withOpacity(0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 4)),
           ],
         ),
         child: Row(
@@ -778,7 +886,8 @@ class _FlowScreenState extends State<FlowScreen>
                 color: themeColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(Icons.place_rounded, size: 22, color: themeColor.withOpacity(0.85)),
+              child: Icon(Icons.place_rounded,
+                  size: 22, color: themeColor.withOpacity(0.85)),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -799,12 +908,14 @@ class _FlowScreenState extends State<FlowScreen>
                   Text(
                     addressLine,
                     style: TextStyle(
-                      color: Color(0xFF222222).withOpacity(hasAddress ? 0.95 : 0.35),
+                      color: Color(0xFF222222)
+                          .withOpacity(hasAddress ? 0.95 : 0.35),
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0.5,
                       height: 1.35,
-                      fontStyle: hasAddress ? FontStyle.normal : FontStyle.italic,
+                      fontStyle:
+                          hasAddress ? FontStyle.normal : FontStyle.italic,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -825,42 +936,61 @@ class _FlowScreenState extends State<FlowScreen>
     final weatherType = _mapWeatherCode(controller.wmoCode);
     final medalIcon = sub?.medalIcon;
 
-    return Padding(padding: const EdgeInsets.symmetric(horizontal: 45), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        GestureDetector(
-          onTap: () => RiverSelectorSheet.show(context),
-          child: Row(
-            children: [
-              Text(sub?.name.split('·')[0] ?? '江面', style: const TextStyle(color: Color(0xFF222222), fontSize: 18, fontWeight: FontWeight.w400)),
-              const SizedBox(width: 4),
-              const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: Color(0xFF888888)),
-            ],
-          ),
-        ),
-        Row(children: [
-          if (medalIcon != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Image.asset(
-                'assets/$medalIcon',
-                width: 24,
-                height: 24,
-                errorBuilder: (_, __, ___) => const SizedBox(),
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 45),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            GestureDetector(
+              onTap: () => RiverSelectorSheet.show(context),
+              child: Row(
+                children: [
+                  Text(sub?.name.split('·')[0] ?? '江面',
+                      style: const TextStyle(
+                          color: Color(0xFF222222),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400)),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.keyboard_arrow_down_rounded,
+                      size: 20, color: Color(0xFF888888)),
+                ],
               ),
             ),
-          GestureDetector(onTap: () => _showWeatherDetail(controller), child: Row(children: [
-            Text(controller.temp, style: const TextStyle(color: Color(0xFF222222), fontSize: 18, fontWeight: FontWeight.w300)),
-            const SizedBox(width: 8),
-            Icon(weatherType.icon, size: 22, color: const Color(0xFF222222)),
-          ])),
-        ]),
-      ]),
-      Text(sub?.name ?? '正在加载...', style: TextStyle(color: const Color(0xFF222222).withOpacity(0.5), fontSize: 13)),
-    ]));
+            Row(children: [
+              if (medalIcon != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Image.asset(
+                    'assets/$medalIcon',
+                    width: 24,
+                    height: 24,
+                    errorBuilder: (_, __, ___) => const SizedBox(),
+                  ),
+                ),
+              GestureDetector(
+                  onTap: () => _showWeatherDetail(controller),
+                  child: Row(children: [
+                    Text(controller.temp,
+                        style: const TextStyle(
+                            color: Color(0xFF222222),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w300)),
+                    const SizedBox(width: 8),
+                    Icon(weatherType.icon,
+                        size: 22, color: const Color(0xFF222222)),
+                  ])),
+            ]),
+          ]),
+          Text(sub?.name ?? '正在加载...',
+              style: TextStyle(
+                  color: const Color(0xFF222222).withOpacity(0.5),
+                  fontSize: 13)),
+        ]));
   }
 
-  Widget _buildStepsAndProgress(FlowController controller, ChallengeProvider challenge, double visualDistance) {
-    String steps = controller.displaySteps.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+  Widget _buildStepsAndProgress(FlowController controller,
+      ChallengeProvider challenge, double visualDistance) {
+    String steps = controller.displaySteps.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     final sub = challenge.currentSubSection;
     final all = challenge.allSubSections;
     double segmentStartKm = 0;
@@ -870,16 +1000,32 @@ class _FlowScreenState extends State<FlowScreen>
       segmentStartKm = idx > 0 ? all[idx - 1].accumulatedLength : 0;
       segmentLengthKm = sub.accumulatedLength - segmentStartKm;
     }
-    final segmentTraveledKm = (visualDistance - segmentStartKm).clamp(0.0, segmentLengthKm);
+    final segmentTraveledKm =
+        (visualDistance - segmentStartKm).clamp(0.0, segmentLengthKm);
     final segmentLine = segmentLengthKm > 0
         ? "本段已行 ${segmentTraveledKm.toStringAsFixed(1)} km / 本段 ${segmentLengthKm.toStringAsFixed(0)} km"
         : null;
     return Column(children: [
-      Text(steps, style: TextStyle(color: const Color(0xFF222222), fontSize: steps.length > 7 ? 82 : 105, fontWeight: FontWeight.w100, letterSpacing: -2)),
-      Text("已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km", style: TextStyle(color: const Color(0xFF555555).withOpacity(0.7), fontSize: 16, letterSpacing: 1.2)),
+      Text(steps,
+          style: TextStyle(
+              color: const Color(0xFF222222),
+              fontSize: steps.length > 7 ? 82 : 105,
+              fontWeight: FontWeight.w100,
+              letterSpacing: -2)),
+      Text(
+          "已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km",
+          style: TextStyle(
+              color: const Color(0xFF555555).withOpacity(0.7),
+              fontSize: 16,
+              letterSpacing: 1.2)),
       if (segmentLine != null) ...[
         const SizedBox(height: 10),
-        Text(segmentLine, style: TextStyle(color: const Color(0xFF555555).withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w300, letterSpacing: 0.8)),
+        Text(segmentLine,
+            style: TextStyle(
+                color: const Color(0xFF555555).withOpacity(0.6),
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 0.8)),
       ],
     ]);
   }
@@ -892,9 +1038,19 @@ class RiverShaderPainter extends CustomPainter {
   final double time, turbulence, width, speed, offset, pulse, pulseX, pulseY;
   final Color themeColor;
 
-  RiverShaderPainter({required this.shader, required this.useRealPath, required this.pathOffsets, required this.time,
-    required this.turbulence, required this.width, required this.speed, required this.themeColor, required this.offset,
-    required this.pulse, required this.pulseX, required this.pulseY});
+  RiverShaderPainter(
+      {required this.shader,
+      required this.useRealPath,
+      required this.pathOffsets,
+      required this.time,
+      required this.turbulence,
+      required this.width,
+      required this.speed,
+      required this.themeColor,
+      required this.offset,
+      required this.pulse,
+      required this.pulseX,
+      required this.pulseY});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -915,6 +1071,7 @@ class RiverShaderPainter extends CustomPainter {
     shader.setFloat(45, pulseY);
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
+
   @override
   bool shouldRepaint(covariant CustomPainter old) => true;
 }

@@ -69,7 +69,7 @@ python3 tools/fetch_river_pois.py --river yangtze --step 5 --key "$AMAP_KEY" --o
 查询时取「距离 path_km 最近」的一条：前后各查一次（≤ path_km 最大 / ≥ path_km 最小），比较 \|d - path_km\| 取更近者，避免只取「≤ 当前里程最大」导致 105 km 点比 80 km 更近却被忽略的问题。  
 若做数据压缩，可只保留「POI/地址发生变化」的里程点，同一查询逻辑仍然成立（返回该里程所在段的代表点）。运行 **compress_river_pois.py** 对已生成的 DB 做变化点压缩：`python3 tools/compress_river_pois.py [--db tools/out/rivtrek_base.db]`，支持 `--dry-run` 仅查看保留行数。
 
-- **缩放因子**：行进距离与路径地理距离可能不一致，App 从各河流 **master JSON**（如 `yangtze_master.json`）的 `correction_coefficient` 自动读取，查库前做 `path_km = accumulated_km * correction_coefficient`，无需在 config 里手配。
+- **缩放因子**：`distance_km` 与 master 的累计挑战里程一致；查库直接用行进距离（accumulated_km），不乘 correction_coefficient。修正系数仅用于其他场景（如展示路径距离等）。
 
 ```sql
 CREATE TABLE river_pois (
@@ -92,4 +92,4 @@ CREATE TABLE river_pois (
 1. 运行 POI 脚本，输出到 `tools/out/rivtrek_base.db`（可多河多次跑，或合并成单文件；可选再跑 compress 做变化点压缩）
 2. **将 `tools/out/` 下生成的 `rivtrek_base.db` 拷贝到 `assets/db/`**（已在 `pubspec.yaml` 声明）
 3. App 首次需要基础数据时：若本地无该文件则从 asset 复制到应用目录并打开，之后直接查该库
-4. 产品里根据当前行进距离调 **getNearestPoi(riverId, accumulatedKm)**，用返回的 `shortLabel` 做「此刻行至 XXX」等展示，无需请求天地图。
+4. 产品里根据当前行进距离调 **getNearestPoi(numericId, accumulatedKm)**（用数字主键避免字符串 id 匹配问题），用返回的 `shortLabel` 做「此刻行至 XXX」等展示，无需请求天地图。
