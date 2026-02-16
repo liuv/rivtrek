@@ -87,7 +87,7 @@ class DatabaseService {
     ''');
   }
 
-  /// 基础数据库（POI 等静态数据，今后可扩展）。先读本地文件，无则从 asset 复制后打开。
+  /// 基础数据库（POI 等静态数据，只读）。每次使用前从 asset 强制覆盖本地文件，覆盖安装后也会得到新包内最新数据。
   Future<Database?> get baseDatabase async => _getBaseDatabase();
 
   Future<Database?> _getBaseDatabase() async {
@@ -95,10 +95,8 @@ class DatabaseService {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _baseDbFileName);
     try {
-      if (!await File(path).exists()) {
-        final byteData = await rootBundle.load(_baseDbAssetPath);
-        await File(path).writeAsBytes(byteData.buffer.asUint8List());
-      }
+      final byteData = await rootBundle.load(_baseDbAssetPath);
+      await File(path).writeAsBytes(byteData.buffer.asUint8List());
       _baseDatabase = await openDatabase(path);
       return _baseDatabase;
     } catch (_) {
