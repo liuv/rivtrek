@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rivtrek/models/daily_stats.dart';
 import 'package:rivtrek/timeline/article/article_widget.dart';
 import 'package:rivtrek/timeline/bloc_provider.dart';
 import "package:rivtrek/timeline/colors.dart";
@@ -19,10 +20,27 @@ typedef SelectItemCallback(TimelineEntry item);
 /// This is the Stateful Widget associated with the Timeline object. 
 /// It is built from a [focusItem], that is the event the [Timeline] should
 /// focus on when it's created.
+/// When [activities] / [axisMode] are provided (挑战记录入口), header 显示时间/公里模式切换。
 class TimelineWidget extends StatefulWidget {
   final MenuItemData focusItem;
   final Timeline timeline;
-  TimelineWidget(this.focusItem, this.timeline, {Key? key}) : super(key: key);
+  final List<DailyActivity>? activities;
+  final List<DailyWeather>? weathers;
+  final List<RiverEvent>? events;
+  final TimelineAxisMode? axisMode;
+  /// 切换时间/公里模式时由外部替换为新的 TimelinePage，避免循环依赖。
+  final void Function(TimelineAxisMode mode)? onSwitchAxisMode;
+
+  TimelineWidget(
+    this.focusItem,
+    this.timeline, {
+    Key? key,
+    this.activities,
+    this.weathers,
+    this.events,
+    this.axisMode,
+    this.onSwitchAxisMode,
+  }) : super(key: key);
 
   @override
   _TimelineWidgetState createState() => _TimelineWidgetState();
@@ -285,72 +303,106 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                       color: _headerBackgroundColor != null
                           ? _headerBackgroundColor
                           : Color.fromRGBO(238, 240, 242, 0.81)),
-                  Container(
-                      color: _headerBackgroundColor != null
-                          ? _headerBackgroundColor
-                          : Color.fromRGBO(238, 240, 242, 0.81),
-                      height: 56.0,
-                      width: double.infinity,
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            IconButton(
-                              padding:
-                                  EdgeInsets.only(left: 20.0, right: 20.0),
-                              color: _headerTextColor != null
-                                  ? _headerTextColor
-                                  : Colors.black.withOpacity(0.5),
-                              alignment: Alignment.centerLeft,
-                              icon: Icon(Icons.arrow_back),
-                              onPressed: () {
-                                widget.timeline.isActive = false;
-                                Navigator.of(context).pop();
-                                return;
-                              },
-                            ),
-                            Text(
-                              _eraName ?? DefaultEraName,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontFamily: "RobotoMedium",
-                                  fontSize: 20.0,
-                                  color: _headerTextColor != null
-                                      ? _headerTextColor
-                                      : darkText.withOpacity(
-                                          darkText.opacity * 0.75)),
-                            ),
-                            Expanded(
-                                child: GestureDetector(
-                                    child: Transform.translate(
-                                        offset: const Offset(0.0, 0.0),
-                                        child: Container(
-                                          height: 60.0,
-                                          width: 60.0,
-                                          padding: EdgeInsets.all(18.0),
-                                          color:
-                                              Colors.white.withOpacity(0.0),
-                                          child: Icon(
-                                              _showFavorites
-                                                  ? Icons.favorite
-                                                  : Icons.favorite_border,
-                                              color: _headerTextColor !=
-                                                      null
-                                                  ? _headerTextColor
-                                                  : darkText.withOpacity(
-                                                      darkText.opacity *
-                                                          0.75)),
-                                        )),
-                                    onTap: () {
-                                      timeline.showFavorites =
-                                          !timeline.showFavorites;
-                                      setState(() {
-                                        _showFavorites =
-                                            timeline.showFavorites;
-                                      });
-                                    })),
-                          ]))
-                ])
+                  _buildTimelineHeader(context, devicePadding),
+                ]),
           ])),
     ));
+  }
+
+  Widget _buildTimelineHeader(BuildContext context, EdgeInsets devicePadding) {
+    return Container(
+      color: _headerBackgroundColor != null
+          ? _headerBackgroundColor
+          : const Color.fromRGBO(238, 240, 242, 0.81),
+      height: 56.0,
+      width: double.infinity,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          IconButton(
+            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+            color: _headerTextColor != null
+                ? _headerTextColor
+                : Colors.black.withOpacity(0.5),
+            alignment: Alignment.centerLeft,
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              widget.timeline.isActive = false;
+              Navigator.of(context).pop();
+            },
+          ),
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                Text(
+                  _eraName ?? DefaultEraName,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontFamily: "RobotoMedium",
+                    fontSize: 20.0,
+                    color: _headerTextColor != null
+                        ? _headerTextColor
+                        : darkText.withOpacity(darkText.opacity * 0.75),
+                  ),
+                ),
+                if (widget.axisMode != null && widget.activities != null) ...[
+                  const SizedBox(width: 12),
+                  _buildModeChip(context, TimelineAxisMode.calendarDate),
+                  const SizedBox(width: 6),
+                  _buildModeChip(context, TimelineAxisMode.distanceKm),
+                ],
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              timeline.showFavorites = !timeline.showFavorites;
+              setState(() => _showFavorites = timeline.showFavorites);
+            },
+            child: Container(
+              height: 60.0,
+              width: 60.0,
+              padding: const EdgeInsets.all(18.0),
+              child: Icon(
+                _showFavorites ? Icons.favorite : Icons.favorite_border,
+                color: _headerTextColor != null
+                    ? _headerTextColor
+                    : darkText.withOpacity(darkText.opacity * 0.75),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeChip(BuildContext context, TimelineAxisMode mode) {
+    final isSelected = widget.axisMode == mode;
+    final label = mode == TimelineAxisMode.calendarDate ? '时间' : '公里';
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isSelected ? null : () => widget.onSwitchAxisMode?.call(mode),
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: isSelected
+                ? (Colors.black.withOpacity(0.15))
+                : Colors.transparent,
+          ),
+          child: Text(
+            '$label模式',
+            style: TextStyle(
+              fontSize: 12,
+              color: _headerTextColor != null
+                  ? _headerTextColor!.withOpacity(isSelected ? 1.0 : 0.6)
+                  : darkText.withOpacity(isSelected ? 0.9 : 0.5),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

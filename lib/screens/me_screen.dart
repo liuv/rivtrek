@@ -3,34 +3,11 @@ import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 import '../providers/challenge_provider.dart';
 import 'settings_screen.dart';
-import 'package:rivtrek/services/database_service.dart';
-import 'package:rivtrek/timeline/timeline/timeline.dart';
-import 'package:rivtrek/timeline/timeline_page.dart';
+import 'package:rivtrek/screens/challenge_records_menu_screen.dart';
 import 'package:rivtrek/screens/share_preview_sheet.dart';
 
 class MeScreen extends StatelessWidget {
   const MeScreen({super.key});
-
-  void _navigateToChallengeRecords(
-      BuildContext context, TimelineAxisMode mode) async {
-    final activities = await DatabaseService.instance.getAllActivities();
-    final weathers = await DatabaseService.instance.getAllWeather();
-    final events = await DatabaseService.instance.getAllEvents();
-
-    if (context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TimelinePage(
-            activities: activities,
-            weathers: weathers,
-            events: events,
-            mode: mode,
-          ),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -182,12 +159,14 @@ class MeScreen extends StatelessWidget {
                       builder: (ctx) => const SharePreviewSheet(),
                     );
                   }),
-                  _buildMenuItem("挑战记录（公里）", Icons.history_rounded,
-                      onTap: () => _navigateToChallengeRecords(
-                          context, TimelineAxisMode.distanceKm)),
-                  _buildMenuItem("挑战记录（日期）", Icons.calendar_month_rounded,
-                      onTap: () => _navigateToChallengeRecords(
-                          context, TimelineAxisMode.calendarDate)),
+                  _buildMenuItem("挑战记录", Icons.history_rounded, onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChallengeRecordsMenuScreen(),
+                      ),
+                    );
+                  }),
                   _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,

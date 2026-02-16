@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 import "package:flutter/services.dart" show rootBundle;
+import 'package:rivtrek/models/daily_stats.dart';
 import 'package:rivtrek/timeline/timeline/timeline.dart';
 import 'package:rivtrek/timeline/timeline/timeline_entry.dart';
 
@@ -73,6 +74,23 @@ class MenuItemData {
       start = entry.start;
       end = entry.end + range;
     }
+  }
+
+  /// 从一条 [DailyActivity] 构建，用于挑战记录菜单点击后聚焦时间线。按 [axisMode] 设置 start/end。
+  factory MenuItemData.fromActivity(DailyActivity activity, TimelineAxisMode axisMode) {
+    final item = MenuItemData();
+    item.label = '${activity.date} · +${activity.distanceKm.toStringAsFixed(1)} km（累计 ${activity.accumulatedDistanceKm.toStringAsFixed(1)} km）';
+    item.pad = true;
+    const double range = 2.0;
+    if (axisMode == TimelineAxisMode.calendarDate) {
+      final day = Timeline.dateStringToAxisDay(activity.date);
+      item.start = day - range / 2;
+      item.end = day + range / 2;
+    } else {
+      item.start = (activity.accumulatedDistanceKm - range / 2).clamp(0.0, double.infinity);
+      item.end = activity.accumulatedDistanceKm + range / 2;
+    }
+    return item;
   }
 }
 

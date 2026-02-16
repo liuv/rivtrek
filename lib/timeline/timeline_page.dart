@@ -19,7 +19,8 @@ class TimelinePage extends StatelessWidget {
       this.activities,
       this.weathers,
       this.events,
-      this.mode = TimelineAxisMode.distanceKm})
+      this.mode = TimelineAxisMode.distanceKm,
+      this.focusItem})
       : super(key: key);
 
   final AnimationController? animationController;
@@ -27,6 +28,8 @@ class TimelinePage extends StatelessWidget {
   final List<DailyWeather>? weathers;
   final List<RiverEvent>? events;
   final TimelineAxisMode mode;
+  /// 从挑战记录菜单进入时传入，用于聚焦到某条记录；未传则聚焦到最近进度。
+  final MenuItemData? focusItem;
 
   @override
   Widget build(BuildContext context) {
@@ -39,50 +42,82 @@ class TimelinePage extends StatelessWidget {
       child: MenuPage(
           animationController: animationController,
           activities: activities,
-          mode: mode),
+          weathers: weathers,
+          events: events,
+          mode: mode,
+          focusItem: focusItem),
       platform: Theme.of(context).platform,
     );
   }
 }
 
 class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key, this.animationController, this.activities, required this.mode}) : super(key: key);
+  const MenuPage({
+    Key? key,
+    this.animationController,
+    this.activities,
+    this.weathers,
+    this.events,
+    required this.mode,
+    this.focusItem,
+  }) : super(key: key);
 
   final AnimationController? animationController;
   final List<DailyActivity>? activities;
+  final List<DailyWeather>? weathers;
+  final List<RiverEvent>? events;
   final TimelineAxisMode mode;
+  final MenuItemData? focusItem;
 
   @override
   Widget build(BuildContext context) {
-    // 挑战记录入口始终直达时间线（无数据时展示空态轴）。
+    // 挑战记录入口：有数据则直接进时间线（带可选 focusItem）；无数据时展示空态轴。
     if (activities != null) {
       final timeline = BlocProvider.getTimeline(context);
-      // 创建一个聚焦到最后一个活动的 MenuItemData
-      final focusItem = MenuItemData();
-      if (activities!.isNotEmpty) {
+      MenuItemData effectiveFocus = focusItem ?? MenuItemData();
+      if (focusItem == null && activities!.isNotEmpty) {
         if (mode == TimelineAxisMode.calendarDate) {
           final sorted = List<DailyActivity>.from(activities!)
             ..sort((a, b) => Timeline.dateStringToAxisDay(a.date)
                 .compareTo(Timeline.dateStringToAxisDay(b.date)));
           final double lastDay = Timeline.dateStringToAxisDay(sorted.last.date);
-          focusItem.start = lastDay - 30.0;
-          focusItem.end = lastDay + 3.0;
-          focusItem.label = "最近记录";
+          effectiveFocus.start = lastDay - 30.0;
+          effectiveFocus.end = lastDay + 3.0;
+          effectiveFocus.label = "最近记录";
         } else {
           final sorted = List<DailyActivity>.from(activities!)
             ..sort((a, b) => a.accumulatedDistanceKm.compareTo(b.accumulatedDistanceKm));
           final double lastDistance = sorted.last.accumulatedDistanceKm;
-          focusItem.start = (lastDistance - 25.0).clamp(0.0, double.maxFinite);
-          focusItem.end = lastDistance + 10.0;
-          focusItem.label = "当前进度";
+          effectiveFocus.start = (lastDistance - 25.0).clamp(0.0, double.maxFinite);
+          effectiveFocus.end = lastDistance + 10.0;
+          effectiveFocus.label = "当前进度";
         }
-      } else {
-        focusItem.start = 0.0;
-        focusItem.end = 30.0;
-        focusItem.label = "挑战记录";
+      } else if (focusItem == null) {
+        effectiveFocus.start = 0.0;
+        effectiveFocus.end = 30.0;
+        effectiveFocus.label = "挑战记录";
       }
-      
-      return TimelineWidget(focusItem, timeline);
+
+      return TimelineWidget(
+        effectiveFocus,
+        timeline,
+        activities: activities,
+        weathers: weathers,
+        events: events,
+        axisMode: mode,
+        onSwitchAxisMode: (newMode) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => TimelinePage(
+                activities: activities,
+                weathers: weathers,
+                events: events,
+                mode: newMode,
+              ),
+            ),
+          );
+        },
+      );
     }
 
     return Scaffold(
