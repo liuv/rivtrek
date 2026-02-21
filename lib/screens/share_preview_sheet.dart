@@ -158,6 +158,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
               sectionName: sectionName,
               themeColor: river.color,
               coverPath: river.coverPath.isNotEmpty ? river.coverPath : null,
+              riverForPathOverlay: river,
               medalIconPath: medalIconPath,
               locationLabel: locationLabel,
               poiNames: hasPoiNames ? poiNames : null,

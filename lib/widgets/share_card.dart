@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../models/river.dart';
+import 'river_path_overlay.dart';
 
 /// 用于生成分享图片的卡片：封面图、河流名、进度条、河段徽章、此刻行至地点/POI、slogan
 class ShareCardWidget extends StatelessWidget {
@@ -10,6 +12,8 @@ class ShareCardWidget extends StatelessWidget {
   final Color themeColor;
   /// 江河封面图 asset 路径，如 "assets/images/cover_yangtze.png"
   final String? coverPath;
+  /// 用于在封面上绘制路径与当前位置；为 null 则不绘制
+  final River? riverForPathOverlay;
   /// 当前河段徽章 asset 路径，如 "assets/rivers/yangtze/medal_xxx.png"
   final String? medalIconPath;
   /// 此刻行至的地点文案（省市区或 formattedAddress）
@@ -26,6 +30,7 @@ class ShareCardWidget extends StatelessWidget {
     required this.sectionName,
     required this.themeColor,
     this.coverPath,
+    this.riverForPathOverlay,
     this.medalIconPath,
     this.locationLabel,
     this.poiNames,
@@ -96,6 +101,12 @@ class ShareCardWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (riverForPathOverlay != null)
+                  RiverPathOverlay(
+                    child: const SizedBox.expand(),
+                    river: riverForPathOverlay!,
+                    currentKm: currentKm,
+                  ),
               ],
               // 无封面时的水纹装饰
               if (!hasCover) ...[

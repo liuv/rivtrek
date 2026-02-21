@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/river.dart';
 import '../providers/challenge_provider.dart';
 import '../repositories/river_repository.dart';
+import '../widgets/river_path_overlay.dart';
 
 class InitialRiverSelectionScreen extends StatefulWidget {
   const InitialRiverSelectionScreen({
@@ -174,6 +175,13 @@ class _InitialRiverSelectionScreenState extends State<InitialRiverSelectionScree
                     ],
                   ),
                 ),
+              ),
+              RiverPathOverlay(
+                child: const SizedBox.expand(),
+                river: river,
+                currentKm: context.watch<ChallengeProvider>().activeRiver?.id == river.id
+                    ? context.watch<ChallengeProvider>().currentDistance
+                    : 0,
               ),
               Padding(
                 padding: const EdgeInsets.all(30),
