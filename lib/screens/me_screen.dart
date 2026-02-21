@@ -296,7 +296,7 @@ class MeScreen extends StatelessWidget {
                       ),
                     );
                   }),
-                  _buildMenuItem("徒步设置", Icons.settings_outlined, onTap: () {
+                  _buildMenuItem("应用设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(

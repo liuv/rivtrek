@@ -7,9 +7,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'screens/flow_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/me_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/initial_river_selection_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'controllers/flow_controller.dart';
 import 'repositories/river_repository.dart';
@@ -41,16 +45,15 @@ void main() async {
     await Permission.activityRecognition.request();
   }
 
-  // 初始化后台任务
+  // 初始化后台任务（行业做法：高频周期 + 不依赖网络，确保日界前能跑一次）
   await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-  
-  // 注册周期性任务 (每小时同步一次)
+  // 15 分钟为系统允许的最短周期，避免「最后一次打开 10 点、10 点后步数记到明天」和漏天
   await Workmanager().registerPeriodicTask(
     "1",
     "periodic-sync-task",
-    frequency: const Duration(hours: 1),
+    frequency: const Duration(minutes: 15),
     constraints: Constraints(
-      networkType: NetworkType.connected,
+      networkType: NetworkType.not_required,
     ),
   );
 
@@ -98,14 +101,97 @@ class MainContainer extends StatefulWidget {
   State<MainContainer> createState() => _MainContainerState();
 }
 
+bool _sensorPermissionHintShownThisLaunch = false;
+
 class _MainContainerState extends State<MainContainer> {
   int _currentIndex = 0;
   late PageController _pageController;
+  /// 是否已完成首次选择河流（null = 仍在读取 pref）
+  bool? _hasCompletedInitialRiverSelection;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
+    _loadInitialRiverSelectionFlag();
+  }
+
+  Future<void> _loadInitialRiverSelectionFlag() async {
+    final prefs = await SharedPreferences.getInstance();
+    final completed = prefs.getBool('has_completed_initial_river_selection') ?? false;
+    if (mounted) {
+      setState(() => _hasCompletedInitialRiverSelection = completed);
+      if (completed) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowSensorPermissionHint(context));
+      }
+    }
+  }
+
+  void _onInitialRiverSelectionComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_completed_initial_river_selection', true);
+    if (mounted) {
+      setState(() => _hasCompletedInitialRiverSelection = true);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowSensorPermissionHint(context));
+    }
+  }
+
+  Future<void> _maybeShowSensorPermissionHint(BuildContext context) async {
+    if (!Platform.isAndroid || _sensorPermissionHintShownThisLaunch) return;
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('sensor_permission_hint_disabled') == true) return;
+    if (prefs.getString('last_steps_source') == 'health_connect') return;
+    bool? batteryOk;
+    bool? autoOk;
+    try {
+      batteryOk = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+      autoOk = await DisableBatteryOptimization.isAutoStartEnabled;
+    } catch (_) {
+      return;
+    }
+    if (batteryOk == true && autoOk == true) return;
+    _sensorPermissionHintShownThisLaunch = true;
+    if (!context.mounted) return;
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        title: const Text('步数记录建议'),
+        content: const Text(
+          '您当前使用本机传感器记录步数。为减少某天步数为 0 或漏记的情况，'
+          '建议在「行者」→「应用设置」中开启「忽略电池优化」和「自启动」。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final p = await SharedPreferences.getInstance();
+              await p.setBool('sensor_permission_hint_disabled', true);
+              if (ctx.mounted) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('您可在「行者」→「应用设置」中重新开启此提醒'),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            child: const Text('不再提示'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('稍后再说'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.of(ctx).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
+            },
+            child: const Text('去设置'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -116,6 +202,17 @@ class _MainContainerState extends State<MainContainer> {
 
   @override
   Widget build(BuildContext context) {
+    // 首次安装：先选河流，选完再进首页并可能弹省电/自启动
+    if (_hasCompletedInitialRiverSelection == false) {
+      return InitialRiverSelectionScreen(onComplete: _onInitialRiverSelectionComplete);
+    }
+    // 未读完 pref 时短暂显示空白/加载，避免闪屏
+    if (_hasCompletedInitialRiverSelection != true) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF9F9F9),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       body: Stack(
         children: [
