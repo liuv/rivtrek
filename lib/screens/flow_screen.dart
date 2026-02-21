@@ -138,11 +138,15 @@ class _FlowScreenState extends State<FlowScreen>
       _currentPoi = null;
     }
 
-    // 按当前行进距离查最近 POI，约 0.5 km 更新一次
+    // 按当前行进距离查最近 POI：仅在挑战加载完成、河流有效且 numericId>0 时查询，避免时序导致匹配不到
+    // 约 0.5 km 更新一次；加载完成后 _lastPoiRequestKm 为 null 会触发首次查询
     final river = challenge.activeRiver;
     final km = challenge.currentDistance;
-    if (river != null &&
-        (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5)) {
+    final canQueryPoi = !challenge.isLoading &&
+        river != null &&
+        river.numericId > 0 &&
+        (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5);
+    if (canQueryPoi) {
       _lastPoiRequestKm = km;
       DatabaseService.instance.getNearestPoi(river.numericId, km).then((p) {
         if (!mounted) return;
@@ -1005,13 +1009,41 @@ class _FlowScreenState extends State<FlowScreen>
     final segmentLine = segmentLengthKm > 0
         ? "本段已行 ${segmentTraveledKm.toStringAsFixed(1)} km / 本段 ${segmentLengthKm.toStringAsFixed(0)} km"
         : null;
+    final stepsSource = controller.stepsSource;
+    final isHealthConnect = stepsSource == 'health_connect';
+    final isSensor = stepsSource == 'sensor';
     return Column(children: [
-      Text(steps,
-          style: TextStyle(
-              color: const Color(0xFF222222),
-              fontSize: steps.length > 7 ? 82 : 105,
-              fontWeight: FontWeight.w100,
-              letterSpacing: -2)),
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 6, bottom: 8),
+            child: Tooltip(
+              message: isHealthConnect
+                  ? '步数来自 Health Connect'
+                  : isSensor
+                      ? '步数来自计步传感器'
+                      : '步数来源未知',
+              child: Icon(
+                isHealthConnect
+                    ? Icons.health_and_safety_outlined
+                    : isSensor
+                        ? Icons.sensors_outlined
+                        : Icons.help_outline_rounded,
+                size: 20,
+                color: const Color(0xFF888888),
+              ),
+            ),
+          ),
+          Text(steps,
+              style: TextStyle(
+                  color: const Color(0xFF222222),
+                  fontSize: steps.length > 7 ? 82 : 105,
+                  fontWeight: FontWeight.w100,
+                  letterSpacing: -2)),
+        ],
+      ),
       Text(
           "已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km",
           style: TextStyle(

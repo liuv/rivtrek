@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/daily_stats.dart';
 
@@ -11,10 +12,15 @@ class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
   static Database? _database;
   static Database? _baseDatabase;
+  /// 单次初始化，避免多路并发复制 asset/打开导致竞态或重复失败
+  static Future<Database?>? _baseDatabaseFuture;
 
   /// 基础数据库文件名，可存 POI、今后其他静态/配置数据等
   static const String _baseDbFileName = 'rivtrek_base.db';
   static const String _baseDbAssetPath = 'assets/db/rivtrek_base.db';
+  /// 与 asset 中 rivtrek_base.db 对应；更新 POI 并重新打库后请 +1，以便安装/升级后覆盖旧文件
+  static const int _baseDbAssetVersion = 1;
+  static const String _prefKeyBaseDbVersion = 'rivtrek_base_asset_version';
 
   DatabaseService._init();
 
@@ -89,19 +95,41 @@ class DatabaseService {
     ''');
   }
 
-  /// 基础数据库（POI 等静态数据，只读）。每次使用前从 asset 强制覆盖本地文件，覆盖安装后也会得到新包内最新数据。
+  /// 基础数据库（POI 等静态数据，只读）。仅「首次安装或 asset 版本升级」时从 asset 拷贝到本地，其余直接打开已拷贝文件，避免每次启动都拷贝。
+  /// 使用单次初始化：多路并发调用共用一个 init Future，避免竞态。
   Future<Database?> get baseDatabase async => _getBaseDatabase();
 
   Future<Database?> _getBaseDatabase() async {
     if (_baseDatabase != null) return _baseDatabase;
+    _baseDatabaseFuture ??= _openBaseDatabaseOnce();
+    final db = await _baseDatabaseFuture!;
+    if (db != null) _baseDatabase = db;
+    else _baseDatabaseFuture = null; // 失败时清空，下次调用可重试
+    return db;
+  }
+
+  Future<Database?> _openBaseDatabaseOnce() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _baseDbFileName);
+    final file = File(path);
     try {
-      final byteData = await rootBundle.load(_baseDbAssetPath);
-      await File(path).writeAsBytes(byteData.buffer.asUint8List());
-      _baseDatabase = await openDatabase(path);
-      return _baseDatabase;
-    } catch (_) {
+      final prefs = await SharedPreferences.getInstance();
+      final storedVersion = prefs.getInt(_prefKeyBaseDbVersion) ?? 0;
+      final needCopy = !file.existsSync() || storedVersion < _baseDbAssetVersion;
+
+      if (needCopy) {
+        final byteData = await rootBundle.load(_baseDbAssetPath);
+        await file.writeAsBytes(byteData.buffer.asUint8List());
+        await prefs.setInt(_prefKeyBaseDbVersion, _baseDbAssetVersion);
+        if (kDebugMode) debugPrint('[POI] baseDatabase copied from asset (version $_baseDbAssetVersion)');
+      }
+
+      return await openDatabase(path, readOnly: true);
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[POI] baseDatabase open failed: $e');
+        debugPrint('$st');
+      }
       return null;
     }
   }
@@ -233,7 +261,9 @@ class DatabaseService {
         debugPrint('$_tag before=${before.length} after=${after.length}');
       RiverPoi? pick(Map<String, dynamic> row) => RiverPoi.fromMap(row);
       if (before.isEmpty && after.isEmpty) {
-        if (kDebugMode) debugPrint('$_tag both empty, return null');
+        if (kDebugMode)
+          debugPrint(
+              '$_tag both empty (no rows for numeric_id=$numericId, pathKm=$pathKm), return null');
         return null;
       }
       if (before.isEmpty) {

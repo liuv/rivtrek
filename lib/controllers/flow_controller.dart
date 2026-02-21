@@ -19,7 +19,9 @@ class FlowController extends ChangeNotifier {
   // 步数与里程
   int _displaySteps = 0;
   double _currentDistance = 0.0;
-  final double _stepLengthKm = 0.0007; 
+  final double _stepLengthKm = 0.0007;
+  /// 步数来源：health_connect | sensor | unknown（用于 UI 显示对应图标）
+  String _stepsSource = 'unknown'; 
   
   // 天气相关
   String _temp = "--";
@@ -44,6 +46,7 @@ class FlowController extends ChangeNotifier {
   // Getters
   int get displaySteps => _displaySteps;
   double get currentDistance => _currentDistance;
+  String get stepsSource => _stepsSource;
   String get temp => _temp;
   String get maxTemp => _maxTemp;
   String get minTemp => _minTemp;
@@ -69,21 +72,30 @@ class FlowController extends ChangeNotifier {
     await _updateUIFromDB();
   }
 
-  /// 从数据库刷新 UI 显示的数据
+  /// 从数据库刷新 UI 显示的数据（riverId 与 ChallengeProvider 一致：先看同步状态，否则用 prefs 兜底）
   Future<void> _updateUIFromDB() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final riverId = _activeRiverId ?? 'yangtze';
-    
+    String riverId = _activeRiverId ?? '';
+    if (riverId.isEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      riverId = prefs.getString('active_river_id') ?? 'yangtze';
+    }
+
     final db = await DatabaseService.instance.database;
     final maps = await db.query('daily_activities', 
         where: 'date = ? AND river_id = ?', 
         whereArgs: [today, riverId]);
     
+    final prefs = await SharedPreferences.getInstance();
+    _stepsSource = prefs.getString('last_steps_source') ?? 'unknown';
+
     if (maps.isNotEmpty) {
       final activity = DailyActivity.fromMap(maps.first);
       _displaySteps = activity.steps;
       _currentDistance = activity.accumulatedDistanceKm;
       _challengeProvider?.syncRealDistance(_currentDistance);
+      notifyListeners();
+    } else {
       notifyListeners();
     }
   }

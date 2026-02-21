@@ -43,7 +43,9 @@ class StepSyncService {
         endTime: now,
         types: types,
       );
-      
+
+      debugPrint("Health Connect: got ${healthData.length} raw data points for STEPS.");
+
       // 按日期分组统计步数
       Map<String, int> dailySteps = {};
       for (var point in healthData) {
@@ -53,6 +55,23 @@ class StepSyncService {
           value = (point.value as NumericHealthValue).numericValue.toInt();
         }
         dailySteps[dateStr] = (dailySteps[dateStr] ?? 0) + value;
+      }
+
+      // 若明细为空，Android 上尝试用「区间总步数」拉取今日步数（部分设备只提供聚合结果）
+      if (dailySteps.isEmpty && Platform.isAndroid) {
+        final todayStart = DateTime(now.year, now.month, now.day);
+        int? totalToday = await health.getTotalStepsInInterval(todayStart, now);
+        if (totalToday != null && totalToday > 0) {
+          final todayStr = DateFormat('yyyy-MM-dd').format(now);
+          dailySteps[todayStr] = totalToday;
+          debugPrint("Health Connect: getTotalStepsInInterval(today) = $totalToday.");
+        }
+      }
+
+      if (dailySteps.isEmpty) {
+        debugPrint("Health Data Sync: no step data from Health Connect (0 points, 0 daily).");
+      } else {
+        debugPrint("Health Data Sync: dailySteps = $dailySteps");
       }
 
       // 更新数据库
@@ -84,6 +103,9 @@ class StepSyncService {
           accumulatedDistanceKm: accumulatedDistance,
           riverId: riverId,
         ));
+      }
+      if (sortedDates.isNotEmpty) {
+        await prefs.setString('last_steps_source', 'health_connect');
       }
       debugPrint("Health Data Sync Completed for $days days.");
     } catch (e) {
@@ -145,6 +167,7 @@ class StepSyncService {
         accumulatedDistanceKm: totalHistory + (todaySteps * _stepLengthKm),
         riverId: riverId,
       ));
+      await prefs.setString('last_steps_source', 'sensor');
 
       debugPrint("Android Sensor Sync: $todaySteps steps.");
       subscription?.cancel();

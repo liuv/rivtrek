@@ -13,7 +13,7 @@ import 'screens/me_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'controllers/flow_controller.dart';
 import 'repositories/river_repository.dart';
-
+import 'services/database_service.dart';
 import 'services/step_sync_service.dart';
 
 @pragma('vm:entry-point')
@@ -56,6 +56,9 @@ void main() async {
 
   // 江河挑战列表从配置文件加载，需在 UI 使用前完成
   await RiverRepository.instance.ensureLoaded();
+
+  // 预打开 rivtrek_base，避免首页首次按距离匹配 POI 时与 asset 复制竞态导致偶发匹配不到
+  await DatabaseService.instance.baseDatabase;
 
   runApp(
     MultiProvider(

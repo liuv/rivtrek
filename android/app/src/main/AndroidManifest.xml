@@ -46,6 +46,11 @@
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
+            <!-- Health Connect 要求：声明可处理「权限使用说明」以便正常读取步数 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
         </activity>
 
         <meta-data android:name="health_permissions_plugin_null_safety" android:value="true" />
