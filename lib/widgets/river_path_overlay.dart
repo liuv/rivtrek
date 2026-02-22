@@ -139,23 +139,37 @@ class _RiverPathOverlayPainter extends CustomPainter {
     // 3. 主路径
     canvas.drawPath(path, fillPaint);
 
-    final pts = pathData.normalizedPoints;
-    final start = _normToScreen(pts.first, size);
-    final end = _normToScreen(pts.last, size);
-
-    _drawMarker(canvas, start, true);
-    _drawMarker(canvas, end, true);
-    // 沿屏幕路径按比例取点，保证当前位置白点精确落在路径上
+    // 4. 已完成段高亮 + 当前位置：同一 PathMetric 上截取段并取点，保证与路径一致
     final pathMetrics = path.computeMetrics();
     for (final metric in pathMetrics) {
       final length = metric.length;
-      if (length > 0) {
-        final offset = (pathFraction * length).clamp(0.0, length);
-        final tangent = metric.getTangentForOffset(offset);
-        if (tangent != null) _drawMarker(canvas, tangent.position, false);
+      if (length <= 0) break;
+      if (pathFraction > 0) {
+        final completedLength = (pathFraction * length).clamp(0.0, length);
+        if (completedLength > 0) {
+          final completedPath = metric.extractPath(0.0, completedLength);
+          final highlightColor = Color.lerp(pathColor, Colors.white, 0.5) ?? pathColor;
+          final highlightPaint = Paint()
+            ..color = highlightColor
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = _pathStrokeWidth + 0.4
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..isAntiAlias = true;
+          canvas.drawPath(completedPath, highlightPaint);
+        }
       }
+      final offset = (pathFraction * length).clamp(0.0, length);
+      final tangent = metric.getTangentForOffset(offset);
+      if (tangent != null) _drawMarker(canvas, tangent.position, false);
       break;
     }
+
+    final pts = pathData.normalizedPoints;
+    final start = _normToScreen(pts.first, size);
+    final end = _normToScreen(pts.last, size);
+    _drawMarker(canvas, start, true);
+    _drawMarker(canvas, end, true);
   }
 
   Path _buildPath(Size size) {

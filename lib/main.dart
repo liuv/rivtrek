@@ -15,6 +15,7 @@ import 'screens/me_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/initial_river_selection_screen.dart';
 import 'providers/challenge_provider.dart';
+import 'providers/user_profile_provider.dart';
 import 'controllers/flow_controller.dart';
 import 'repositories/river_repository.dart';
 import 'services/database_service.dart';
@@ -67,6 +68,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ChallengeProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProxyProvider<ChallengeProvider, FlowController>(
           create: (_) => FlowController(),
           update: (_, challenge, flow) => flow!..updateFromChallenge(challenge),

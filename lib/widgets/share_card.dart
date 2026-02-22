@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../models/river.dart';
@@ -20,6 +21,10 @@ class ShareCardWidget extends StatelessWidget {
   final String? locationLabel;
   /// 附近 POI 名称，多个用顿号拼接，可为 null
   final String? poiNames;
+  /// 分享卡顶部展示的用户昵称；空则显示「涉川」
+  final String? displayName;
+  /// 用户头像文件路径；为 null 时显示昵称首字或默认
+  final String? avatarPath;
   final GlobalKey? repaintBoundaryKey;
 
   const ShareCardWidget({
@@ -34,6 +39,8 @@ class ShareCardWidget extends StatelessWidget {
     this.medalIconPath,
     this.locationLabel,
     this.poiNames,
+    this.displayName,
+    this.avatarPath,
     this.repaintBoundaryKey,
   });
 
@@ -128,14 +135,38 @@ class ShareCardWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "涉川",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 4,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Colors.white.withOpacity(0.9),
+                          backgroundImage: avatarPath != null && avatarPath!.isNotEmpty
+                              ? FileImage(File(avatarPath!))
+                              : null,
+                          child: avatarPath == null || avatarPath!.isEmpty
+                              ? Text(
+                                  (displayName ?? '涉川').isNotEmpty
+                                      ? (displayName ?? '涉川').substring(0, 1)
+                                      : '涉',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: themeColor,
+                                  ),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          displayName?.trim().isEmpty ?? true ? '涉川' : (displayName ?? '涉川'),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                            letterSpacing: 4,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     Text(

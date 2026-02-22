@@ -6,6 +6,9 @@ import 'settings_screen.dart';
 import 'package:rivtrek/screens/challenge_records_menu_screen.dart';
 import 'package:rivtrek/screens/share_preview_sheet.dart';
 import 'package:rivtrek/screens/about_rivtrek_screen.dart';
+import 'package:rivtrek/screens/profile_edit_screen.dart';
+import 'package:rivtrek/providers/user_profile_provider.dart';
+import 'dart:io';
 
 /// 单条勋章数据，用于大图滑动列表
 class _MedalItem {
@@ -183,6 +186,7 @@ class MeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final challenge = context.watch<ChallengeProvider>();
+    final profile = context.watch<UserProfileProvider>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
@@ -196,50 +200,74 @@ class MeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 60),
-                  // User Profile Section
-                  Row(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                  // User Profile Section（整行点击进入编辑）
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileEditScreen(),
+                      ),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: profile.avatarPath != null
+                                ? ClipOval(
+                                    child: Image.file(
+                                      File(profile.avatarPath!),
+                                      key: ValueKey('avatar_${profile.avatarPath}_${profile.avatarVersion}'),
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                              : const Icon(Icons.person_outline_rounded,
+                                  size: 40, color: Color(0xFF888888)),
+                        ),
+                        const SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profile.nickname,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w300,
+                                color: Color(0xFF222222),
+                              ),
+                            ),
+                            Text(
+                              profile.signature,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                color: Color(0xFF888888),
+                              ),
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.person_outline_rounded,
-                            size: 40, color: Color(0xFF888888)),
-                      ),
-                      const SizedBox(width: 20),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "江河行者",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                              color: Color(0xFF222222),
-                            ),
-                          ),
-                          Text(
-                            "步履不停，终达江海",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                              color: Color(0xFF888888),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        const Spacer(),
+                        Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
+                      ],
+                    ),
                   ),
+                ),
                   const SizedBox(height: 50),
                   // Stats Section
                   _buildStatItem("当前挑战", challenge.activeRiver?.name ?? "未选择",

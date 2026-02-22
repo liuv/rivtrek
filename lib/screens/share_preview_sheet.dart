@@ -8,6 +8,7 @@ import 'package:rivtrek/models/daily_stats.dart';
 import 'package:rivtrek/providers/challenge_provider.dart';
 import 'package:rivtrek/services/database_service.dart';
 import 'package:rivtrek/widgets/share_card.dart';
+import 'package:rivtrek/providers/user_profile_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// 分享预览：展示分享卡片，支持「分享图片」生成截图并调起系统分享
@@ -88,6 +89,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
   @override
   Widget build(BuildContext context) {
     final challenge = context.watch<ChallengeProvider>();
+    final profile = context.watch<UserProfileProvider>();
     final river = challenge.activeRiver;
 
     if (river == null) {
@@ -162,6 +164,8 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
               medalIconPath: medalIconPath,
               locationLabel: locationLabel,
               poiNames: hasPoiNames ? poiNames : null,
+              displayName: profile.displayNameForShare,
+              avatarPath: profile.avatarPath,
             ),
             const SizedBox(height: 20),
             SizedBox(
