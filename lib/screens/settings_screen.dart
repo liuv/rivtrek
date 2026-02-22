@@ -1,4 +1,5 @@
 import 'dart:io' show Platform;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -62,14 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   }
 
   Future<void> _loadInitialSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    RiverSettings.instance.update(
-      pathMode: RiverPathMode.values[prefs.getInt('river_path_mode') ?? 0],
-      style: RiverStyle.values[prefs.getInt('river_style') ?? 0],
-      speed: prefs.getDouble('river_speed') ?? 0.3,
-      turbulence: prefs.getDouble('river_turbulence') ?? 0.6,
-      width: prefs.getDouble('river_width') ?? 0.18,
-    );
+    await RiverSettings.loadFromPrefs();
   }
 
   Future<void> _saveSettings({
@@ -78,6 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     double? speed,
     double? turbulence,
     double? width,
+    double? driftCrossScreenSeconds,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     if (pathMode != null) await prefs.setInt('river_path_mode', pathMode.index);
@@ -85,14 +80,36 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     if (speed != null) await prefs.setDouble('river_speed', speed);
     if (turbulence != null) await prefs.setDouble('river_turbulence', turbulence);
     if (width != null) await prefs.setDouble('river_width', width);
-    
+    if (driftCrossScreenSeconds != null) {
+      await prefs.setDouble(
+          'drift_cross_screen_seconds',
+          driftCrossScreenSeconds.clamp(
+              kDriftCrossScreenMinSeconds, kDriftCrossScreenMaxSeconds));
+    }
+
     RiverSettings.instance.update(
       pathMode: pathMode,
       style: style,
       speed: speed,
       turbulence: turbulence,
       width: width,
+      driftCrossScreenSeconds: driftCrossScreenSeconds,
     );
+  }
+
+  /// 过屏时间（秒）转成用户看到的「漂浮速度倍数」：60 秒 = 1x，30 秒 = 2x，120 秒 = 0.5x
+  static double _secondsToMultiplier(double seconds) {
+    if (seconds <= 0) return 2;
+    return 60 / seconds;
+  }
+
+  static String _formatDriftMultiplier(double multiplier) {
+    if (multiplier >= 1) {
+      if (multiplier == multiplier.roundToDouble()) return '${multiplier.round()}x';
+      return '${multiplier.toStringAsFixed(1)}x';
+    }
+    if (multiplier < 0.1) return '${multiplier.toStringAsFixed(2)}x';
+    return '${multiplier.toStringAsFixed(1)}x';
   }
 
   @override
@@ -153,6 +170,17 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               _buildSlider('河道宽度', settings.width, 0.05, 0.4, (val) {
                 _saveSettings(width: val);
               }),
+              const SizedBox(height: 24),
+              _buildSectionTitle('河灯 / 漂流瓶'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  '漂浮速度倍数，左慢右快。参考：1x 为一屏 3 公里 60 秒漂过，约合每公里 20 秒的观感；各河段仍按流速有快慢差异。',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.35),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildDriftSpeedMultiplierSlider(settings.driftCrossScreenSeconds),
               const SizedBox(height: 32),
               _buildSectionTitle('数据与备份'),
               Card(
@@ -494,6 +522,47 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           min: min,
           max: max,
           onChanged: onChanged,
+          activeColor: Colors.blue[800],
+          inactiveColor: Colors.blue[100],
+        ),
+      ],
+    );
+  }
+
+  /// 漂浮速度倍数滑块：范围 0.02x～2x，左=0.02x（慢）右=2x（快）；1x=60 秒；内部为过屏时间（秒）
+  Widget _buildDriftSpeedMultiplierSlider(double seconds) {
+    const minSec = kDriftCrossScreenMinSeconds;  // 2x，快（60/2）
+    const maxSec = kDriftCrossScreenMaxSeconds;  // 0.02x，慢（60/0.02）
+    final logMin = math.log(minSec);
+    final logMax = math.log(maxSec);
+    // linear 0 = 左 = 慢 = maxSec(0.02x)，linear 1 = 右 = 快 = minSec(2x)
+    final linear = (logMax - math.log(seconds.clamp(minSec, maxSec))) / (logMax - logMin);
+    final multiplier = _secondsToMultiplier(seconds);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('漂浮速度倍数', style: TextStyle(fontSize: 14)),
+              Text(
+                _formatDriftMultiplier(multiplier),
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        Slider(
+          value: linear,
+          min: 0,
+          max: 1,
+          onChanged: (linearVal) {
+            // linearVal 0=左(慢) 1=右(快) -> seconds 大=慢 小=快
+            final sec = math.exp(logMax - linearVal * (logMax - logMin));
+            _saveSettings(driftCrossScreenSeconds: sec);
+          },
           activeColor: Colors.blue[800],
           inactiveColor: Colors.blue[100],
         ),

@@ -33,6 +33,7 @@ const Map<String, String> _prefsKeys = {
   'river_speed': 'd',
   'river_turbulence': 'd',
   'river_width': 'd',
+  'drift_cross_screen_seconds': 'd',
   'Favorites': 'l',
 };
 

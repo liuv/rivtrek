@@ -17,6 +17,7 @@ import 'screens/initial_river_selection_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'providers/user_profile_provider.dart';
 import 'controllers/flow_controller.dart';
+import 'models/river_settings.dart';
 import 'repositories/river_repository.dart';
 import 'services/database_service.dart';
 import 'services/step_sync_service.dart';
@@ -63,6 +64,9 @@ void main() async {
 
   // 预打开 rivtrek_base，避免首页首次按距离匹配 POI 时与 asset 复制竞态导致偶发匹配不到
   await DatabaseService.instance.baseDatabase;
+
+  // 从 prefs 加载河流/漂流等效果设置，使首页与设置页一致
+  await RiverSettings.loadFromPrefs();
 
   runApp(
     MultiProvider(

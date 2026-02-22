@@ -43,11 +43,11 @@ class RiverDriftTimeline {
 
   /// 从有序的 SubSection 列表构建时间轴。
   /// [visibleRangeKm] 一屏显示的河道公里数，默认 3.0。
-  /// [targetCrossScreenSeconds] 希望漂流物平均经过一屏的时间（秒），默认 30。
+  /// [targetCrossScreenSeconds] 希望漂流物平均经过一屏的时间（秒），1x 时为 60。
   static RiverDriftTimeline fromSubSections(
     List<SubSection> subSections, {
     double visibleRangeKm = 3.0,
-    double targetCrossScreenSeconds = 30.0,
+    double targetCrossScreenSeconds = 60.0,
   }) {
     if (subSections.isEmpty) {
       return RiverDriftTimeline._(
@@ -89,7 +89,7 @@ class RiverDriftTimeline {
         totalTimeHours > 0 ? totalLengthKm / totalTimeHours : 0.5;
     // 希望：visibleRangeKm 在 targetCrossScreenSeconds 内漂完
     // 即 virtualTimeSeconds = visibleRangeKm / averageSpeedKmh * 3600
-    // 显示 30 秒 = virtualTimeSeconds 的虚拟时间 => timeScale = virtualTimeSeconds / 30
+    // 显示 targetCrossScreenSeconds 秒 = virtualTimeSeconds 的虚拟时间 => timeScale = virtualTimeSeconds / targetCrossScreenSeconds
     final virtualSecondsToCrossScreen =
         (visibleRangeKm / averageSpeedKmh) * 3600;
     final timeScale =

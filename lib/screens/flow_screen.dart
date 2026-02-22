@@ -32,6 +32,9 @@ class _FlowScreenState extends State<FlowScreen>
         TickerProviderStateMixin,
         WidgetsBindingObserver,
         AutomaticKeepAliveClientMixin {
+  /// 已行至在屏幕上方 1/3 处时的视口偏移：视口中心 = 已行至 + 此值（km）
+  static const double _kOneThirdFromTopOffsetKm = 0.5;
+
   // 视觉距离（用于动画过渡）
   double _visualDistance = 0.0;
   late AnimationController _distanceController;
@@ -54,6 +57,7 @@ class _FlowScreenState extends State<FlowScreen>
   List<RiverEvent> _driftEvents = [];
   bool _driftEventsLoaded = false;
   String? _driftTimelineRiverId;
+  double? _lastDriftCrossScreenSeconds;
 
   // 里程碑相关
   String? _lastTriggeredSubSectionName;
@@ -86,11 +90,12 @@ class _FlowScreenState extends State<FlowScreen>
       final challenge = context.read<ChallengeProvider>();
       final realKm = controller.currentDistance;
       final displayIsReal = (challenge.currentDistance - realKm).abs() < 0.001;
-      final viewingNearReal = (_visualDistance - realKm).abs() < 0.8;
+      final targetCenter = realKm + _kOneThirdFromTopOffsetKm;
+      final viewingNearReal = (_visualDistance - targetCenter).abs() < 0.8;
       if (_distanceController.isAnimating) return;
       if (displayIsReal || viewingNearReal) {
-        if ((_visualDistance - challenge.currentDistance).abs() > 0.001) {
-          setState(() => _visualDistance = challenge.currentDistance);
+        if ((_visualDistance - targetCenter).abs() > 0.001) {
+          setState(() => _visualDistance = challenge.currentDistance + _kOneThirdFromTopOffsetKm);
         }
       }
     };
@@ -141,14 +146,15 @@ class _FlowScreenState extends State<FlowScreen>
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     final realKm = controller.currentDistance;
-    final viewingNearReal = (_visualDistance - realKm).abs() < 0.8;
+    final targetCenter = realKm + _kOneThirdFromTopOffsetKm;
+    final viewingNearReal = (_visualDistance - targetCenter).abs() < 0.8;
 
-    // 仅在「未双指滑走」时同步视觉距离；滑走后等用户回到当前位置再随步数更新
+    // 仅在「未双指滑走」时同步视觉距离；滑走后等用户回到当前位置再随步数更新；已行至在屏上 1/3 处
     if (!_distanceController.isAnimating && viewingNearReal) {
-      if ((_visualDistance - challenge.currentDistance).abs() > 5.0) {
-        _animateTo(challenge.currentDistance);
+      if ((_visualDistance - targetCenter).abs() > 5.0) {
+        _animateTo(challenge.currentDistance + _kOneThirdFromTopOffsetKm);
       } else {
-        _visualDistance = challenge.currentDistance;
+        _visualDistance = challenge.currentDistance + _kOneThirdFromTopOffsetKm;
       }
     }
 
@@ -199,13 +205,21 @@ class _FlowScreenState extends State<FlowScreen>
       });
     }
 
+    // 过屏时间设置变更时重建时间轴，使新倍数生效
+    final driftSec = RiverSettings.instance.driftCrossScreenSeconds;
+    if (_lastDriftCrossScreenSeconds != null &&
+        (driftSec - _lastDriftCrossScreenSeconds!).abs() > 0.5) {
+      _driftTimeline = null;
+    }
+    _lastDriftCrossScreenSeconds = driftSec;
+
     // 漂流时间轴：挑战加载完成后构建一次；漂流事件加载一次
     if (_driftTimeline == null &&
         challenge.allSubSections.isNotEmpty) {
       _driftTimeline = RiverDriftTimeline.fromSubSections(
         challenge.allSubSections,
         visibleRangeKm: 3.0,
-        targetCrossScreenSeconds: 30.0,
+        targetCrossScreenSeconds: driftSec,
       );
       _driftTimelineRiverId = challenge.activeRiver?.id;
       if (!_driftEventsLoaded) _loadDriftEvents();
@@ -436,7 +450,7 @@ class _FlowScreenState extends State<FlowScreen>
       description: "在 $sectionName 举行祭江仪式${displayText.isNotEmpty ? '：$displayText' : ''}",
       latitude: controller.lat,
       longitude: controller.lon,
-      distanceAtKm: challenge.currentDistance,
+      distanceAtKm: challenge.realDistance,
     ));
   }
 
@@ -444,6 +458,9 @@ class _FlowScreenState extends State<FlowScreen>
     _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
+    // 释放位置为当前屏幕 1/3 处对应的公里数（滑动时也能看到河灯）
+    final totalKm = challenge.activeRiver?.totalLengthKm ?? 0.0;
+    final dropKm = (_visualDistance - _kOneThirdFromTopOffsetKm).clamp(0.0, totalKm);
     final event = RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
@@ -452,7 +469,7 @@ class _FlowScreenState extends State<FlowScreen>
       description: "在 ${challenge.currentSubSection?.name ?? '江面'} 放下一盏河灯",
       latitude: controller.lat,
       longitude: controller.lon,
-      distanceAtKm: challenge.currentDistance,
+      distanceAtKm: dropKm,
     );
     DatabaseService.instance.recordEvent(event);
     setState(() => _driftEvents.add(event));
@@ -463,6 +480,9 @@ class _FlowScreenState extends State<FlowScreen>
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     final sectionName = challenge.currentSubSection?.name ?? '江面';
+    // 释放位置为当前屏幕 1/3 处对应的公里数（滑动时也能看到河灯）
+    final totalKm = challenge.activeRiver?.totalLengthKm ?? 0.0;
+    final dropKm = (_visualDistance - _kOneThirdFromTopOffsetKm).clamp(0.0, totalKm);
     final desc = message != null && message.trim().isNotEmpty
         ? "在 $sectionName 放下漂流瓶\n\n${message.trim()}"
         : "在 $sectionName 放下漂流瓶";
@@ -474,7 +494,7 @@ class _FlowScreenState extends State<FlowScreen>
       description: desc,
       latitude: controller.lat,
       longitude: controller.lon,
-      distanceAtKm: challenge.currentDistance,
+      distanceAtKm: dropKm,
     );
     DatabaseService.instance.recordEvent(event);
     setState(() => _driftEvents.add(event));
@@ -847,9 +867,9 @@ class _FlowScreenState extends State<FlowScreen>
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // 初始化视觉距离
+    // 初始化视觉距离（已行至在屏上 1/3 处）
     if (_visualDistance == 0 && challenge.currentDistance != 0) {
-      _visualDistance = challenge.currentDistance;
+      _visualDistance = challenge.currentDistance + _kOneThirdFromTopOffsetKm;
     }
 
     final sub = challenge.currentSubSection;
