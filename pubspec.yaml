@@ -2,7 +2,7 @@ name: rivtrek
 description: "涉川 Rivtrek - 涉川"
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: '>=3.6.0 <4.0.0'

@@ -11,16 +11,19 @@ import '../services/database_service.dart';
 
 class ChallengeProvider extends ChangeNotifier {
   River? _activeRiver;
-  double _realDistance = 0.0;    // 真实的、由数据库驱动的进度
-  double _displayDistance = 0.0; // UI显示的进度（支持手势模拟）
+  double _realDistance = 0.0;    // 真实的、由数据库驱动的进度（步数→累计里程）
+  double _displayDistance = 0.0; // UI 显示的进度（非调试时与 real 同步，双指滑动时为虚拟值）
   List<SubSection> _allSubSections = [];
   SubSection? _currentSubSection;
   bool _isLoading = true;
+  /// 双指滑动调试模式：为 true 时不随步数更新里程，仅随滑动；双击 tab 或重新打开 app 置为 false
+  bool _debugSlideMode = false;
 
   // Getters
   River? get activeRiver => _activeRiver;
   double get realDistance => _realDistance;
   double get currentDistance => _displayDistance; // 页面显示这个
+  bool get debugSlideMode => _debugSlideMode;
   List<SubSection> get allSubSections => _allSubSections;
   SubSection? get currentSubSection => _currentSubSection;
   bool get isLoading => _isLoading;
@@ -37,6 +40,7 @@ class ChallengeProvider extends ChangeNotifier {
 
   Future<void> switchRiver(String riverId) async {
     _isLoading = true;
+    _debugSlideMode = false; // 每次切河流或冷启动都重置调试状态，按步数同步
     notifyListeners();
 
     final river = RiverRepository.instance.getRiverById(riverId);
@@ -64,28 +68,28 @@ class ChallengeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 由 FlowController 调用，同步实时步数产生的里程
+  // 由 FlowController 调用，同步实时步数产生的累计里程（步数是当日，里程是累计）
   void syncRealDistance(double totalRealDistance) {
     _realDistance = totalRealDistance;
-    
-    // 如果当前没有处于“虚拟滑动”状态（即显示距离接近真实距离），则自动同步显示
-    if ((_displayDistance - _realDistance).abs() < 0.1) {
+    if (!_debugSlideMode) {
       _displayDistance = _realDistance;
       _updateSubSection();
     }
     notifyListeners();
   }
 
-  // 手势滑动调用（仅更新虚拟显示）
+  // 双指滑动：进入调试模式，仅更新虚拟显示，不再用步数更新里程
   void updateVirtualDistance(double newDistance) {
     if (_activeRiver == null) return;
+    _debugSlideMode = true;
     _displayDistance = newDistance.clamp(0.0, _activeRiver!.totalLengthKm);
     _updateSubSection();
     notifyListeners();
   }
 
-  // 恢复到真实进度的动画回归逻辑
+  // 双击底部「涉川」tab：退出调试模式，恢复为步数/里程同步显示
   void resetToRealDistance() {
+    _debugSlideMode = false;
     _displayDistance = _realDistance;
     _updateSubSection();
     notifyListeners();

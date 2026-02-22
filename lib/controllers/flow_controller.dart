@@ -110,10 +110,10 @@ class FlowController extends ChangeNotifier {
     _currentSubSection = challenge.currentSubSection;
     _activeRiverId = challenge.activeRiver?.id;
 
-    // 仅当 challenge 当前展示的是真实里程（未双指滑走）时才从 challenge 同步 _currentDistance，
-    // 否则会拿虚拟公里数覆盖刚由 _updateUIFromDB 写入的真实值，导致步数/公里数不同源
-    final displayNearReal = (challenge.currentDistance - challenge.realDistance).abs() < 0.5;
-    if (displayNearReal) {
+    // 仅当未处于双指滑动调试模式且展示接近真实里程时，才从 challenge 同步 _currentDistance；
+    // 调试模式下不覆盖，避免虚拟公里数覆盖 DB 真实值
+    if (!challenge.debugSlideMode &&
+        (challenge.currentDistance - challenge.realDistance).abs() < 0.5) {
       _currentDistance = challenge.currentDistance;
     }
     if (riverChanged) {
@@ -135,7 +135,7 @@ class FlowController extends ChangeNotifier {
   void _startPedometerListening() {
     _pedometerSubscription = Pedometer.stepCountStream.listen((event) async {
       try {
-        await StepSyncService.syncAndroidSensor();
+        await StepSyncService.syncAndroidSensor(currentHardwareSteps: event.steps);
         await _updateUIFromDB();
       } catch (e) {
         if (kDebugMode) debugPrint('StepSyncService.syncAndroidSensor error: $e');

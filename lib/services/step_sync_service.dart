@@ -130,8 +130,18 @@ class StepSyncService {
   /// - 今日步数 = 当前硬件累计 - 今日 0 点基线；今日基线 = 昨日最后一次同步时的累计值。
   /// - 依赖后台：WorkManager 每 15 分钟跑一次（不依赖网络），确保日界前至少跑一次，避免「上午 10 点后步数被记到明天」和漏天。
   /// - 用户需在「应用设置」中授权忽略电池优化/自启动，否则厂商可能杀掉后台导致漏天。
-  static Future<void> syncAndroidSensor() async {
+  /// - [currentHardwareSteps] 若由外部传入（如 FlowController 的 pedometer 回调），则直接用该值写库并返回，避免二次订阅导致收不到事件、页面不刷新。
+  static Future<void> syncAndroidSensor({int? currentHardwareSteps}) async {
     if (!Platform.isAndroid) return;
+
+    if (currentHardwareSteps != null) {
+      try {
+        await _writeSensorStepsToDb(currentHardwareSteps);
+      } catch (e) {
+        debugPrint("Android Sensor Sync (with steps) Error: $e");
+      }
+      return;
+    }
 
     final completer = Completer<void>();
     StreamSubscription<StepCount>? subscription;
@@ -147,78 +157,8 @@ class StepSyncService {
 
     subscription = Pedometer.stepCountStream.listen((event) async {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final now = DateTime.now();
-        final today = DateFormat('yyyy-MM-dd').format(now);
-        final int hardwareTotal = event.steps;
-
-        const kLastSyncDate = 'sensor_last_sync_date';
-        const kLastDayEndCumulative = 'sensor_last_day_end_cumulative';
-        const kStepsAtDayStart = 'sensor_steps_at_day_start';
-
-        // 一次性迁移：旧版 base_steps_value / last_sync_date → 新 key
-        if (prefs.getString(kLastSyncDate) == null &&
-            prefs.getString('last_sync_date') != null &&
-            prefs.getInt('base_steps_value') != null) {
-          await prefs.setString(kLastSyncDate, prefs.getString('last_sync_date')!);
-          await prefs.setInt(kLastDayEndCumulative, prefs.getInt('base_steps_value')!);
-          await prefs.setInt(kStepsAtDayStart, prefs.getInt('base_steps_value')!);
-        }
-
-        String? lastSyncDate = prefs.getString(kLastSyncDate);
-        int lastDayEnd = prefs.getInt(kLastDayEndCumulative) ?? hardwareTotal;
-        int stepsAtDayStart = prefs.getInt(kStepsAtDayStart) ?? hardwareTotal;
-
-        int todaySteps;
-        if (lastSyncDate == null) {
-          // 首次使用：以当前值为今日起点
-          stepsAtDayStart = hardwareTotal;
-          lastSyncDate = today;
-          lastDayEnd = hardwareTotal;
-          todaySteps = 0;
-          await prefs.setString(kLastSyncDate, today);
-          await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
-          await prefs.setInt(kStepsAtDayStart, hardwareTotal);
-        } else if (lastSyncDate != today) {
-          // 跨日：今日基线 = 上次同步时的累计（即「昨日末」或更早的末次值）
-          // 若中间漏了多天未同步，只能把「自上次同步至今」的步数全算到今日；日界准确依赖 15 分钟后台跑满
-          stepsAtDayStart = lastDayEnd;
-          if (hardwareTotal < stepsAtDayStart) {
-            stepsAtDayStart = hardwareTotal;
-          }
-          todaySteps = (hardwareTotal - stepsAtDayStart).clamp(0, 0x7FFFFFFF);
-          lastSyncDate = today;
-          lastDayEnd = hardwareTotal;
-          await prefs.setString(kLastSyncDate, today);
-          await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
-          await prefs.setInt(kStepsAtDayStart, stepsAtDayStart);
-        } else {
-          // 同日：沿用今日已有基线
-          if (hardwareTotal < stepsAtDayStart) {
-            stepsAtDayStart = hardwareTotal;
-            await prefs.setInt(kStepsAtDayStart, hardwareTotal);
-          }
-          todaySteps = (hardwareTotal - stepsAtDayStart).clamp(0, 0x7FFFFFFF);
-          lastDayEnd = hardwareTotal;
-          await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
-        }
-
-        final String riverId = prefs.getString('active_river_id') ?? 'yangtze';
-        final allActivities = await DatabaseService.instance.getAllActivities();
-        final double totalHistory = allActivities
-            .where((a) => a.date != today && a.riverId == riverId)
-            .fold(0.0, (sum, item) => sum + item.distanceKm);
-
-        await DatabaseService.instance.saveActivity(DailyActivity(
-          date: today,
-          steps: todaySteps,
-          distanceKm: todaySteps * _stepLengthKm,
-          accumulatedDistanceKm: totalHistory + (todaySteps * _stepLengthKm),
-          riverId: riverId,
-        ));
-        await prefs.setString('last_steps_source', 'sensor');
-
-        debugPrint("Android Sensor Sync: today=$todaySteps (cumulative=$hardwareTotal, baseline=$stepsAtDayStart)");
+        await _writeSensorStepsToDb(event.steps);
+        debugPrint("Android Sensor Sync: today from stream (cumulative=${event.steps})");
       } catch (e) {
         debugPrint("Android Sensor Sync Error: $e");
       } finally {
@@ -230,5 +170,72 @@ class StepSyncService {
     });
 
     return completer.future;
+  }
+
+  static Future<void> _writeSensorStepsToDb(int hardwareTotal) async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+
+    const kLastSyncDate = 'sensor_last_sync_date';
+    const kLastDayEndCumulative = 'sensor_last_day_end_cumulative';
+    const kStepsAtDayStart = 'sensor_steps_at_day_start';
+
+    if (prefs.getString(kLastSyncDate) == null &&
+        prefs.getString('last_sync_date') != null &&
+        prefs.getInt('base_steps_value') != null) {
+      await prefs.setString(kLastSyncDate, prefs.getString('last_sync_date')!);
+      await prefs.setInt(kLastDayEndCumulative, prefs.getInt('base_steps_value')!);
+      await prefs.setInt(kStepsAtDayStart, prefs.getInt('base_steps_value')!);
+    }
+
+    String? lastSyncDate = prefs.getString(kLastSyncDate);
+    int lastDayEnd = prefs.getInt(kLastDayEndCumulative) ?? hardwareTotal;
+    int stepsAtDayStart = prefs.getInt(kStepsAtDayStart) ?? hardwareTotal;
+
+    int todaySteps;
+    if (lastSyncDate == null) {
+      stepsAtDayStart = hardwareTotal;
+      lastSyncDate = today;
+      lastDayEnd = hardwareTotal;
+      todaySteps = 0;
+      await prefs.setString(kLastSyncDate, today);
+      await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
+      await prefs.setInt(kStepsAtDayStart, hardwareTotal);
+    } else if (lastSyncDate != today) {
+      stepsAtDayStart = lastDayEnd;
+      if (hardwareTotal < stepsAtDayStart) stepsAtDayStart = hardwareTotal;
+      todaySteps = (hardwareTotal - stepsAtDayStart).clamp(0, 0x7FFFFFFF);
+      lastSyncDate = today;
+      lastDayEnd = hardwareTotal;
+      await prefs.setString(kLastSyncDate, today);
+      await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
+      await prefs.setInt(kStepsAtDayStart, stepsAtDayStart);
+    } else {
+      if (hardwareTotal < stepsAtDayStart) {
+        stepsAtDayStart = hardwareTotal;
+        await prefs.setInt(kStepsAtDayStart, hardwareTotal);
+      }
+      todaySteps = (hardwareTotal - stepsAtDayStart).clamp(0, 0x7FFFFFFF);
+      lastDayEnd = hardwareTotal;
+      await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
+    }
+
+    final String riverId = prefs.getString('active_river_id') ?? 'yangtze';
+    final allActivities = await DatabaseService.instance.getAllActivities();
+    final double totalHistory = allActivities
+        .where((a) => a.date != today && a.riverId == riverId)
+        .fold(0.0, (sum, item) => sum + item.distanceKm);
+
+    await DatabaseService.instance.saveActivity(DailyActivity(
+      date: today,
+      steps: todaySteps,
+      distanceKm: todaySteps * _stepLengthKm,
+      accumulatedDistanceKm: totalHistory + (todaySteps * _stepLengthKm),
+      riverId: riverId,
+    ));
+    await prefs.setString('last_steps_source', 'sensor');
+
+    debugPrint("Android Sensor Sync: today=$todaySteps (cumulative=$hardwareTotal, baseline=$stepsAtDayStart)");
   }
 }
