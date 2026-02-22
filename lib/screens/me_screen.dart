@@ -7,12 +7,21 @@ import 'package:rivtrek/screens/challenge_records_menu_screen.dart';
 import 'package:rivtrek/screens/share_preview_sheet.dart';
 import 'package:rivtrek/screens/about_rivtrek_screen.dart';
 
+/// 单条勋章数据，用于大图滑动列表
+class _MedalItem {
+  final String imagePath;
+  final String sectionName;
+  final bool isUnlocked;
+  _MedalItem(this.imagePath, this.sectionName, this.isUnlocked);
+}
+
 void _showMedalFullScreen(
   BuildContext context, {
-  required String imagePath,
-  required String sectionName,
-  required bool isUnlocked,
+  required List<_MedalItem> medals,
+  required int initialIndex,
 }) {
+  if (medals.isEmpty) return;
+  final index = initialIndex.clamp(0, medals.length - 1);
   showGeneralDialog<void>(
     context: context,
     barrierColor: Colors.black87,
@@ -20,92 +29,137 @@ void _showMedalFullScreen(
     barrierLabel: '关闭',
     transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (ctx, _, __) => _MedalFullScreenView(
-      imagePath: imagePath,
-      sectionName: sectionName,
-      isUnlocked: isUnlocked,
+      medals: medals,
+      initialIndex: index,
       onClose: () => Navigator.of(ctx).pop(),
     ),
   );
 }
 
-class _MedalFullScreenView extends StatelessWidget {
-  final String imagePath;
-  final String sectionName;
-  final bool isUnlocked;
+class _MedalFullScreenView extends StatefulWidget {
+  final List<_MedalItem> medals;
+  final int initialIndex;
   final VoidCallback onClose;
 
   const _MedalFullScreenView({
-    required this.imagePath,
-    required this.sectionName,
-    required this.isUnlocked,
+    required this.medals,
+    required this.initialIndex,
     required this.onClose,
   });
 
   @override
+  State<_MedalFullScreenView> createState() => _MedalFullScreenViewState();
+}
+
+class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
+  late PageController _pageController;
+  late int _currentPage;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialIndex);
+    _currentPage = widget.initialIndex;
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final medals = widget.medals;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Stack(
           children: [
-            Center(
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
+            PageView.builder(
+              controller: _pageController,
+              itemCount: medals.length,
+              onPageChanged: (i) => setState(() => _currentPage = i),
+              itemBuilder: (context, index) {
+                final item = medals[index];
+                return Center(
+                  child: InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 4.0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        imagePath,
-                        width: 220,
-                        height: 220,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.military_tech_outlined,
-                          size: 120,
-                          color: Colors.black26,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(
-                        sectionName,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    if (!isUnlocked)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          "尚未解锁",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white.withOpacity(0.7),
+                          child: Image.asset(
+                            item.imagePath,
+                            width: 220,
+                            height: 220,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.military_tech_outlined,
+                              size: 120,
+                              color: Colors.black26,
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            item.sectionName,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        if (!item.isUnlocked)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              "尚未解锁",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white.withOpacity(0.7),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            Positioned(
+              top: 8,
+              left: 8,
+              right: 48,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (medals.length > 1)
+                    Text(
+                      '${_currentPage + 1} / ${medals.length}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.9),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ),
             Positioned(
@@ -113,7 +167,7 @@ class _MedalFullScreenView extends StatelessWidget {
               right: 16,
               child: IconButton(
                 icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
-                onPressed: onClose,
+                onPressed: widget.onClose,
               ),
             ),
           ],
@@ -223,14 +277,21 @@ class MeScreen extends StatelessWidget {
 
                         return GestureDetector(
                           onTap: () {
-                            if (medalIcon != null) {
-                              _showMedalFullScreen(
-                                context,
-                                imagePath: 'assets/$medalIcon',
-                                sectionName: sub.name,
-                                isUnlocked: isUnlocked,
-                              );
+                            if (medalIcon == null) return;
+                            final medalItems = <_MedalItem>[];
+                            for (var s in challenge.allSubSections) {
+                              if (s.medalIcon != null)
+                                medalItems.add(_MedalItem(
+                                  'assets/${s.medalIcon}',
+                                  s.name,
+                                  challenge.currentDistance >= s.accumulatedLength,
+                                ));
                             }
+                            if (medalItems.isEmpty) return;
+                            int initialIndex = 0;
+                            for (int i = 0; i < index; i++)
+                              if (challenge.allSubSections[i].medalIcon != null) initialIndex++;
+                            _showMedalFullScreen(context, medals: medalItems, initialIndex: initialIndex);
                           },
                           child: Container(
                             width: 80,

@@ -65,11 +65,33 @@ class _FlowScreenState extends State<FlowScreen>
 
   late Stopwatch _stopwatch;
   final Set<int> _pointers = {};
+  VoidCallback? _flowControllerListener;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // 传感器触发 → 同步写 DB → FlowController 从 DB 读出步数+里程并 notify。此处同步视觉距离时：
+    // 1) 若用户已双指滑走，不因步数更新而拉回，等回到当前位置后再随步数更新；
+    // 2) 若当前展示的就是真实里程（例如双击回到当前位置后），则随步数/里程更新。
+    _flowControllerListener = () {
+      if (!mounted) return;
+      final controller = context.read<FlowController>();
+      final challenge = context.read<ChallengeProvider>();
+      final realKm = controller.currentDistance;
+      final displayIsReal = (challenge.currentDistance - realKm).abs() < 0.001;
+      final viewingNearReal = (_visualDistance - realKm).abs() < 0.8;
+      if (_distanceController.isAnimating) return;
+      if (displayIsReal || viewingNearReal) {
+        if ((_visualDistance - challenge.currentDistance).abs() > 0.001) {
+          setState(() => _visualDistance = challenge.currentDistance);
+        }
+      }
+    };
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FlowController>().addListener(_flowControllerListener!);
+    });
 
     _distanceController = AnimationController(
       vsync: this,
@@ -111,10 +133,13 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _updateFrame() {
+    final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
+    final realKm = controller.currentDistance;
+    final viewingNearReal = (_visualDistance - realKm).abs() < 0.8;
 
-    // 同步视觉距离
-    if (!_distanceController.isAnimating) {
+    // 仅在「未双指滑走」时同步视觉距离；滑走后等用户回到当前位置再随步数更新
+    if (!_distanceController.isAnimating && viewingNearReal) {
       if ((_visualDistance - challenge.currentDistance).abs() > 5.0) {
         _animateTo(challenge.currentDistance);
       } else {
@@ -215,6 +240,11 @@ class _FlowScreenState extends State<FlowScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    if (_flowControllerListener != null) {
+      try {
+        context.read<FlowController>().removeListener(_flowControllerListener!);
+      } catch (_) {}
+    }
     _timeController.dispose();
     _distanceController.dispose();
     _milestoneController.dispose();
@@ -363,17 +393,21 @@ class _FlowScreenState extends State<FlowScreen>
     }
   }
 
-  void _addBlessing(Offset position) {
+  void _addBlessing(Offset position, {String? text}) {
     _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     final words = ["安", "顺", "福", "宁", "和"];
     final size = MediaQuery.of(context).size;
+    final displayText = (text != null && text.trim().isNotEmpty)
+        ? text.trim()
+        : words[math.Random().nextInt(words.length)];
+    final sectionName = challenge.currentSubSection?.name ?? '江面';
     setState(() {
       _pulseCenter =
           Offset(position.dx / size.width, position.dy / size.height);
       _blessings.add(Blessing(
-        text: words[math.Random().nextInt(words.length)],
+        text: displayText,
         localY: (position.dy / size.height) * 2.0 - 1.0,
         randomX: (math.Random().nextDouble() - 0.5) * 0.05,
       ));
@@ -386,7 +420,7 @@ class _FlowScreenState extends State<FlowScreen>
       timestamp: DateTime.now().millisecondsSinceEpoch,
       type: RiverEventType.activity,
       name: "祭江祈福",
-      description: "在 ${challenge.currentSubSection?.name ?? '江面'} 举行祭江仪式",
+      description: "在 $sectionName 举行祭江仪式${displayText.isNotEmpty ? '：$displayText' : ''}",
       latitude: controller.lat,
       longitude: controller.lon,
       distanceAtKm: challenge.currentDistance,
@@ -419,10 +453,11 @@ class _FlowScreenState extends State<FlowScreen>
     ));
   }
 
-  void _addBottle() {
+  void _addBottle({String? message}) {
     _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
+    final sectionName = challenge.currentSubSection?.name ?? '江面';
     setState(() {
       _bottles.add(Bottle(
         id: DateTime.now().millisecondsSinceEpoch.toDouble(),
@@ -433,16 +468,51 @@ class _FlowScreenState extends State<FlowScreen>
       ));
     });
 
+    final desc = message != null && message.trim().isNotEmpty
+        ? "在 $sectionName 放下漂流瓶\n\n${message.trim()}"
+        : "在 $sectionName 放下漂流瓶";
     DatabaseService.instance.recordEvent(RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
       type: RiverEventType.activity,
       name: "水畔寄书",
-      description: "在 ${challenge.currentSubSection?.name ?? '江面'} 放下漂流瓶",
+      description: desc,
       latitude: controller.lat,
       longitude: controller.lon,
       distanceAtKm: challenge.currentDistance,
     ));
+  }
+
+  Future<void> _showBlessingInputDialog(Size size) async {
+    final text = await showDialog<String>(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (ctx) => _RitualTextInputDialog(
+        title: '临川祈愿',
+        hint: '八字以内，写下祈福',
+        maxLength: 8,
+        maxLines: 1,
+        confirmLabel: '祈愿',
+      ),
+    );
+    if (!mounted) return;
+    if (text != null) _addBlessing(Offset(size.width / 2, size.height / 2), text: text);
+  }
+
+  Future<void> _showBottleInputDialog() async {
+    final message = await showDialog<String>(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (ctx) => _RitualTextInputDialog(
+        title: '水畔寄书',
+        hint: '写下心意，随江远行（128字以内）',
+        maxLength: 128,
+        maxLines: 5,
+        confirmLabel: '寄出',
+      ),
+    );
+    if (!mounted) return;
+    if (message != null) _addBottle(message: message);
   }
 
   void _showRitualSheet() {
@@ -507,7 +577,7 @@ class _FlowScreenState extends State<FlowScreen>
                   subtitle: '写下心意，随江远行',
                   onTap: () {
                     Navigator.pop(ctx);
-                    _addBottle();
+                    _showBottleInputDialog();
                   },
                 ),
                 const SizedBox(height: 12),
@@ -515,10 +585,10 @@ class _FlowScreenState extends State<FlowScreen>
                   ctx,
                   icon: Icons.auto_awesome,
                   title: '临川祈愿',
-                  subtitle: '在江面留下祈福一字',
+                  subtitle: '八字以内，在江面留下祈福',
                   onTap: () {
                     Navigator.pop(ctx);
-                    _addBlessing(Offset(size.width / 2, size.height / 2));
+                    _showBlessingInputDialog(size);
                   },
                 ),
               ],
@@ -949,25 +1019,32 @@ class _FlowScreenState extends State<FlowScreen>
     final x = (_getRiverPathAt(b.localY, settings, sub, currentDistance) +
             b.randomX) /
         (MediaQuery.of(context).size.aspectRatio);
+    const maxW = 220.0;
     return Positioned(
-      left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
-      top: (b.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
+      left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - maxW / 2,
+      top: (b.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 30,
       child: Opacity(
           opacity: b.opacity,
           child: ImageFiltered(
             imageFilter: ui.ImageFilter.blur(sigmaX: b.blur, sigmaY: b.blur),
-            child: Text(b.text,
-                style: const TextStyle(
-                    fontSize: 52,
-                    color: Color(0xFFFFD700),
-                    fontWeight: FontWeight.w600,
-                    shadows: [
-                      Shadow(color: Colors.orangeAccent, blurRadius: 15),
-                      Shadow(
-                          color: Colors.black45,
-                          blurRadius: 5,
-                          offset: Offset(2, 2)),
-                    ])),
+            child: SizedBox(
+              width: maxW,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(b.text,
+                    style: const TextStyle(
+                        fontSize: 52,
+                        color: Color(0xFFFFD700),
+                        fontWeight: FontWeight.w600,
+                        shadows: [
+                          Shadow(color: Colors.orangeAccent, blurRadius: 15),
+                          Shadow(
+                              color: Colors.black45,
+                              blurRadius: 5,
+                              offset: Offset(2, 2)),
+                        ])),
+              ),
+            ),
           )),
     );
   }
@@ -1285,6 +1362,114 @@ class _FlowScreenState extends State<FlowScreen>
                 letterSpacing: 0.8)),
       ],
     ]);
+  }
+}
+
+class _RitualTextInputDialog extends StatefulWidget {
+  final String title;
+  final String hint;
+  final int maxLength;
+  final int maxLines;
+  final String confirmLabel;
+
+  const _RitualTextInputDialog({
+    required this.title,
+    required this.hint,
+    required this.maxLength,
+    required this.maxLines,
+    required this.confirmLabel,
+  });
+
+  @override
+  State<_RitualTextInputDialog> createState() => _RitualTextInputDialogState();
+}
+
+class _RitualTextInputDialogState extends State<_RitualTextInputDialog> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white.withOpacity(0.98),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Text(
+        widget.title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 1.5,
+          color: Color(0xFF222222),
+        ),
+      ),
+      content: TextField(
+        controller: _controller,
+        maxLength: widget.maxLength,
+        maxLines: widget.maxLines,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          hintStyle: TextStyle(
+            color: const Color(0xFF222222).withOpacity(0.35),
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+          ),
+          counterStyle: TextStyle(
+            color: const Color(0xFF222222).withOpacity(0.4),
+            fontSize: 12,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: const Color(0xFF222222).withOpacity(0.12)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: const Color(0xFF222222).withOpacity(0.12)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(color: const Color(0xFF222222).withOpacity(0.35), width: 1.2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        style: const TextStyle(fontSize: 15, color: Color(0xFF222222), height: 1.4),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            '取消',
+            style: TextStyle(color: const Color(0xFF222222).withOpacity(0.5), fontSize: 15),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            final text = _controller.text.trim();
+            Navigator.pop(context, text.isEmpty ? null : text);
+          },
+          child: Text(
+            widget.confirmLabel,
+            style: const TextStyle(
+              color: Color(0xFF222222),
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

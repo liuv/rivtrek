@@ -72,7 +72,7 @@ class FlowController extends ChangeNotifier {
     await _updateUIFromDB();
   }
 
-  /// 从数据库刷新 UI 显示的数据（riverId 与 ChallengeProvider 一致：先看同步状态，否则用 prefs 兜底）
+  /// 从数据库刷新 UI：步数、里程以 DB 为准，只读不写；保证「先落库再更新页面」避免展示与存储不一致
   Future<void> _updateUIFromDB() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     String riverId = _activeRiverId ?? '';
@@ -104,43 +104,46 @@ class FlowController extends ChangeNotifier {
   void updateFromChallenge(ChallengeProvider challenge) {
     _challengeProvider = challenge;
     if (challenge.isLoading) return;
-    
-    bool riverChanged = _activeRiverId != challenge.activeRiver?.id;
-    
+
+    final bool riverChanged = _activeRiverId != challenge.activeRiver?.id;
     _allSubSections = challenge.allSubSections;
     _currentSubSection = challenge.currentSubSection;
-    _currentDistance = challenge.currentDistance;
     _activeRiverId = challenge.activeRiver?.id;
 
+    // 仅当 challenge 当前展示的是真实里程（未双指滑走）时才从 challenge 同步 _currentDistance，
+    // 否则会拿虚拟公里数覆盖刚由 _updateUIFromDB 写入的真实值，导致步数/公里数不同源
+    final displayNearReal = (challenge.currentDistance - challenge.realDistance).abs() < 0.5;
+    if (displayNearReal) {
+      _currentDistance = challenge.currentDistance;
+    }
     if (riverChanged) {
       _displaySteps = (_currentDistance / _stepLengthKm).round();
     }
-    
+
     notifyListeners();
   }
 
   void startStepListening() {
-    // 启动实时监听
+    // 传感器来数据 → 写 DB 成功 → 回调里 _updateUIFromDB 从 DB 读出并 notify，不做轮询。
     if (Platform.isIOS) {
       _startHealthKitPolling();
     } else {
       _startPedometerListening();
     }
-    
-    // 同时启动一个定时器，每隔一段时间从 DB 刷新一次（配合后台任务）
-    _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) => _updateUIFromDB());
   }
 
   void _startPedometerListening() {
     _pedometerSubscription = Pedometer.stepCountStream.listen((event) async {
-      await StepSyncService.syncAndroidSensor();
-      await _updateUIFromDB();
+      try {
+        await StepSyncService.syncAndroidSensor();
+        await _updateUIFromDB();
+      } catch (e) {
+        if (kDebugMode) debugPrint('StepSyncService.syncAndroidSensor error: $e');
+      }
     });
   }
 
   void _startHealthKitPolling() {
-    // iOS 依然采用轮询方式获取实时步数
     _refreshTimer?.cancel();
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       await StepSyncService.syncHealthData(days: 1);

@@ -186,6 +186,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
                 currentKm: context.watch<ChallengeProvider>().activeRiver?.id == river.id
                     ? context.watch<ChallengeProvider>().currentDistance
                     : 0,
+                totalKm: river.totalLengthKm,
               ),
               // 卡片内容
               Padding(

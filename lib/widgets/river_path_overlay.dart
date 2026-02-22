@@ -5,12 +5,14 @@ import '../models/river.dart';
 import '../services/cover_path_service.dart';
 
 /// 在封面或固定尺寸区域上叠加河流路径与当前位置。
-/// [river] 用于加载 pointsJsonPath；[currentKm] 为当前行进里程，用于绘制当前位置点。
-/// 路径约 100 点、描边 + 外发光，与背景分离；起止点与当前位置为圆盘 + 描边。
+/// [river] 用于加载 pointsJsonPath；[currentKm] 为挑战当前里程；[totalKm] 为挑战总长（如 river.totalLengthKm）。
+/// 用进度比例 currentKm/totalKm 映射到路径上的位置，避免路径里程与挑战里程不一致导致点位偏移。
 class RiverPathOverlay extends StatefulWidget {
   final Widget child;
   final River? river;
   final double currentKm;
+  /// 挑战总里程（与 currentKm 同一套口径），用于按比例映射到路径；不传则退化为用 currentKm 直接当路径公里数
+  final double? totalKm;
   final Color? pathColor;
 
   const RiverPathOverlay({
@@ -18,6 +20,7 @@ class RiverPathOverlay extends StatefulWidget {
     required this.child,
     required this.river,
     this.currentKm = 0,
+    this.totalKm,
     this.pathColor,
   });
 
@@ -62,12 +65,16 @@ class _RiverPathOverlayState extends State<RiverPathOverlay> {
             builder: (context, constraints) {
               final size = Size(constraints.maxWidth, constraints.maxHeight);
               final themeColor = widget.pathColor ?? widget.river?.color ?? const Color(0xFF4FC3F7);
-              final pos = CoverPathService.getPositionOnPath(_pathData!, widget.currentKm);
+              final total = widget.totalKm ?? 0.0;
+              final pathKm = _pathData!.totalKm;
+              final pathFraction = (total > 0)
+                  ? (widget.currentKm / total).clamp(0.0, 1.0)
+                  : (pathKm > 0 ? (widget.currentKm / pathKm).clamp(0.0, 1.0) : 0.0);
               return CustomPaint(
                 size: size,
                 painter: _RiverPathOverlayPainter(
                   pathData: _pathData!,
-                  currentPosition: pos,
+                  pathFraction: pathFraction,
                   pathColor: themeColor,
                 ),
               );
@@ -80,12 +87,13 @@ class _RiverPathOverlayState extends State<RiverPathOverlay> {
 
 class _RiverPathOverlayPainter extends CustomPainter {
   final RiverCoverPathData pathData;
-  final Offset? currentPosition;
+  /// 0–1，沿路径的进度，用于在屏幕路径上精确取点，保证白点在路径上
+  final double pathFraction;
   final Color pathColor;
 
   _RiverPathOverlayPainter({
     required this.pathData,
-    required this.currentPosition,
+    required this.pathFraction,
     required this.pathColor,
   });
 
@@ -137,7 +145,17 @@ class _RiverPathOverlayPainter extends CustomPainter {
 
     _drawMarker(canvas, start, true);
     _drawMarker(canvas, end, true);
-    if (currentPosition != null) _drawMarker(canvas, _normToScreen(currentPosition!, size), false);
+    // 沿屏幕路径按比例取点，保证当前位置白点精确落在路径上
+    final pathMetrics = path.computeMetrics();
+    for (final metric in pathMetrics) {
+      final length = metric.length;
+      if (length > 0) {
+        final offset = (pathFraction * length).clamp(0.0, length);
+        final tangent = metric.getTangentForOffset(offset);
+        if (tangent != null) _drawMarker(canvas, tangent.position, false);
+      }
+      break;
+    }
   }
 
   Path _buildPath(Size size) {
@@ -179,7 +197,7 @@ class _RiverPathOverlayPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RiverPathOverlayPainter old) {
     return old.pathData != pathData ||
-        old.currentPosition != currentPosition ||
+        old.pathFraction != pathFraction ||
         old.pathColor != pathColor;
   }
 }

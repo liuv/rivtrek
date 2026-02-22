@@ -106,6 +106,7 @@ class ShareCardWidget extends StatelessWidget {
                     child: const SizedBox.expand(),
                     river: riverForPathOverlay!,
                     currentKm: currentKm,
+                    totalKm: totalKm,
                   ),
               ],
               // 无封面时的水纹装饰
@@ -210,12 +211,15 @@ class ShareCardWidget extends StatelessWidget {
                           const SizedBox(width: 10),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              medalIconPath!,
-                              width: 48,
-                              height: 48,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                            child: Opacity(
+                              opacity: 0.85,
+                              child: Image.asset(
+                                medalIconPath!,
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                              ),
                             ),
                           ),
                         ],

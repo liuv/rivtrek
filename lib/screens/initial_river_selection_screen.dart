@@ -182,6 +182,7 @@ class _InitialRiverSelectionScreenState extends State<InitialRiverSelectionScree
                 currentKm: context.watch<ChallengeProvider>().activeRiver?.id == river.id
                     ? context.watch<ChallengeProvider>().currentDistance
                     : 0,
+                totalKm: river.totalLengthKm,
               ),
               Padding(
                 padding: const EdgeInsets.all(30),
