@@ -29,6 +29,9 @@ class UserProfileProvider extends ChangeNotifier {
     _load();
   }
 
+  /// 从 SharedPreferences 重新加载（如恢复备份后调用）
+  Future<void> reloadFromPrefs() async => _load();
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     _nickname = prefs.getString(_keyNickname) ?? _defaultNickname;

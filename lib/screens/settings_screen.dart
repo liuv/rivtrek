@@ -1,9 +1,16 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:app_settings/app_settings.dart';
 import '../models/river_settings.dart';
+import '../services/backup_service.dart';
+import '../providers/challenge_provider.dart';
+import '../providers/user_profile_provider.dart';
+import '../controllers/flow_controller.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -146,11 +153,170 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               _buildSlider('河道宽度', settings.width, 0.05, 0.4, (val) {
                 _saveSettings(width: val);
               }),
+              const SizedBox(height: 32),
+              _buildSectionTitle('数据与备份'),
+              Card(
+                elevation: 0,
+                color: Colors.grey[100],
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.backup_outlined, size: 22),
+                      title: const Text('导出备份'),
+                      subtitle: const Text('将步数、天气、事件与个人资料打包为单文件，可分享保存或换机导入'),
+                      onTap: _onExportBackup,
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.restore_outlined, size: 22),
+                      title: const Text('从备份恢复'),
+                      subtitle: const Text('选择此前导出的 .rivtrek 文件，覆盖当前数据（建议先备份当前数据）'),
+                      onTap: _onRestoreBackup,
+                    ),
+                  ],
+                ),
+              ),
             ],
           );
         }
       ),
     );
+  }
+
+  Future<void> _onExportBackup() async {
+    try {
+      final path = await BackupService.instance.createBackup();
+      if (!mounted) return;
+      final choice = await showModalBottomSheet<String>(
+        context: context,
+        builder: (ctx) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.upload_file),
+                title: const Text('分享或发送'),
+                subtitle: const Text('通过微信、邮件等分享到云盘或新设备'),
+                onTap: () => Navigator.of(ctx).pop('share'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.save_alt),
+                title: const Text('保存到手机'),
+                subtitle: const Text('保存到本机「下载」目录，便于稍后拷贝到电脑或新机'),
+                onTap: () => Navigator.of(ctx).pop('save'),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      );
+      if (choice == 'share') {
+        await Share.shareXFiles(
+          [XFile(path)],
+          subject: '涉川数据备份',
+          text: '涉川数据备份，可在新设备上通过「设置 → 从备份恢复」导入。',
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('请通过分享保存到云盘或发送到新设备'), duration: Duration(seconds: 3)),
+          );
+        }
+      } else if (choice == 'save') {
+        final savedPath = await BackupService.instance.saveBackupToDownloads(path);
+        if (mounted && savedPath != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('已保存到：$savedPath'), duration: const Duration(seconds: 4)),
+          );
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('无法获取下载目录，请使用「分享」保存'), duration: Duration(seconds: 3)),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('导出失败：$e'), duration: const Duration(seconds: 4)),
+        );
+      }
+    }
+  }
+
+  Future<void> _onRestoreBackup() async {
+    // Android 上自定义扩展名 rivtrek 不被系统识别会报错，故用 FileType.any，选完后校验扩展名
+    final picked = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+      allowMultiple: false,
+    );
+    if (picked == null || picked.files.isEmpty) return;
+    final file = picked.files.single;
+    final path = file.path;
+    if (path == null || path.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('无法读取所选文件路径，请从「文件」或「下载」中选择 .rivtrek 文件'), duration: Duration(seconds: 3)),
+        );
+      }
+      return;
+    }
+    final name = file.name.toLowerCase();
+    if (!name.endsWith('.$kBackupFileExtension')) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请选择 .rivtrek 备份文件'), duration: Duration(seconds: 3)),
+        );
+      }
+      return;
+    }
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('确认恢复'),
+        content: const Text(
+          '将从所选备份覆盖当前设备上的活动、天气、事件与个人设置。此操作不可撤销，建议先导出当前数据再恢复。是否继续？',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('取消')),
+          FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('恢复')),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    try {
+      await BackupService.instance.restoreBackup(path);
+      final prefs = await SharedPreferences.getInstance();
+      final activeRiverId = prefs.getString('active_river_id') ?? 'yangtze';
+      if (mounted) {
+        await context.read<ChallengeProvider>().switchRiver(activeRiverId);
+        await context.read<UserProfileProvider>().reloadFromPrefs();
+        await context.read<FlowController>().refreshFromDb();
+      }
+      if (mounted) {
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('恢复完成'),
+            content: const Text('数据已恢复。建议重启应用以使时间线收藏等全部生效。'),
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('知道了'),
+              ),
+            ],
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('数据已恢复，建议重启应用'), duration: Duration(seconds: 2)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('恢复失败：$e'), duration: const Duration(seconds: 4)),
+        );
+      }
+    }
   }
 
   Widget _buildBackendStepsSection(BuildContext context) {
