@@ -32,3 +32,23 @@ class Blessing {
     required this.randomX,
   });
 }
+
+/// 漂流瓶（水畔寄书），与河灯类似随水流漂动
+class Bottle {
+  final double id;
+  double localY;
+  final double randomX;
+  final double wobbleSpeed;
+  final double wobblePhase;
+  final double scaleBase;
+  double rotation = 0;
+
+  Bottle({
+    required this.id,
+    this.localY = -1.2,
+    required this.randomX,
+    required this.wobbleSpeed,
+    required this.wobblePhase,
+    required this.scaleBase,
+  });
+}

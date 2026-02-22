@@ -47,6 +47,7 @@ class _FlowScreenState extends State<FlowScreen>
 
   final List<Lantern> _lanterns = [];
   final List<Blessing> _blessings = [];
+  final List<Bottle> _bottles = [];
   double _lastFrameTime = 0;
 
   // 里程碑相关
@@ -340,6 +341,19 @@ class _FlowScreenState extends State<FlowScreen>
       if (l.localY > 1.2) _lanterns.removeAt(i);
     }
 
+    for (int i = _bottles.length - 1; i >= 0; i--) {
+      final b = _bottles[i];
+      b.localY += currentSpeed * dt;
+      double combinedWobbleSpeed = b.wobbleSpeed * (1.0 + currentSpeed * 2.0);
+      double noise =
+          math.sin(currentTime * combinedWobbleSpeed + b.wobblePhase) * 0.7 +
+              math.sin(currentTime * combinedWobbleSpeed * 2.1 +
+                      b.wobblePhase * 1.3) *
+                  0.3;
+      b.rotation = noise * (math.pi / 4) * (currentSpeed * 4.0).clamp(0.4, 1.2);
+      if (b.localY > 1.2) _bottles.removeAt(i);
+    }
+
     for (int i = _blessings.length - 1; i >= 0; i--) {
       final b = _blessings[i];
       b.localY += currentSpeed * 0.8 * dt;
@@ -403,6 +417,177 @@ class _FlowScreenState extends State<FlowScreen>
       longitude: controller.lon,
       distanceAtKm: challenge.currentDistance,
     ));
+  }
+
+  void _addBottle() {
+    _triggerLightHaptic();
+    final controller = context.read<FlowController>();
+    final challenge = context.read<ChallengeProvider>();
+    setState(() {
+      _bottles.add(Bottle(
+        id: DateTime.now().millisecondsSinceEpoch.toDouble(),
+        randomX: (math.Random().nextDouble() - 0.5) * 0.1,
+        wobbleSpeed: 1.5 + math.Random().nextDouble() * 1.5,
+        wobblePhase: math.Random().nextDouble() * math.pi * 2,
+        scaleBase: 0.8 + math.Random().nextDouble() * 0.4,
+      ));
+    });
+
+    DatabaseService.instance.recordEvent(RiverEvent(
+      date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+      type: RiverEventType.activity,
+      name: "水畔寄书",
+      description: "在 ${challenge.currentSubSection?.name ?? '江面'} 放下漂流瓶",
+      latitude: controller.lat,
+      longitude: controller.lon,
+      distanceAtKm: challenge.currentDistance,
+    ));
+  }
+
+  void _showRitualSheet() {
+    final size = MediaQuery.of(context).size;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.96),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border.all(color: const Color(0xFF222222).withOpacity(0.06)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF222222).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  '开始仪式',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 3,
+                    color: const Color(0xFF222222).withOpacity(0.5),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _ritualTile(
+                  ctx,
+                  icon: Icons.nightlight_round_outlined,
+                  title: '星河流灯',
+                  subtitle: '放一盏河灯随水漂流',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _addLantern();
+                  },
+                ),
+                const SizedBox(height: 12),
+                _ritualTile(
+                  ctx,
+                  icon: Icons.send_outlined,
+                  title: '水畔寄书',
+                  subtitle: '写下心意，随江远行',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _addBottle();
+                  },
+                ),
+                const SizedBox(height: 12),
+                _ritualTile(
+                  ctx,
+                  icon: Icons.auto_awesome,
+                  title: '临川祈愿',
+                  subtitle: '在江面留下祈福一字',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _addBlessing(Offset(size.width / 2, size.height / 2));
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _ritualTile(
+    BuildContext ctx, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF222222).withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 22, color: const Color(0xFF222222).withOpacity(0.65)),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF222222),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF222222).withOpacity(0.45),
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: const Color(0xFF222222).withOpacity(0.25)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _loadShaders() async {
@@ -663,6 +848,8 @@ class _FlowScreenState extends State<FlowScreen>
                     _buildBlessingWidget(b, settings, sub, _visualDistance)),
                 ..._lanterns.map((l) =>
                     _buildLanternWidget(l, settings, sub, _visualDistance)),
+                ..._bottles.map((b) =>
+                    _buildBottleWidget(b, settings, sub, _visualDistance)),
 
                 // 里程碑勋章浮现层
                 if (_milestoneMedalPath != null) _buildMilestoneOverlay(),
@@ -800,6 +987,33 @@ class _FlowScreenState extends State<FlowScreen>
             opacity: (1.0 - (l.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
             child: Image.asset(
               'assets/icons/light.png',
+              width: 50 * scale,
+              height: 50 * scale,
+              color: settings.style == RiverStyle.aurora
+                  ? Colors.white.withOpacity(0.9)
+                  : null,
+              colorBlendMode:
+                  settings.style == RiverStyle.aurora ? BlendMode.plus : null,
+            ),
+          )),
+    );
+  }
+
+  Widget _buildBottleWidget(Bottle b, RiverSettings settings, SubSection? sub,
+      double currentDistance) {
+    final x = (_getRiverPathAt(b.localY, settings, sub, currentDistance) +
+            b.randomX) /
+        (MediaQuery.of(context).size.aspectRatio);
+    final scale = b.scaleBase * (0.8 + (b.localY + 1.0) * 0.2);
+    return Positioned(
+      left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
+      top: (b.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
+      child: Transform.rotate(
+          angle: b.rotation,
+          child: Opacity(
+            opacity: (1.0 - (b.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
+            child: Image.asset(
+              'assets/icons/bottle.png',
               width: 50 * scale,
               height: 50 * scale,
               color: settings.style == RiverStyle.aurora
@@ -960,6 +1174,17 @@ class _FlowScreenState extends State<FlowScreen>
               ),
             ),
             Row(children: [
+              GestureDetector(
+                onTap: _showRitualSheet,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Icon(
+                    Icons.auto_awesome_outlined,
+                    size: 22,
+                    color: const Color(0xFF222222).withOpacity(0.6),
+                  ),
+                ),
+              ),
               if (medalIcon != null)
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
