@@ -17,6 +17,7 @@ import '../models/flow_models.dart';
 import '../controllers/flow_controller.dart';
 import '../providers/challenge_provider.dart';
 import '../models/river_section.dart';
+import '../services/river_drift_service.dart';
 import 'river_selector_sheet.dart';
 
 class FlowScreen extends StatefulWidget {
@@ -45,10 +46,14 @@ class _FlowScreenState extends State<FlowScreen>
   List<double> _currentPathOffsets = List.filled(32, 0.0);
   String? _loadedPointsRiverId;
 
-  final List<Lantern> _lanterns = [];
   final List<Blessing> _blessings = [];
-  final List<Bottle> _bottles = [];
   double _lastFrameTime = 0;
+
+  /// 河灯/漂流瓶：从 DB 加载，按虚拟源头时间戳计算当前位置
+  RiverDriftTimeline? _driftTimeline;
+  List<RiverEvent> _driftEvents = [];
+  bool _driftEventsLoaded = false;
+  String? _driftTimelineRiverId;
 
   // 里程碑相关
   String? _lastTriggeredSubSectionName;
@@ -164,6 +169,19 @@ class _FlowScreenState extends State<FlowScreen>
       _currentPoi = null;
     }
 
+    // 切换河流时重建漂流时间轴并重新加载漂流事件
+    final currentRiverId = challenge.activeRiver?.id;
+    if (currentRiverId != null && _driftTimeline != null) {
+      // 若河流 ID 与构建时间轴时不一致（如切换河流），重置以便用新河流的 subsection 重建
+      if (_driftTimelineRiverId != currentRiverId) {
+        _driftTimeline = null;
+        _driftEventsLoaded = false;
+        _driftTimelineRiverId = currentRiverId;
+      }
+    } else if (currentRiverId != null) {
+      _driftTimelineRiverId = currentRiverId;
+    }
+
     // 按当前行进距离查最近 POI：仅在挑战加载完成、河流有效且 numericId>0 时查询，避免时序导致匹配不到
     // 约 0.5 km 更新一次；加载完成后 _lastPoiRequestKm 为 null 会触发首次查询
     final river = challenge.activeRiver;
@@ -181,7 +199,27 @@ class _FlowScreenState extends State<FlowScreen>
       });
     }
 
-    _updateLanterns(challenge.currentSubSection);
+    // 漂流时间轴：挑战加载完成后构建一次；漂流事件加载一次
+    if (_driftTimeline == null &&
+        challenge.allSubSections.isNotEmpty) {
+      _driftTimeline = RiverDriftTimeline.fromSubSections(
+        challenge.allSubSections,
+        visibleRangeKm: 3.0,
+        targetCrossScreenSeconds: 30.0,
+      );
+      _driftTimelineRiverId = challenge.activeRiver?.id;
+      if (!_driftEventsLoaded) _loadDriftEvents();
+    }
+    _updateBlessingsOnly(challenge.currentSubSection);
+  }
+
+  Future<void> _loadDriftEvents() async {
+    final list = await DatabaseService.instance.getDriftEvents();
+    if (!mounted) return;
+    setState(() {
+      _driftEvents = list;
+      _driftEventsLoaded = true;
+    });
   }
 
   /// 轻震：祭江、放河灯等事件用，比跨河段震感更轻
@@ -344,7 +382,8 @@ class _FlowScreenState extends State<FlowScreen>
     }
   }
 
-  void _updateLanterns(SubSection? sub) {
+  /// 仅更新祭江祈福的动画；河灯/漂流瓶位置由虚拟源头时间戳每帧计算
+  void _updateBlessingsOnly(SubSection? sub) {
     final double currentTime = _stopwatch.elapsedMilliseconds / 1000.0;
     if (_lastFrameTime == 0) {
       _lastFrameTime = currentTime;
@@ -357,32 +396,6 @@ class _FlowScreenState extends State<FlowScreen>
 
     final double currentSpeed =
         (RiverSettings.instance.speed + (sub.baseFlowSpeed * 0.1)) * 0.5;
-
-    for (int i = _lanterns.length - 1; i >= 0; i--) {
-      final l = _lanterns[i];
-      l.localY += currentSpeed * dt;
-      double combinedWobbleSpeed = l.wobbleSpeed * (1.0 + currentSpeed * 2.0);
-      double noise =
-          math.sin(currentTime * combinedWobbleSpeed + l.wobblePhase) * 0.7 +
-              math.sin(currentTime * combinedWobbleSpeed * 2.1 +
-                      l.wobblePhase * 1.3) *
-                  0.3;
-      l.rotation = noise * (math.pi / 4) * (currentSpeed * 4.0).clamp(0.4, 1.2);
-      if (l.localY > 1.2) _lanterns.removeAt(i);
-    }
-
-    for (int i = _bottles.length - 1; i >= 0; i--) {
-      final b = _bottles[i];
-      b.localY += currentSpeed * dt;
-      double combinedWobbleSpeed = b.wobbleSpeed * (1.0 + currentSpeed * 2.0);
-      double noise =
-          math.sin(currentTime * combinedWobbleSpeed + b.wobblePhase) * 0.7 +
-              math.sin(currentTime * combinedWobbleSpeed * 2.1 +
-                      b.wobblePhase * 1.3) *
-                  0.3;
-      b.rotation = noise * (math.pi / 4) * (currentSpeed * 4.0).clamp(0.4, 1.2);
-      if (b.localY > 1.2) _bottles.removeAt(i);
-    }
 
     for (int i = _blessings.length - 1; i >= 0; i--) {
       final b = _blessings[i];
@@ -431,17 +444,7 @@ class _FlowScreenState extends State<FlowScreen>
     _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
-    setState(() {
-      _lanterns.add(Lantern(
-        id: DateTime.now().millisecondsSinceEpoch.toDouble(),
-        randomX: (math.Random().nextDouble() - 0.5) * 0.1,
-        wobbleSpeed: 1.5 + math.Random().nextDouble() * 1.5,
-        wobblePhase: math.Random().nextDouble() * math.pi * 2,
-        scaleBase: 0.8 + math.Random().nextDouble() * 0.4,
-      ));
-    });
-
-    DatabaseService.instance.recordEvent(RiverEvent(
+    final event = RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
       type: RiverEventType.activity,
@@ -450,7 +453,9 @@ class _FlowScreenState extends State<FlowScreen>
       latitude: controller.lat,
       longitude: controller.lon,
       distanceAtKm: challenge.currentDistance,
-    ));
+    );
+    DatabaseService.instance.recordEvent(event);
+    setState(() => _driftEvents.add(event));
   }
 
   void _addBottle({String? message}) {
@@ -458,20 +463,10 @@ class _FlowScreenState extends State<FlowScreen>
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     final sectionName = challenge.currentSubSection?.name ?? '江面';
-    setState(() {
-      _bottles.add(Bottle(
-        id: DateTime.now().millisecondsSinceEpoch.toDouble(),
-        randomX: (math.Random().nextDouble() - 0.5) * 0.1,
-        wobbleSpeed: 1.5 + math.Random().nextDouble() * 1.5,
-        wobblePhase: math.Random().nextDouble() * math.pi * 2,
-        scaleBase: 0.8 + math.Random().nextDouble() * 0.4,
-      ));
-    });
-
     final desc = message != null && message.trim().isNotEmpty
         ? "在 $sectionName 放下漂流瓶\n\n${message.trim()}"
         : "在 $sectionName 放下漂流瓶";
-    DatabaseService.instance.recordEvent(RiverEvent(
+    final event = RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
       type: RiverEventType.activity,
@@ -480,7 +475,9 @@ class _FlowScreenState extends State<FlowScreen>
       latitude: controller.lat,
       longitude: controller.lon,
       distanceAtKm: challenge.currentDistance,
-    ));
+    );
+    DatabaseService.instance.recordEvent(event);
+    setState(() => _driftEvents.add(event));
   }
 
   Future<void> _showBlessingInputDialog(Size size) async {
@@ -916,10 +913,7 @@ class _FlowScreenState extends State<FlowScreen>
                 ))),
                 ..._blessings.map((b) =>
                     _buildBlessingWidget(b, settings, sub, _visualDistance)),
-                ..._lanterns.map((l) =>
-                    _buildLanternWidget(l, settings, sub, _visualDistance)),
-                ..._bottles.map((b) =>
-                    _buildBottleWidget(b, settings, sub, _visualDistance)),
+                ..._buildVisibleDriftWidgets(settings, sub),
 
                 // 里程碑勋章浮现层
                 if (_milestoneMedalPath != null) _buildMilestoneOverlay(),
@@ -1014,6 +1008,87 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
+  /// 根据虚拟源头时间戳计算当前可见的河灯/漂流瓶并返回对应 Widget 列表
+  List<Widget> _buildVisibleDriftWidgets(
+      RiverSettings settings, SubSection? sub) {
+    final timeline = _driftTimeline;
+    if (timeline == null || _driftEvents.isEmpty) return [];
+
+    final tNowSec = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    final (dMin, dMax) = timeline.visibleRange(_visualDistance);
+    final currentTime = _stopwatch.elapsedMilliseconds / 1000.0;
+    final List<Widget> out = [];
+
+    for (final event in _driftEvents) {
+      final dropSec = event.timestamp / 1000.0;
+      final virtualSourceSec =
+          timeline.calculateVirtualSourceTimestamp(event.distanceAtKm, dropSec);
+      final currentDist =
+          timeline.calculateCurrentDistance(virtualSourceSec, tNowSec);
+      if (currentDist < 0 || currentDist > timeline.totalLengthKm) continue;
+      if (currentDist < dMin || currentDist > dMax) continue;
+
+      final localY = timeline.kmToLocalY(currentDist, _visualDistance);
+      final seed = event.id ?? event.timestamp;
+      final randomX = ((seed % 1000) / 1000.0 - 0.5) * 0.1;
+      final scaleBase = 0.8 + ((seed % 500) / 500.0) * 0.4;
+      final wobblePhase = (seed % 1000) / 1000.0 * math.pi * 2;
+      final rotation = (math.sin(currentTime * 1.5 + wobblePhase) * 0.7 +
+              math.sin(currentTime * 2.1 + wobblePhase * 1.3) * 0.3) *
+          (math.pi / 4);
+
+      final isLantern = event.name == '放河灯';
+      out.add(_buildDriftItemWidget(
+        isLantern: isLantern,
+        localY: localY,
+        randomX: randomX,
+        scaleBase: scaleBase,
+        rotation: rotation,
+        settings: settings,
+        sub: sub,
+        currentDistance: _visualDistance,
+      ));
+    }
+    return out;
+  }
+
+  Widget _buildDriftItemWidget({
+    required bool isLantern,
+    required double localY,
+    required double randomX,
+    required double scaleBase,
+    required double rotation,
+    required RiverSettings settings,
+    required SubSection? sub,
+    required double currentDistance,
+  }) {
+    final x = (_getRiverPathAt(localY, settings, sub, currentDistance) +
+            randomX) /
+        (MediaQuery.of(context).size.aspectRatio);
+    final scale = scaleBase * (0.8 + (localY + 1.0) * 0.2);
+    final asset = isLantern ? 'assets/icons/light.png' : 'assets/icons/bottle.png';
+    return Positioned(
+      left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
+      top: (localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
+      child: Transform.rotate(
+        angle: rotation,
+        child: Opacity(
+          opacity: (1.0 - (localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
+          child: Image.asset(
+            asset,
+            width: 50 * scale,
+            height: 50 * scale,
+            color: settings.style == RiverStyle.aurora
+                ? Colors.white.withOpacity(0.9)
+                : null,
+            colorBlendMode:
+                settings.style == RiverStyle.aurora ? BlendMode.plus : null,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBlessingWidget(Blessing b, RiverSettings settings,
       SubSection? sub, double currentDistance) {
     final x = (_getRiverPathAt(b.localY, settings, sub, currentDistance) +
@@ -1044,60 +1119,6 @@ class _FlowScreenState extends State<FlowScreen>
                               offset: Offset(2, 2)),
                         ])),
               ),
-            ),
-          )),
-    );
-  }
-
-  Widget _buildLanternWidget(Lantern l, RiverSettings settings, SubSection? sub,
-      double currentDistance) {
-    final x = (_getRiverPathAt(l.localY, settings, sub, currentDistance) +
-            l.randomX) /
-        (MediaQuery.of(context).size.aspectRatio);
-    final scale = l.scaleBase * (0.8 + (l.localY + 1.0) * 0.2);
-    return Positioned(
-      left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
-      top: (l.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
-      child: Transform.rotate(
-          angle: l.rotation,
-          child: Opacity(
-            opacity: (1.0 - (l.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
-            child: Image.asset(
-              'assets/icons/light.png',
-              width: 50 * scale,
-              height: 50 * scale,
-              color: settings.style == RiverStyle.aurora
-                  ? Colors.white.withOpacity(0.9)
-                  : null,
-              colorBlendMode:
-                  settings.style == RiverStyle.aurora ? BlendMode.plus : null,
-            ),
-          )),
-    );
-  }
-
-  Widget _buildBottleWidget(Bottle b, RiverSettings settings, SubSection? sub,
-      double currentDistance) {
-    final x = (_getRiverPathAt(b.localY, settings, sub, currentDistance) +
-            b.randomX) /
-        (MediaQuery.of(context).size.aspectRatio);
-    final scale = b.scaleBase * (0.8 + (b.localY + 1.0) * 0.2);
-    return Positioned(
-      left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
-      top: (b.localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
-      child: Transform.rotate(
-          angle: b.rotation,
-          child: Opacity(
-            opacity: (1.0 - (b.localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
-            child: Image.asset(
-              'assets/icons/bottle.png',
-              width: 50 * scale,
-              height: 50 * scale,
-              color: settings.style == RiverStyle.aurora
-                  ? Colors.white.withOpacity(0.9)
-                  : null,
-              colorBlendMode:
-                  settings.style == RiverStyle.aurora ? BlendMode.plus : null,
             ),
           )),
     );

@@ -228,6 +228,16 @@ class DatabaseService {
         .toList();
   }
 
+  /// 仅返回河灯、漂流瓶等漂流类事件（用于虚拟源头时间戳渲染）
+  Future<List<RiverEvent>> getDriftEvents() async {
+    final all = await getAllEvents();
+    return all
+        .where((e) =>
+            e.type == RiverEventType.activity &&
+            (e.name == '放河灯' || e.name == '水畔寄书'))
+        .toList();
+  }
+
   /// 按「行进距离」（挑战累计里程）查最近 POI，使用数字主键 [numericId] 查库，避免字符串 id 的精确匹配/空格等问题。
   /// river_pois.distance_km 与 fetch_river_pois 写入一致，为挑战里程，故直接用 accumulatedKm 查，不乘修正系数。
   /// 若基础库未就绪、无 river_pois 表，静默返回 null，不抛错。
