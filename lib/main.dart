@@ -289,9 +289,17 @@ class _MainContainerState extends State<MainContainer> {
       },
       onDoubleTap: () {
         if (index == 0) {
-          // 双击 Flow 按钮，回归真实进度
+          // 双击涉川：退出调试模式 + 主动拉取步数并刷新
           context.read<ChallengeProvider>().resetToRealDistance();
           HapticFeedback.mediumImpact();
+          Future(() async {
+            try {
+              await StepSyncService.syncAll();
+              if (context.mounted) {
+                await context.read<FlowController>().refreshFromDb();
+              }
+            } catch (_) {}
+          });
         }
       },
       child: Container(

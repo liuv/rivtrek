@@ -72,6 +72,11 @@ class FlowController extends ChangeNotifier {
     await _updateUIFromDB();
   }
 
+  /// 对外：拉取步数并从 DB 刷新 UI（如双击涉川 tab 时主动刷新）
+  Future<void> refreshFromDb() async {
+    await _updateUIFromDB();
+  }
+
   /// 从数据库刷新 UI：步数、里程以 DB 为准，只读不写；保证「先落库再更新页面」避免展示与存储不一致
   Future<void> _updateUIFromDB() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
