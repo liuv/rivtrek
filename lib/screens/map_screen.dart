@@ -117,13 +117,26 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       ];
     }
 
-    // 高德：矢量 style=7，卫星 style=6，XYZ 与 flutter_map 一致
-    final amapBaseUrl = isSatellite
-        ? 'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}'
-        : 'http://wprd0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7';
+    // 高德：非卫星 style=7 单层；卫星无「一张图」style，只能两层：底层 style=6 卫星 + 上层 style=8 路网注记
+    if (!isSatellite) {
+      return [
+        TileLayer(
+          urlTemplate: 'http://wprd0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7',
+          subdomains: const ['1', '2', '3', '4'],
+          userAgentPackageName: userAgent,
+          tileProvider: cache,
+        ),
+      ];
+    }
     return [
       TileLayer(
-        urlTemplate: amapBaseUrl,
+        urlTemplate: 'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+        subdomains: const ['1', '2', '3', '4'],
+        userAgentPackageName: userAgent,
+        tileProvider: cache,
+      ),
+      TileLayer(
+        urlTemplate: 'http://wprd0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8',
         subdomains: const ['1', '2', '3', '4'],
         userAgentPackageName: userAgent,
         tileProvider: cache,
