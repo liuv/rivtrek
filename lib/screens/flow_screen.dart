@@ -18,6 +18,7 @@ import '../controllers/flow_controller.dart';
 import '../providers/challenge_provider.dart';
 import '../models/river_section.dart';
 import '../services/river_drift_service.dart';
+import 'lantern_ritual_screen.dart';
 import 'river_selector_sheet.dart';
 
 class FlowScreen extends StatefulWidget {
@@ -454,13 +455,36 @@ class _FlowScreenState extends State<FlowScreen>
     ));
   }
 
-  void _addLantern() {
+  void _openLanternRitual() {
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        pageBuilder: (ctx, _, __) => ChangeNotifierProvider<FlowController>.value(
+          value: context.read<FlowController>(),
+          child: ChangeNotifierProvider<ChallengeProvider>.value(
+            value: context.read<ChallengeProvider>(),
+            child: LanternRitualScreen(
+              onComplete: (wish) {
+                _addLantern(wish: wish);
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _addLantern({String? wish}) {
     _triggerLightHaptic();
     final controller = context.read<FlowController>();
     final challenge = context.read<ChallengeProvider>();
     // 释放位置为当前屏幕 1/3 处对应的公里数（滑动时也能看到河灯）
     final totalKm = challenge.activeRiver?.totalLengthKm ?? 0.0;
     final dropKm = (_visualDistance - _kOneThirdFromTopOffsetKm).clamp(0.0, totalKm);
+    final extraData = wish != null && wish.isNotEmpty
+        ? jsonEncode({'wish': wish})
+        : '{}';
     final event = RiverEvent(
       date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       timestamp: DateTime.now().millisecondsSinceEpoch,
@@ -470,6 +494,7 @@ class _FlowScreenState extends State<FlowScreen>
       latitude: controller.lat,
       longitude: controller.lon,
       distanceAtKm: dropKm,
+      extraData: extraData,
     );
     DatabaseService.instance.recordEvent(event);
     setState(() => _driftEvents.add(event));
@@ -580,10 +605,10 @@ class _FlowScreenState extends State<FlowScreen>
                   ctx,
                   icon: Icons.nightlight_round_outlined,
                   title: '星河流灯',
-                  subtitle: '放一盏河灯随水漂流',
+                  subtitle: '净心 · 寄愿 · 放灯入江',
                   onTap: () {
                     Navigator.pop(ctx);
-                    _addLantern();
+                    _openLanternRitual();
                   },
                 ),
                 const SizedBox(height: 12),
@@ -887,7 +912,7 @@ class _FlowScreenState extends State<FlowScreen>
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: GestureDetector(
-            onDoubleTap: _addLantern,
+            onDoubleTap: _openLanternRitual,
             onLongPressStart: (d) => _addBlessing(d.localPosition),
             child: Listener(
               onPointerDown: (e) => setState(() => _pointers.add(e.pointer)),

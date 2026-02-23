@@ -1,0 +1,488 @@
+// 放河灯仪式：净心 → 寄愿 → 步数灵力 → 滑动放灯 → 结语
+
+import 'dart:convert';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../controllers/flow_controller.dart';
+
+/// 仪式页河水声资源（10 秒，循环播放）
+const String _kRiverSoundAsset = 'audio/murmur_01.mp3';
+const double _kRiverSoundVolume = 0.35;
+const Duration _kRiverSoundFadeIn = Duration(milliseconds: 1800);
+const Duration _kRiverSoundFadeOut = Duration(milliseconds: 900);
+
+/// 放灯所需最少步数（步数即「灵力」，满则灯更亮）
+const int kMinStepsToReleaseLantern = 3000;
+
+class LanternRitualScreen extends StatefulWidget {
+  const LanternRitualScreen({
+    super.key,
+    required this.onComplete,
+  });
+
+  final void Function(String? wish) onComplete;
+
+  @override
+  State<LanternRitualScreen> createState() => _LanternRitualScreenState();
+}
+
+class _LanternRitualScreenState extends State<LanternRitualScreen>
+    with TickerProviderStateMixin {
+  int _step = 0;
+  final TextEditingController _wishController = TextEditingController();
+  double _dragOffset = 0;
+  bool _released = false;
+  late AnimationController _fadeController;
+  late AnimationController _volumeFadeController;
+  late AnimationController _dimController;
+  AudioPlayer? _riverSound;
+  static const int _totalSteps = 5; // 净心、写灯语、步数、放灯、结语
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _volumeFadeController = AnimationController(
+      vsync: this,
+      duration: _kRiverSoundFadeIn,
+    );
+    _dimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _startRiverSound();
+    _dimController.forward();
+  }
+
+  Future<void> _startRiverSound() async {
+    final player = AudioPlayer();
+    _riverSound = player;
+    try {
+      await player.setReleaseMode(ReleaseMode.loop);
+      await player.setVolume(0);
+      await player.setSource(AssetSource(_kRiverSoundAsset));
+      await player.resume();
+      if (!mounted || _riverSound != player) return;
+      _volumeFadeController.forward(from: 0);
+      _volumeFadeController.addListener(_onVolumeFadeTick);
+    } catch (e) {
+      if (kDebugMode) debugPrint('LanternRitual river sound: $e');
+    }
+  }
+
+  void _onVolumeFadeTick() {
+    final v = _volumeFadeController.value * _kRiverSoundVolume;
+    _riverSound?.setVolume(v);
+    if (_volumeFadeController.isCompleted) {
+      _volumeFadeController.removeListener(_onVolumeFadeTick);
+    }
+  }
+
+  Future<void> _fadeOutRiverSound() async {
+    _volumeFadeController.removeListener(_onVolumeFadeTick);
+    final player = _riverSound;
+    if (player == null) return;
+    const steps = 12;
+    final stepMs = _kRiverSoundFadeOut.inMilliseconds / steps;
+    final stepVol = _kRiverSoundVolume / steps;
+    for (var i = steps; i >= 0 && mounted; i--) {
+      await player.setVolume(stepVol * i);
+      await Future.delayed(Duration(milliseconds: stepMs.round()));
+    }
+    await player.stop();
+    await player.dispose();
+    if (mounted) _riverSound = null;
+  }
+
+  @override
+  void dispose() {
+    _volumeFadeController.removeListener(_onVolumeFadeTick);
+    _volumeFadeController.dispose();
+    _dimController.dispose();
+    if (!_released) {
+      _riverSound?.stop();
+      _riverSound?.dispose();
+      _riverSound = null;
+    }
+    _wishController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  int get _todaySteps {
+    try {
+      return context.read<FlowController>().displaySteps;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  bool get _canReleaseBySteps => _todaySteps >= kMinStepsToReleaseLantern;
+
+  void _next() {
+    if (_step >= _totalSteps - 1) return;
+    setState(() => _step++);
+  }
+
+  void _onRelease() {
+    if (_released) return;
+    _released = true;
+    HapticFeedback.mediumImpact();
+    _fadeController.forward();
+    _fadeOutRiverSound();
+    Future.delayed(const Duration(milliseconds: 2200), () {
+      if (!mounted) return;
+      final wish = _wishController.text.trim().isEmpty
+          ? null
+          : _wishController.text.trim();
+      widget.onComplete(wish);
+      Navigator.of(context).pop();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedBuilder(
+            animation: _dimController,
+            builder: (context, _) => Container(
+              color: Colors.black.withOpacity(0.78 * _dimController.value),
+            ),
+          ),
+          SafeArea(child: _buildStep()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep() {
+    switch (_step) {
+      case 0:
+        return _buildCalmMind();
+      case 1:
+        return _buildWishInput();
+      case 2:
+        return _buildStepsCheck();
+      case 3:
+        return _buildSwipeRelease();
+      case 4:
+        return _buildClosing();
+      default:
+        return _buildCalmMind();
+    }
+  }
+
+  Widget _buildCalmMind() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.nightlight_round_outlined,
+            size: 56,
+            color: Colors.amber.shade200.withOpacity(0.9),
+          ),
+          const SizedBox(height: 40),
+          Text(
+            '请在此刻，放下杂念，只留一心愿。',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18,
+              height: 1.6,
+              color: Colors.white.withOpacity(0.92),
+              fontWeight: FontWeight.w300,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 48),
+          TextButton(
+            onPressed: _next,
+            child: Text(
+              '下一步',
+              style: TextStyle(
+                color: Colors.amber.shade200,
+                fontSize: 16,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWishInput() {
+    const suggestions = ['坚持', '自律', '变好', '平安', '成为想成为的人'];
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 28),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          Text(
+            '寄愿',
+            style: TextStyle(
+              fontSize: 15,
+              letterSpacing: 4,
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '写一句只给自己看的话，不公开、不炫耀——这才是真・信念。',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 24),
+          TextField(
+            controller: _wishController,
+            maxLength: 20,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white.withOpacity(0.95),
+            ),
+            decoration: InputDecoration(
+              hintText: '可留空，或写下心愿',
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.68),
+                fontSize: 16,
+              ),
+              counterText: '',
+              filled: true,
+              fillColor: Colors.white.withOpacity(0.08),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.amber.shade200.withOpacity(0.6)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: suggestions
+                .map((s) => ActionChip(
+                      label: Text(
+                        s,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      backgroundColor: Colors.black.withOpacity(0.45),
+                      side: BorderSide(color: Colors.white.withOpacity(0.35)),
+                      onPressed: () {
+                        _wishController.text = s;
+                      },
+                    ))
+                .toList(),
+          ),
+          const SizedBox(height: 48),
+          TextButton(
+            onPressed: _next,
+            child: Text(
+              '继续',
+              style: TextStyle(
+                color: Colors.amber.shade200,
+                fontSize: 16,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepsCheck() {
+    final steps = _todaySteps;
+    final ok = _canReleaseBySteps;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '今日步数',
+            style: TextStyle(
+              fontSize: 14,
+              letterSpacing: 2,
+              color: Colors.white.withOpacity(0.88),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '$steps',
+            style: TextStyle(
+              fontSize: 52,
+              fontWeight: FontWeight.w200,
+              color: ok ? Colors.amber.shade200 : Colors.white.withOpacity(0.9),
+            ),
+          ),
+          Text(
+            '步',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white.withOpacity(0.88),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            ok
+                ? '步数即灵力，可以点亮一盏河灯。'
+                : '今日步数满 $kMinStepsToReleaseLantern 步，河灯更亮；未满也可放灯，愿心不减。',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 48),
+          TextButton(
+            onPressed: _next,
+            child: Text(
+              ok ? '放灯' : '仍要放灯',
+              style: TextStyle(
+                color: Colors.amber.shade200,
+                fontSize: 16,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSwipeRelease() {
+    const double triggerOffset = 100;
+    final progress = (_dragOffset / triggerOffset).clamp(0.0, 1.0);
+    final triggered = _dragOffset >= triggerOffset;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onVerticalDragUpdate: (d) {
+        if (_released) return;
+        setState(() {
+          _dragOffset -= d.delta.dy;
+          if (_dragOffset < 0) _dragOffset = 0;
+          if (_dragOffset >= triggerOffset) _onRelease();
+        });
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '向上滑动，将河灯放入江中',
+            style: TextStyle(
+              fontSize: 15,
+              letterSpacing: 1,
+              color: Colors.white.withOpacity(0.92),
+            ),
+          ),
+          const SizedBox(height: 32),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // 水波纹示意（放灯时扩大）
+              if (progress > 0)
+                Container(
+                  width: 80 + progress * 60,
+                  height: 80 + progress * 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.amber.shade200.withOpacity(0.3 * progress),
+                      width: 2,
+                    ),
+                  ),
+                ),
+              Icon(
+                Icons.nightlight_round_outlined,
+                size: 64 + progress * 16,
+                color: Colors.amber.shade200.withOpacity(0.7 + 0.3 * progress),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: Colors.white.withOpacity(0.15),
+              valueColor: AlwaysStoppedAnimation(Colors.amber.shade200),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            triggered ? '河灯已入江…' : '继续上滑',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.88),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClosing() {
+    return FadeTransition(
+      opacity: _fadeController,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 36),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '你走过的路，会化作江流；\n你许下的愿，会变成河灯。\n风会记得，水会记得，你自己更会记得。',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17,
+                height: 1.85,
+                color: Colors.white.withOpacity(0.95),
+                fontWeight: FontWeight.w300,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 从 extraData 解析河灯心愿（仅本地，不公开）
+String? parseLanternWishFromExtraData(String extraData) {
+  if (extraData.isEmpty || extraData == '{}') return null;
+  try {
+    final map = jsonDecode(extraData) as Map<String, dynamic>?;
+    return map?['wish'] as String?;
+  } catch (_) {
+    return null;
+  }
+}

@@ -33,9 +33,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final XFile? file = await _picker.pickImage(source: source, maxWidth: 512, maxHeight: 512, imageQuality: 90);
+    final XFile? file = await _picker.pickImage(
+        source: source, maxWidth: 512, maxHeight: 512, imageQuality: 90);
     if (file == null || !mounted) return;
-    await context.read<UserProfileProvider>().setAvatarFromFile(File(file.path));
+    await context
+        .read<UserProfileProvider>()
+        .setAvatarFromFile(File(file.path));
   }
 
   void _showAvatarOptions() {
@@ -114,13 +117,15 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                         ? ClipOval(
                             child: Image.file(
                               File(profile.avatarPath!),
-                              key: ValueKey('avatar_${profile.avatarPath}_${profile.avatarVersion}'),
+                              key: ValueKey(
+                                  'avatar_${profile.avatarPath}_${profile.avatarVersion}'),
                               width: 96,
                               height: 96,
                               fit: BoxFit.cover,
                             ),
                           )
-                        : const Icon(Icons.person_outline_rounded, size: 48, color: Color(0xFF888888)),
+                        : const Icon(Icons.person_outline_rounded,
+                            size: 48, color: Color(0xFF888888)),
                   ),
                   Positioned(
                     right: 0,
@@ -131,7 +136,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                         color: Color(0xFF0097A7),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                      child: const Icon(Icons.camera_alt,
+                          size: 18, color: Colors.white),
                     ),
                   ),
                 ],
@@ -149,7 +155,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 labelText: '昵称',
                 hintText: '江河行者',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               onSubmitted: (_) => profile.setNickname(_nameController.text),
             ),
@@ -158,12 +165,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               controller: _signatureController,
               decoration: const InputDecoration(
                 labelText: '个性签名',
-                hintText: '步履不停，终达江海',
+                hintText: '江河不语，步履生光',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               maxLines: 2,
-              onSubmitted: (_) => profile.setSignature(_signatureController.text),
+              onSubmitted: (_) =>
+                  profile.setSignature(_signatureController.text),
             ),
           ],
         ),
