@@ -997,7 +997,7 @@ class _FlowScreenState extends State<FlowScreen>
                   _buildPoiCard(sub, controller),
                   const Spacer(flex: 3),
                   _buildStepsAndProgress(
-                      controller, challenge, _visualDistance),
+                      controller, challenge, challenge.currentDistance),
                   const Spacer(flex: 4),
                 ])),
               ]),
@@ -1396,8 +1396,9 @@ class _FlowScreenState extends State<FlowScreen>
         ]));
   }
 
+  /// 步数与进度区：显示实际累计里程（非视口偏移），起步与到江尾时如实显示 0 与总长
   Widget _buildStepsAndProgress(FlowController controller,
-      ChallengeProvider challenge, double visualDistance) {
+      ChallengeProvider challenge, double accumulatedKm) {
     String steps = controller.displaySteps.toString().replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     final sub = challenge.currentSubSection;
@@ -1410,7 +1411,7 @@ class _FlowScreenState extends State<FlowScreen>
       segmentLengthKm = sub.accumulatedLength - segmentStartKm;
     }
     final segmentTraveledKm =
-        (visualDistance - segmentStartKm).clamp(0.0, segmentLengthKm);
+        (accumulatedKm - segmentStartKm).clamp(0.0, segmentLengthKm);
     final segmentLine = segmentLengthKm > 0
         ? "本段已行 ${segmentTraveledKm.toStringAsFixed(1)} km / 本段 ${segmentLengthKm.toStringAsFixed(0)} km"
         : null;
@@ -1450,7 +1451,7 @@ class _FlowScreenState extends State<FlowScreen>
         ],
       ),
       Text(
-          "已行至 ${visualDistance.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km",
+          "已行至 ${accumulatedKm.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km",
           style: TextStyle(
               color: const Color(0xFF555555).withOpacity(0.7),
               fontSize: 16,

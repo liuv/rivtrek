@@ -76,18 +76,31 @@ class StepSyncService {
 
       final prefs = await SharedPreferences.getInstance();
       final String riverId = prefs.getString('active_river_id') ?? 'yangtze';
+      final String todayStr = DateFormat('yyyy-MM-dd').format(now);
 
-      // 挑战起始日：首次安装/首次同步当天，不把安装前的历史步数记入挑战（避免 1 月 5 日安装却生成 1–4 日数据）
       const kChallengeStartDate = 'challenge_start_date';
       String challengeStartDate = prefs.getString(kChallengeStartDate) ?? '';
-      if (challengeStartDate.isEmpty) {
-        challengeStartDate = DateFormat('yyyy-MM-dd').format(now);
-        await prefs.setString(kChallengeStartDate, challengeStartDate);
-        debugPrint("Health Data Sync: challenge_start_date set to $challengeStartDate (first run).");
+
+      final allActivities = await DatabaseService.instance.getAllActivities();
+      final activitiesForRiver = allActivities
+          .where((a) => a.riverId == riverId)
+          .toList();
+
+      // 安装对齐：仅当「当前河流在 DB 中没有任何活动」时从今天起算（全新安装/卸载重装）。
+      // 升级安装时 DB 已有活动，activitiesForRiver 非空，不会进此分支，保留原有 challenge_start_date 与历史数据。
+      if (activitiesForRiver.isEmpty) {
+        challengeStartDate = todayStr;
+        await prefs.setString(kChallengeStartDate, todayStr);
+        if (kDebugMode) {
+          debugPrint(
+              "Health Data Sync: no activities for river, set challenge_start_date=$todayStr (fresh/reinstall).");
+        }
+      } else if (challengeStartDate.isEmpty) {
+        challengeStartDate = todayStr;
+        await prefs.setString(kChallengeStartDate, todayStr);
+        debugPrint("Health Data Sync: challenge_start_date set to $challengeStartDate (first run, legacy).");
       }
 
-      double accumulatedDistance = 0.0;
-      final allActivities = await DatabaseService.instance.getAllActivities();
       final startDateStr = DateFormat('yyyy-MM-dd').format(startDate);
       final previousActivities = allActivities
           .where((a) =>
@@ -95,19 +108,29 @@ class StepSyncService {
               a.date.compareTo(startDateStr) < 0 &&
               a.date.compareTo(challengeStartDate) >= 0)
           .toList();
+      double accumulatedDistance = 0.0;
       if (previousActivities.isNotEmpty) {
         previousActivities.sort((a, b) => b.date.compareTo(a.date));
         accumulatedDistance = previousActivities.first.accumulatedDistanceKm;
       }
 
-      // 只处理 >= 挑战起始日的日期，安装前的步数不写入
+      // 只处理 >= 挑战起始日的日期
       List<String> sortedDates = dailySteps.keys
           .where((d) => d.compareTo(challengeStartDate) >= 0)
           .toList()
         ..sort();
+
+      // 冲突策略：同日期已存在时取 max(已有步数, 健康数据步数)，避免被较小值覆盖丢失进度
+      final existingByDate = {
+        for (var a in activitiesForRiver) a.date: a,
+      };
       for (var date in sortedDates) {
-        int steps = dailySteps[date]!;
-        double distance = steps * _stepLengthKm;
+        final healthSteps = dailySteps[date]!;
+        final existing = existingByDate[date];
+        final steps = existing != null
+            ? (healthSteps > existing.steps ? healthSteps : existing.steps)
+            : healthSteps;
+        final distance = steps * _stepLengthKm;
         accumulatedDistance += distance;
         await DatabaseService.instance.saveActivity(DailyActivity(
           date: date,
@@ -227,15 +250,24 @@ class StepSyncService {
         .where((a) => a.date != today && a.riverId == riverId)
         .fold(0.0, (sum, item) => sum + item.distanceKm);
 
+    // 冲突策略：今日若已有记录（如 Health 已写），取步数较大值，不丢失进度
+    final existingToday = allActivities
+        .where((a) => a.date == today && a.riverId == riverId)
+        .firstOrNull;
+    final stepsToWrite = existingToday != null
+        ? (todaySteps > existingToday.steps ? todaySteps : existingToday.steps)
+        : todaySteps;
+    final distanceToWrite = stepsToWrite * _stepLengthKm;
+
     await DatabaseService.instance.saveActivity(DailyActivity(
       date: today,
-      steps: todaySteps,
-      distanceKm: todaySteps * _stepLengthKm,
-      accumulatedDistanceKm: totalHistory + (todaySteps * _stepLengthKm),
+      steps: stepsToWrite,
+      distanceKm: distanceToWrite,
+      accumulatedDistanceKm: totalHistory + distanceToWrite,
       riverId: riverId,
     ));
     await prefs.setString('last_steps_source', 'sensor');
 
-    debugPrint("Android Sensor Sync: today=$todaySteps (cumulative=$hardwareTotal, baseline=$stepsAtDayStart)");
+    debugPrint("Android Sensor Sync: today=$stepsToWrite (cumulative=$hardwareTotal, baseline=$stepsAtDayStart)");
   }
 }
