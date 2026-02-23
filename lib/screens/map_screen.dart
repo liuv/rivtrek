@@ -9,6 +9,14 @@ import '../services/geo_service.dart';
 import '../models/river_data.dart';
 import '../providers/challenge_provider.dart';
 
+/// 未解锁徽章灰度滤镜（与 me_screen 一致）
+const ColorFilter _kMedalGrayscaleFilter = ColorFilter.matrix(<double>[
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0,      0,      0,      1, 0,
+]);
+
 /// 底图来源：天地图 / 高德
 enum MapProvider { tianditu, amap }
 
@@ -446,20 +454,39 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       height: 80,
       child: Stack(
         alignment: Alignment.center,
+        clipBehavior: Clip.none,
         children: [
           if (medalIcon != null)
-            Opacity(
-              opacity: isUnlocked ? 1.0 : 0.2,
-              child: Image.asset(
-                'assets/$medalIcon',
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.military_tech_outlined, size: 40, color: Colors.black12),
-              ),
-            )
+            isUnlocked
+                ? Image.asset(
+                    'assets/$medalIcon',
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.military_tech_outlined, size: 40, color: Colors.black12),
+                  )
+                : Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Opacity(
+                        opacity: 0.35,
+                        child: ColorFiltered(
+                          colorFilter: _kMedalGrayscaleFilter,
+                          child: Image.asset(
+                            'assets/$medalIcon',
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.military_tech_outlined, size: 40, color: Colors.black12),
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.lock_outline_rounded, size: 28, color: Colors.black54),
+                    ],
+                  )
           else
             const Icon(Icons.military_tech_outlined, size: 40, color: Colors.black12),
-          
-          if (!isUnlocked)
-            const Icon(Icons.lock_outline_rounded, size: 20, color: Colors.black26),
+          if (!isUnlocked && medalIcon != null)
+            Positioned(
+              bottom: 2,
+              child: Text("未解锁", style: TextStyle(fontSize: 10, color: Colors.black45)),
+            ),
         ],
       ),
     );

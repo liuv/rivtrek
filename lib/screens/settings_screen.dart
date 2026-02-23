@@ -225,15 +225,18 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               ListTile(
                 leading: const Icon(Icons.upload_file),
                 title: const Text('分享或发送'),
-                subtitle: const Text('通过微信、邮件等分享到云盘或新设备'),
+                subtitle: Text(Platform.isIOS
+                    ? '通过分享可保存到相册/文件或发送到其他设备'
+                    : '通过微信、邮件等分享到云盘或新设备'),
                 onTap: () => Navigator.of(ctx).pop('share'),
               ),
-              ListTile(
-                leading: const Icon(Icons.save_alt),
-                title: const Text('保存到手机'),
-                subtitle: const Text('保存到本机「下载」目录，便于稍后拷贝到电脑或新机'),
-                onTap: () => Navigator.of(ctx).pop('save'),
-              ),
+              if (!Platform.isIOS)
+                ListTile(
+                  leading: const Icon(Icons.save_alt),
+                  title: const Text('保存到手机'),
+                  subtitle: const Text('保存到本机「下载」目录，便于稍后拷贝到电脑或新机'),
+                  onTap: () => Navigator.of(ctx).pop('save'),
+                ),
               const SizedBox(height: 8),
             ],
           ),

@@ -10,6 +10,14 @@ import 'package:rivtrek/screens/profile_edit_screen.dart';
 import 'package:rivtrek/providers/user_profile_provider.dart';
 import 'dart:io';
 
+/// 未解锁徽章灰度滤镜（仅解锁后显示彩色）
+const ColorFilter _kMedalGrayscaleFilter = ColorFilter.matrix(<double>[
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0,      0,      0,      1, 0,
+]);
+
 /// 单条勋章数据，用于大图滑动列表
 class _MedalItem {
   final String imagePath;
@@ -105,16 +113,85 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                               ),
                             ],
                           ),
-                          child: Image.asset(
-                            item.imagePath,
-                            width: 220,
-                            height: 220,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => const Icon(
-                              Icons.military_tech_outlined,
-                              size: 120,
-                              color: Colors.black26,
-                            ),
+                            child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // 未解锁：灰度图；解锁：彩色原图
+                              if (item.isUnlocked)
+                                Image.asset(
+                                  item.imagePath,
+                                  width: 220,
+                                  height: 220,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.military_tech_outlined,
+                                    size: 120,
+                                    color: Colors.black26,
+                                  ),
+                                )
+                              else
+                                ColorFiltered(
+                                  colorFilter: _kMedalGrayscaleFilter,
+                                  child: Image.asset(
+                                    item.imagePath,
+                                    width: 220,
+                                    height: 220,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                      Icons.military_tech_outlined,
+                                      size: 120,
+                                      color: Colors.black26,
+                                    ),
+                                  ),
+                                ),
+                              // 未解锁时在徽章图上叠加锁图标（居中）
+                              if (!item.isUnlocked)
+                                Positioned.fill(
+                                  child: Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black38,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.lock_outline_rounded,
+                                        size: 48,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              // 未解锁时底部条「未解锁」
+                              if (!item.isUnlocked)
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.lock_outline_rounded, size: 18, color: Colors.white.withOpacity(0.95)),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          "未解锁",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white.withOpacity(0.95),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -337,26 +414,45 @@ class MeScreen extends StatelessWidget {
                             ),
                             child: Stack(
                               alignment: Alignment.center,
+                              clipBehavior: Clip.none,
                               children: [
                                 if (medalIcon != null)
-                                  Opacity(
-                                    opacity: isUnlocked ? 1.0 : 0.15,
-                                    child: Image.asset(
-                                      'assets/$medalIcon',
-                                      width: 50,
-                                      height: 50,
-                                      errorBuilder: (context, error,
-                                              stackTrace) =>
-                                          const Icon(Icons.military_tech_outlined,
-                                              color: Colors.black12),
-                                    ),
-                                  )
+                                  isUnlocked
+                                      ? Image.asset(
+                                          'assets/$medalIcon',
+                                          width: 50,
+                                          height: 50,
+                                          errorBuilder: (context, error, stackTrace) =>
+                                              const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                                        )
+                                      : Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // 灰度 + 压低亮度，保留轮廓但增加神秘感
+                                            Opacity(
+                                              opacity: 0.35,
+                                              child: ColorFiltered(
+                                                colorFilter: _kMedalGrayscaleFilter,
+                                                child: Image.asset(
+                                                  'assets/$medalIcon',
+                                                  width: 50,
+                                                  height: 50,
+                                                  errorBuilder: (context, error, stackTrace) =>
+                                                      const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                                                ),
+                                              ),
+                                            ),
+                                            // 徽章上居中锁图标
+                                            Icon(Icons.lock_outline_rounded, size: 22, color: Colors.black54),
+                                          ],
+                                        )
                                 else
-                                  const Icon(Icons.military_tech_outlined,
-                                      color: Colors.black12),
-                                if (!isUnlocked)
-                                  const Icon(Icons.lock_outline_rounded,
-                                      size: 16, color: Colors.black26),
+                                  const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                                if (!isUnlocked && medalIcon != null)
+                                  Positioned(
+                                    bottom: 2,
+                                    child: Text("未解锁", style: TextStyle(fontSize: 9, color: Colors.black45)),
+                                  ),
                               ],
                             ),
                           ),

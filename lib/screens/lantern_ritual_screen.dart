@@ -441,10 +441,12 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     );
   }
 
-  /// 河灯起始在下 1/3，上滑到上 1/3 释放，与主屏动画起点衔接
+  /// 河灯/瓶起始在下 1/3，上滑到上 1/3 释放，与主屏动画起点衔接
   static const double _kLanternSizeBase = 76.0;
-  /// 主屏河灯尺寸 50 * scale，上 1/3 处 localY≈-0.33，scale≈0.93，视觉尺寸约 46.5
+  /// 主屏河灯：50 * scale，上 1/3 处 scale≈0.93，视觉尺寸约 46.5
   static const double _kMainScreenLanternSizeAtRelease = 50.0 * 0.93;
+  /// 主屏漂流瓶同 50*scale，但释放页瓶子略放大以便与江面漂流瓶视觉一致（瓶图留白多易显小）
+  static const double _kMainScreenBottleSizeAtRelease = 58.0;
 
   Widget _buildSwipeRelease() {
     final size = MediaQuery.sizeOf(context);
@@ -455,7 +457,8 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
         : (_dragOffset / triggerDistance).clamp(0.0, 1.0);
     final triggered = _dragOffset >= triggerDistance;
 
-    final scaleAtRelease = _kMainScreenLanternSizeAtRelease / _kLanternSizeBase;
+    final releaseSize = _isBottle ? _kMainScreenBottleSizeAtRelease : _kMainScreenLanternSizeAtRelease;
+    final scaleAtRelease = releaseSize / _kLanternSizeBase;
     final currentScale = 1.0 + (scaleAtRelease - 1.0) * progress;
     final currentSize = _kLanternSizeBase * currentScale;
 
