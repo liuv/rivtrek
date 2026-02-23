@@ -1,19 +1,16 @@
 // 放河灯/漂流瓶仪式：净心 → 寄愿/寄语 → 步数 → 滑动放灯/放瓶 → 结语（控件复用）
 
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/scheduler.dart' show Ticker;
 import 'package:flutter/services.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../controllers/flow_controller.dart';
+import '../models/ambient_mix.dart';
+import '../services/ambient_audio_service.dart';
 
-/// 仪式页河水声：进入即播，离开时淡出（无淡入，避免部分设备 OGG 解码延迟导致无声）
-const String _kRiverSoundAsset = 'assets/audio/murmur_01.ogg';
-const String _kRiverSoundAssetMp3 = 'assets/audio/murmur_01.mp3';
-const double _kRiverSoundVolume = 0.35;
+/// 仪式页实景混音：淡出时长
 const Duration _kRiverSoundFadeOut = Duration(milliseconds: 400);
 
 /// 放灯/放瓶所需最少步数（步数即灵力/缘分）
@@ -26,10 +23,13 @@ class LanternRitualScreen extends StatefulWidget {
     super.key,
     required this.onComplete,
     this.mode = RitualMode.lantern,
+    this.wmoCode = 0,
   });
 
   final void Function(String? wish) onComplete;
   final RitualMode mode;
+  /// 当前天气 WMO 码，用于实景混音（0 或未传则按 unknown 处理）
+  final int wmoCode;
 
   @override
   State<LanternRitualScreen> createState() => _LanternRitualScreenState();
@@ -50,7 +50,6 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   late AnimationController _fadeController;
   late AnimationController _dimController;
   late AnimationController _lanternFadeOutController;
-  AudioPlayer? _riverSound;
   static const int _totalSteps = 5; // 净心、寄语、步数、放灯/放瓶、结语
 
   bool get _isBottle => widget.mode == RitualMode.bottle;
@@ -70,41 +69,26 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1450),
     );
-    _startRiverSound();
+    _startRiverAmbient();
     _dimController.forward();
   }
 
-  /// 进入即播：直接目标音量循环播放，无淡入
-  Future<void> _startRiverSound() async {
-    final player = AudioPlayer();
-    _riverSound = player;
-    try {
-      try {
-        await player.setAsset(_kRiverSoundAsset);
-      } catch (_) {
-        await player.setAsset(_kRiverSoundAssetMp3);
-      }
-      await player.setLoopMode(LoopMode.one);
-      await player.setVolume(_kRiverSoundVolume);
-      await player.play();
-    } catch (e) {
-      if (kDebugMode) debugPrint('LanternRitual river sound: $e');
-    }
+  /// 行业做法：只发指令给 audio_service，加载与混音在 Handler 内执行
+  void _startRiverAmbient() {
+    final now = DateTime.now();
+    final weather = AmbientMixRecipe.weatherTypeFromWmoCode(widget.wmoCode);
+    final isNight = now.hour < 6 || now.hour >= 18;
+    final spec = AmbientMixRecipe.compute(
+      weather,
+      isNight: isNight,
+      month: now.month,
+      context: AmbientContext.ritual,
+    );
+    AmbientAudioService.playAmbient(spec);
   }
 
-  Future<void> _fadeOutRiverSound() async {
-    final player = _riverSound;
-    if (player == null) return;
-    const steps = 4;
-    final stepMs = _kRiverSoundFadeOut.inMilliseconds / steps;
-    final stepVol = _kRiverSoundVolume / steps;
-    for (var i = steps; i >= 0 && mounted; i--) {
-      await player.setVolume(stepVol * i);
-      await Future.delayed(Duration(milliseconds: stepMs.round()));
-    }
-    await player.stop();
-    await player.dispose();
-    if (mounted) _riverSound = null;
+  void _fadeOutRiverSound() {
+    AmbientAudioService.stopAmbient();
   }
 
   @override
@@ -113,11 +97,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _lanternFadeOutController.dispose();
     _flingTicker?.dispose();
     _flingTicker = null;
-    if (!_released) {
-      _riverSound?.stop();
-      _riverSound?.dispose();
-      _riverSound = null;
-    }
+    if (!_released) AmbientAudioService.stopAmbient();
     _wishController.dispose();
     _fadeController.dispose();
     super.dispose();

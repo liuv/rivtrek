@@ -11,7 +11,7 @@
 * **定位**：一款文艺、极简的健康运动 App。
 * **核心逻辑**：将用户的每日步行数映射为在地理名川（如长江）上的虚拟徒步距离。
 * **设计风格**：Digital Zen（数字禅意）、极简主义、高通透感、磨砂玻璃效果。
-* **技术栈**：Flutter (Canvas/CustomPainter), Shader (GLSL), HealthKit/Google Fit API。
+* **技术栈**：Flutter (Canvas/CustomPainter), Shader (GLSL), HealthKit/Google Fit API。Flutter 命令前加 `fvm` 前缀（如 `fvm flutter run`、`fvm flutter pub get`）。
 
 ---
 

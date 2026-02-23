@@ -19,6 +19,7 @@ import 'providers/user_profile_provider.dart';
 import 'controllers/flow_controller.dart';
 import 'models/river_settings.dart';
 import 'repositories/river_repository.dart';
+import 'services/ambient_audio_service.dart';
 import 'services/database_service.dart';
 import 'services/step_sync_service.dart';
 
@@ -67,6 +68,11 @@ void main() async {
 
   // 从 prefs 加载河流/漂流等效果设置，使首页与设置页一致
   await RiverSettings.loadFromPrefs();
+
+  // 行业做法：音频由 audio_service 管理，UI 只发指令不跑加载/混音
+  try {
+    await AmbientAudioService.init();
+  } catch (_) {}
 
   runApp(
     MultiProvider(

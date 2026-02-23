@@ -18,6 +18,7 @@ import '../controllers/flow_controller.dart';
 import '../providers/challenge_provider.dart';
 import '../models/river_section.dart';
 import '../services/river_drift_service.dart';
+import 'immersive_listen_screen.dart';
 import 'lantern_ritual_screen.dart';
 import 'river_selector_sheet.dart';
 
@@ -470,16 +471,18 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _openLanternRitual() {
+    final controller = context.read<FlowController>();
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         opaque: false,
         barrierColor: Colors.transparent,
         pageBuilder: (ctx, _, __) => ChangeNotifierProvider<FlowController>.value(
-          value: context.read<FlowController>(),
+          value: controller,
           child: ChangeNotifierProvider<ChallengeProvider>.value(
             value: context.read<ChallengeProvider>(),
             child: LanternRitualScreen(
               mode: RitualMode.lantern,
+              wmoCode: controller.wmoCode,
               onComplete: (wish) => _addLantern(wish: wish),
             ),
           ),
@@ -489,19 +492,32 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _openBottleRitual() {
+    final controller = context.read<FlowController>();
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         opaque: false,
         barrierColor: Colors.transparent,
         pageBuilder: (ctx, _, __) => ChangeNotifierProvider<FlowController>.value(
-          value: context.read<FlowController>(),
+          value: controller,
           child: ChangeNotifierProvider<ChallengeProvider>.value(
             value: context.read<ChallengeProvider>(),
             child: LanternRitualScreen(
               mode: RitualMode.bottle,
+              wmoCode: controller.wmoCode,
               onComplete: (message) => _addBottle(message: message),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _openImmersiveListen() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (ctx) => ChangeNotifierProvider<FlowController>.value(
+          value: context.read<FlowController>(),
+          child: const ImmersiveListenScreen(),
         ),
       ),
     );
@@ -657,6 +673,17 @@ class _FlowScreenState extends State<FlowScreen>
                   onTap: () {
                     Navigator.pop(ctx);
                     _showBlessingInputDialog(size);
+                  },
+                ),
+                const SizedBox(height: 12),
+                _ritualTile(
+                  ctx,
+                  icon: Icons.headphones_outlined,
+                  title: '河声',
+                  subtitle: '根据天气与昼夜的实景混音，听水正念',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _openImmersiveListen();
                   },
                 ),
               ],
