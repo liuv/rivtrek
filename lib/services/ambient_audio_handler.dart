@@ -1,19 +1,21 @@
 // lib/services/ambient_audio_handler.dart
-// 音频逻辑在 AudioHandler 内，UI 只发 customAction(playAmbient/stopAmbient)。
+// 音频逻辑在 AudioHandler 内，UI 只发 customAction(playAmbient/stopAmbient、playBlessing/preloadBlessingBowl/cancelBlessing)。
 // 范例与约定见：docs/AMBIENT_AUDIO_REFERENCES.md（audio_service Tutorial / Example）
 
 import 'package:flutter/foundation.dart';
 import 'package:audio_service/audio_service.dart';
 import '../models/ambient_mix.dart';
 import 'river_ambient_service.dart';
+import 'blessing_sound_service.dart';
 
-/// 河畔混音由系统音频服务管理，加载与播放均在 Handler 内执行，不占 UI 线程
+/// 河畔混音与祭江祈福音效均由 Handler 管理，加载与播放在 Handler 内执行
 class AmbientAudioHandler extends BaseAudioHandler {
   AmbientAudioHandler() {
     _broadcastState(AudioProcessingState.idle, false);
   }
 
   final RiverAmbientService _service = RiverAmbientService();
+  final BlessingSoundService _blessingSound = BlessingSoundService();
 
   void _broadcastState(AudioProcessingState state, bool playing) {
     playbackState.add(PlaybackState(
@@ -39,6 +41,19 @@ class AmbientAudioHandler extends BaseAudioHandler {
       _broadcastState(AudioProcessingState.idle, false);
       return null;
     }
+    if (name == 'preloadBlessingBowl') {
+      _blessingSound.preloadBowl();
+      return null;
+    }
+    if (name == 'playBlessing') {
+      if (kDebugMode) debugPrint('[BlessingSound] handler playBlessing');
+      _blessingSound.play();
+      return null;
+    }
+    if (name == 'cancelBlessing') {
+      _blessingSound.cancel();
+      return null;
+    }
     return super.customAction(name, extras);
   }
 
@@ -46,6 +61,7 @@ class AmbientAudioHandler extends BaseAudioHandler {
   Future<void> stop() async {
     if (kDebugMode) debugPrint('[Ambient] handler stop()');
     _service.stop();
+    _blessingSound.cancel();
     _broadcastState(AudioProcessingState.idle, false);
   }
 }

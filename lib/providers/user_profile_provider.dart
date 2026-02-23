@@ -22,8 +22,10 @@ class UserProfileProvider extends ChangeNotifier {
   String? get avatarPath => _avatarPath;
   String get signature => _signature;
   int get avatarVersion => _avatarVersion;
+
   /// 展示用昵称：空则用默认「涉川」（分享卡用）
-  String get displayNameForShare => _nickname.trim().isEmpty ? '涉川' : _nickname.trim();
+  String get displayNameForShare =>
+      _nickname.trim().isEmpty ? '涉川' : _nickname.trim();
 
   UserProfileProvider() {
     _load();
@@ -39,8 +41,10 @@ class UserProfileProvider extends ChangeNotifier {
     final saved = prefs.getString(_keyAvatarPath);
     if (saved != null && saved.isNotEmpty) {
       final f = File(saved);
-      if (f.existsSync()) _avatarPath = saved;
-      else await prefs.remove(_keyAvatarPath);
+      if (f.existsSync())
+        _avatarPath = saved;
+      else
+        await prefs.remove(_keyAvatarPath);
     } else {
       _avatarPath = null;
     }

@@ -39,4 +39,19 @@ class AmbientAudioService {
     if (kDebugMode) debugPrint('[Ambient] stopAmbient called, handler=${_handler != null}');
     _handler?.customAction('stopAmbient');
   }
+
+  /// 祭江祈福：预加载颂钵（打开仪式 sheet 时调，不 await）
+  static void preloadBlessingBowl() {
+    _handler?.customAction('preloadBlessingBowl');
+  }
+
+  /// 祭江祈福：开播颂钵 → 5s 后混入河水，河水播 3s 后淡出 2s 结束（不 await，由 Handler 执行）
+  static void playBlessing() {
+    _handler?.customAction('playBlessing');
+  }
+
+  /// 祭江祈福：取消当前轮次（dispose 时调）
+  static void cancelBlessing() {
+    _handler?.customAction('cancelBlessing');
+  }
 }

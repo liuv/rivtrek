@@ -18,6 +18,7 @@ import '../controllers/flow_controller.dart';
 import '../providers/challenge_provider.dart';
 import '../models/river_section.dart';
 import '../services/river_drift_service.dart';
+import '../services/ambient_audio_service.dart';
 import 'immersive_listen_screen.dart';
 import 'lantern_ritual_screen.dart';
 import 'river_selector_sheet.dart';
@@ -317,6 +318,7 @@ class _FlowScreenState extends State<FlowScreen>
     _milestoneController.dispose();
     _pulseController.dispose();
     _driftFadeInController.dispose();
+    AmbientAudioService.cancelBlessing();
     _stopwatch.stop();
     super.dispose();
   }
@@ -468,6 +470,9 @@ class _FlowScreenState extends State<FlowScreen>
       longitude: controller.lon,
       distanceAtKm: challenge.realDistance,
     ));
+
+    // 祭江音效：颂钵 5 秒后混入河水，河水满音量 3 秒后淡出 2 秒结束
+    AmbientAudioService.playBlessing();
   }
 
   void _openLanternRitual() {
@@ -600,6 +605,7 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   void _showRitualSheet() {
+    AmbientAudioService.preloadBlessingBowl();
     final size = MediaQuery.of(context).size;
     showModalBottomSheet(
       context: context,
