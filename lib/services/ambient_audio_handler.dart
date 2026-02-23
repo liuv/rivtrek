@@ -27,15 +27,15 @@ class AmbientAudioHandler extends BaseAudioHandler {
   Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async {
     if (name == 'playAmbient' && extras != null) {
       if (kDebugMode) debugPrint('[Ambient] handler playAmbient');
-      _broadcastState(AudioProcessingState.loading, false); // Tutorial：先广播 loading
+      _broadcastState(AudioProcessingState.loading, false);
       final spec = AmbientMixSpec.fromMap(extras);
       _service.play(spec);
-      _broadcastState(AudioProcessingState.ready, true); // 混音由多轨组成，不 await 加载完成
+      _broadcastState(AudioProcessingState.ready, true);
       return null;
     }
     if (name == 'stopAmbient') {
       if (kDebugMode) debugPrint('[Ambient] handler stopAmbient');
-      await _service.stopSyncAsync(); // Tutorial：先 await 释放再广播 idle
+      _service.stop();
       _broadcastState(AudioProcessingState.idle, false);
       return null;
     }
@@ -45,7 +45,7 @@ class AmbientAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     if (kDebugMode) debugPrint('[Ambient] handler stop()');
-    await _service.stopSyncAsync(); // 与 Tutorial 一致：await 释放后再 idle
+    _service.stop();
     _broadcastState(AudioProcessingState.idle, false);
   }
 }

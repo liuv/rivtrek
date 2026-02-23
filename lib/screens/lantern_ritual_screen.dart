@@ -10,9 +10,6 @@ import '../controllers/flow_controller.dart';
 import '../models/ambient_mix.dart';
 import '../services/ambient_audio_service.dart';
 
-/// 仪式页实景混音：淡出时长
-const Duration _kRiverSoundFadeOut = Duration(milliseconds: 400);
-
 /// 放灯/放瓶所需最少步数（步数即灵力/缘分）
 const int kMinStepsToReleaseLantern = 3000;
 
@@ -36,7 +33,7 @@ class LanternRitualScreen extends StatefulWidget {
 }
 
 class _LanternRitualScreenState extends State<LanternRitualScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   int _step = 0;
   final TextEditingController _wishController = TextEditingController();
   double _dragOffset = 0;
@@ -57,6 +54,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -73,6 +71,16 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _dimController.forward();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      AmbientAudioService.stopAmbient();
+    } else if (state == AppLifecycleState.resumed) {
+      _startRiverAmbient();
+    }
+  }
+
   /// 行业做法：只发指令给 audio_service，加载与混音在 Handler 内执行
   void _startRiverAmbient() {
     final now = DateTime.now();
@@ -87,17 +95,14 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     AmbientAudioService.playAmbient(spec);
   }
 
-  void _fadeOutRiverSound() {
-    AmbientAudioService.stopAmbient();
-  }
-
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _dimController.dispose();
     _lanternFadeOutController.dispose();
     _flingTicker?.dispose();
     _flingTicker = null;
-    if (!_released) AmbientAudioService.stopAmbient();
+    AmbientAudioService.stopAmbient();
     _wishController.dispose();
     _fadeController.dispose();
     super.dispose();
@@ -124,7 +129,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     HapticFeedback.mediumImpact();
     _lanternFadeOutController.forward(from: 0);
     _fadeController.forward();
-    _fadeOutRiverSound(); // 立即开始声音渐隐，与画面同步，由动到静
+    // 声音在页面关闭时再停（dispose），放灯/放瓶动画与结语页期间继续播
     const stayMs = 1550;
     Future.delayed(const Duration(milliseconds: stayMs), () {
       if (!mounted) return;

@@ -14,16 +14,29 @@ class ImmersiveListenScreen extends StatefulWidget {
   State<ImmersiveListenScreen> createState() => _ImmersiveListenScreenState();
 }
 
-class _ImmersiveListenScreenState extends State<ImmersiveListenScreen> {
+class _ImmersiveListenScreenState extends State<ImmersiveListenScreen>
+    with WidgetsBindingObserver {
   String _status = '';
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _startAmbient());
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      AmbientAudioService.stopAmbient();
+    } else if (state == AppLifecycleState.resumed) {
+      _startAmbient();
+    }
+  }
+
   void _startAmbient() {
+    if (!mounted) return;
     final controller = context.read<FlowController>();
     final now = DateTime.now();
     final weather = AmbientMixRecipe.weatherTypeFromWmoCode(controller.wmoCode);
@@ -34,12 +47,13 @@ class _ImmersiveListenScreenState extends State<ImmersiveListenScreen> {
       month: now.month,
       context: AmbientContext.immersive,
     );
-    if (mounted) setState(() => _status = '${weather.label} · ${isNight ? "夜" : "昼"}');
+    setState(() => _status = '${weather.label} · ${isNight ? "夜" : "昼"}');
     AmbientAudioService.playAmbient(spec);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     AmbientAudioService.stopAmbient();
     super.dispose();
   }
