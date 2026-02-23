@@ -59,6 +59,9 @@ class _FlowScreenState extends State<FlowScreen>
   bool _driftEventsLoaded = false;
   String? _driftTimelineRiverId;
   double? _lastDriftCrossScreenSeconds;
+  /// 刚放下的河灯 timestamp，用于主屏渐入动画，动画结束后置 null
+  int? _lastAddedLanternTimestamp;
+  late AnimationController _driftFadeInController;
 
   // 里程碑相关
   String? _lastTriggeredSubSectionName;
@@ -131,6 +134,16 @@ class _FlowScreenState extends State<FlowScreen>
     });
 
     _stopwatch = Stopwatch()..start();
+
+    _driftFadeInController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _driftFadeInController.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        setState(() => _lastAddedLanternTimestamp = null);
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FlowController>().init();
@@ -302,6 +315,7 @@ class _FlowScreenState extends State<FlowScreen>
     _distanceController.dispose();
     _milestoneController.dispose();
     _pulseController.dispose();
+    _driftFadeInController.dispose();
     _stopwatch.stop();
     super.dispose();
   }
@@ -498,6 +512,11 @@ class _FlowScreenState extends State<FlowScreen>
     );
     DatabaseService.instance.recordEvent(event);
     setState(() => _driftEvents.add(event));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _lastAddedLanternTimestamp = event.timestamp;
+      _driftFadeInController.forward(from: 0);
+    });
   }
 
   void _addBottle({String? message}) {
@@ -1085,6 +1104,7 @@ class _FlowScreenState extends State<FlowScreen>
       final isLantern = event.name == '放河灯';
       out.add(_buildDriftItemWidget(
         isLantern: isLantern,
+        eventTimestamp: event.timestamp,
         localY: localY,
         randomX: randomX,
         scaleBase: scaleBase,
@@ -1099,6 +1119,7 @@ class _FlowScreenState extends State<FlowScreen>
 
   Widget _buildDriftItemWidget({
     required bool isLantern,
+    required int eventTimestamp,
     required double localY,
     required double randomX,
     required double scaleBase,
@@ -1112,25 +1133,34 @@ class _FlowScreenState extends State<FlowScreen>
         (MediaQuery.of(context).size.aspectRatio);
     final scale = scaleBase * (0.8 + (localY + 1.0) * 0.2);
     final asset = isLantern ? 'assets/icons/light.png' : 'assets/icons/bottle.png';
+    final content = Transform.rotate(
+      angle: rotation,
+      child: Opacity(
+        opacity: (1.0 - (localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
+        child: Image.asset(
+          asset,
+          width: 50 * scale,
+          height: 50 * scale,
+          color: settings.style == RiverStyle.aurora
+              ? Colors.white.withOpacity(0.9)
+              : null,
+          colorBlendMode:
+              settings.style == RiverStyle.aurora ? BlendMode.plus : null,
+        ),
+      ),
+    );
+    final useFadeIn = isLantern &&
+        _lastAddedLanternTimestamp != null &&
+        eventTimestamp == _lastAddedLanternTimestamp;
     return Positioned(
       left: (x * 0.5 + 0.5) * MediaQuery.of(context).size.width - 25,
       top: (localY * 0.5 + 0.5) * MediaQuery.of(context).size.height - 25,
-      child: Transform.rotate(
-        angle: rotation,
-        child: Opacity(
-          opacity: (1.0 - (localY.abs() - 0.8).clamp(0.0, 0.2) / 0.2),
-          child: Image.asset(
-            asset,
-            width: 50 * scale,
-            height: 50 * scale,
-            color: settings.style == RiverStyle.aurora
-                ? Colors.white.withOpacity(0.9)
-                : null,
-            colorBlendMode:
-                settings.style == RiverStyle.aurora ? BlendMode.plus : null,
-          ),
-        ),
-      ),
+      child: useFadeIn
+          ? FadeTransition(
+              opacity: Tween<double>(begin: 0, end: 1).animate(_driftFadeInController),
+              child: content,
+            )
+          : content,
     );
   }
 

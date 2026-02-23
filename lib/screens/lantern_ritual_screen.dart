@@ -34,10 +34,12 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   int _step = 0;
   final TextEditingController _wishController = TextEditingController();
   double _dragOffset = 0;
+  double _lanternOffsetY = 0; // 河灯相对初始位置的垂直偏移（上滑为正）
   bool _released = false;
   late AnimationController _fadeController;
   late AnimationController _volumeFadeController;
   late AnimationController _dimController;
+  late AnimationController _lanternFadeOutController;
   AudioPlayer? _riverSound;
   static const int _totalSteps = 5; // 净心、写灯语、步数、放灯、结语
 
@@ -55,6 +57,10 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _dimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
+    );
+    _lanternFadeOutController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
     );
     _startRiverSound();
     _dimController.forward();
@@ -105,6 +111,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _volumeFadeController.removeListener(_onVolumeFadeTick);
     _volumeFadeController.dispose();
     _dimController.dispose();
+    _lanternFadeOutController.dispose();
     if (!_released) {
       _riverSound?.stop();
       _riverSound?.dispose();
@@ -134,17 +141,23 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     if (_released) return;
     _released = true;
     HapticFeedback.mediumImpact();
+    _lanternFadeOutController.forward(from: 0);
     _fadeController.forward();
-    _fadeOutRiverSound();
-    Future.delayed(const Duration(milliseconds: 2200), () {
+    // 尽量缩短停留：河灯渐隐约 450ms，再留极短时间即返回，音乐在后台淡出
+    const stayMs = 550;
+    Future.delayed(const Duration(milliseconds: stayMs), () {
       if (!mounted) return;
       final wish = _wishController.text.trim().isEmpty
           ? null
           : _wishController.text.trim();
       widget.onComplete(wish);
       Navigator.of(context).pop();
+      _fadeOutRiverSound(); // 不 await，返回后后台淡出
     });
   }
+
+  /// 遮罩不随滑动变化，保持场景切换感，弱化卡顿感
+  double _getOverlayOpacity() => 0.78 * _dimController.value;
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +169,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           AnimatedBuilder(
             animation: _dimController,
             builder: (context, _) => Container(
-              color: Colors.black.withOpacity(0.78 * _dimController.value),
+              color: Colors.black.withOpacity(_getOverlayOpacity()),
             ),
           ),
           SafeArea(child: _buildStep()),
@@ -377,75 +390,116 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     );
   }
 
-  Widget _buildSwipeRelease() {
-    const double triggerOffset = 100;
-    final progress = (_dragOffset / triggerOffset).clamp(0.0, 1.0);
-    final triggered = _dragOffset >= triggerOffset;
+  /// 河灯起始在下 1/3，上滑到上 1/3 释放，与主屏动画起点衔接
+  static const double _kLanternSizeBase = 76.0;
+  /// 主屏河灯尺寸 50 * scale，上 1/3 处 localY≈-0.33，scale≈0.93，视觉尺寸约 46.5
+  static const double _kMainScreenLanternSizeAtRelease = 50.0 * 0.93;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onVerticalDragUpdate: (d) {
-        if (_released) return;
-        setState(() {
-          _dragOffset -= d.delta.dy;
-          if (_dragOffset < 0) _dragOffset = 0;
-          if (_dragOffset >= triggerOffset) _onRelease();
-        });
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '向上滑动，将河灯放入江中',
+  Widget _buildSwipeRelease() {
+    final size = MediaQuery.sizeOf(context);
+    final h = size.height;
+    final triggerDistance = h / 3;
+    final progress = (triggerDistance <= 0)
+        ? 0.0
+        : (_dragOffset / triggerDistance).clamp(0.0, 1.0);
+    final triggered = _dragOffset >= triggerDistance;
+
+    final scaleAtRelease = _kMainScreenLanternSizeAtRelease / _kLanternSizeBase;
+    final currentScale = 1.0 + (scaleAtRelease - 1.0) * progress;
+    final currentSize = _kLanternSizeBase * currentScale;
+
+    final bottomThird = h * (2 / 3);
+    final baseTop = bottomThird - _kLanternSizeBase / 2;
+    final lanternTop = (baseTop - _lanternOffsetY).clamp(0.0, h - currentSize);
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          top: 24,
+          left: 24,
+          right: 24,
+          child: Text(
+            triggered ? '愿随水去。' : '轻托河灯，向上送入江中。',
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
-              letterSpacing: 1,
-              color: Colors.white.withOpacity(0.92),
+              letterSpacing: 2,
+              height: 1.5,
+              color: Colors.white.withOpacity(triggered ? 0.7 : 0.85),
+              fontWeight: FontWeight.w300,
             ),
           ),
-          const SizedBox(height: 32),
-          Stack(
-            alignment: Alignment.center,
+        ),
+        Positioned(
+          left: (size.width - currentSize) / 2,
+          top: lanternTop,
+          child: triggered
+              ? FadeTransition(
+                  opacity: Tween<double>(begin: 1, end: 0).animate(_lanternFadeOutController),
+                  child: _buildLanternImage(currentSize),
+                )
+              : GestureDetector(
+                  onVerticalDragUpdate: (d) {
+                    if (_released) return;
+                    setState(() {
+                      _dragOffset -= d.delta.dy;
+                      if (_dragOffset < 0) _dragOffset = 0;
+                      _lanternOffsetY -= d.delta.dy;
+                      if (_lanternOffsetY < 0) _lanternOffsetY = 0;
+                      if (_lanternOffsetY > triggerDistance) _lanternOffsetY = triggerDistance;
+                      if (_dragOffset >= triggerDistance) _onRelease();
+                    });
+                  },
+                  child: _buildLanternImage(currentSize),
+                ),
+        ),
+        Positioned(
+          bottom: 32,
+          left: 24,
+          right: 24,
+          child: Column(
             children: [
-              // 水波纹示意（放灯时扩大）
-              if (progress > 0)
-                Container(
-                  width: 80 + progress * 60,
-                  height: 80 + progress * 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.amber.shade200.withOpacity(0.3 * progress),
-                      width: 2,
-                    ),
+              if (!triggered)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 3,
+                    backgroundColor: Colors.white.withOpacity(0.12),
+                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFE4B86A)),
                   ),
                 ),
-              Icon(
-                Icons.nightlight_round_outlined,
-                size: 64 + progress * 16,
-                color: Colors.amber.shade200.withOpacity(0.7 + 0.3 * progress),
+              if (!triggered) const SizedBox(height: 12),
+              Text(
+                triggered ? '河灯已入江。' : '松手即放。',
+                style: TextStyle(
+                  fontSize: 13,
+                  letterSpacing: 3,
+                  color: Colors.white.withOpacity(0.72),
+                  fontWeight: FontWeight.w300,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-              backgroundColor: Colors.white.withOpacity(0.15),
-              valueColor: AlwaysStoppedAnimation(Colors.amber.shade200),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            triggered ? '河灯已入江…' : '继续上滑',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.88),
-            ),
-          ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLanternImage(double size) {
+    const String assetPath = 'assets/icons/light.png';
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Image.asset(
+        assetPath,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => Icon(
+          Icons.nightlight_round_outlined,
+          size: size,
+          color: Colors.amber.shade200.withOpacity(0.9),
+        ),
       ),
     );
   }
