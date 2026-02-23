@@ -1,4 +1,4 @@
-// 放河灯仪式：净心 → 寄愿 → 步数灵力 → 滑动放灯 → 结语
+// 放河灯/漂流瓶仪式：净心 → 寄愿/寄语 → 步数 → 滑动放灯/放瓶 → 结语（控件复用）
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
@@ -16,16 +16,20 @@ const String _kRiverSoundAssetMp3 = 'assets/audio/murmur_01.mp3';
 const double _kRiverSoundVolume = 0.35;
 const Duration _kRiverSoundFadeOut = Duration(milliseconds: 400);
 
-/// 放灯所需最少步数（步数即「灵力」，满则灯更亮）
+/// 放灯/放瓶所需最少步数（步数即灵力/缘分）
 const int kMinStepsToReleaseLantern = 3000;
+
+enum RitualMode { lantern, bottle }
 
 class LanternRitualScreen extends StatefulWidget {
   const LanternRitualScreen({
     super.key,
     required this.onComplete,
+    this.mode = RitualMode.lantern,
   });
 
   final void Function(String? wish) onComplete;
+  final RitualMode mode;
 
   @override
   State<LanternRitualScreen> createState() => _LanternRitualScreenState();
@@ -47,7 +51,9 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   late AnimationController _dimController;
   late AnimationController _lanternFadeOutController;
   AudioPlayer? _riverSound;
-  static const int _totalSteps = 5; // 净心、写灯语、步数、放灯、结语
+  static const int _totalSteps = 5; // 净心、寄语、步数、放灯/放瓶、结语
+
+  bool get _isBottle => widget.mode == RitualMode.bottle;
 
   @override
   void initState() {
@@ -226,19 +232,23 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   }
 
   Widget _buildCalmMind() {
+    final icon = _isBottle ? Icons.send_outlined : Icons.nightlight_round_outlined;
+    final text = _isBottle
+        ? '请在此刻，静心片刻，只留一封信。'
+        : '请在此刻，放下杂念，只留一心愿。';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.nightlight_round_outlined,
+            icon,
             size: 56,
             color: Colors.amber.shade200.withOpacity(0.9),
           ),
           const SizedBox(height: 40),
           Text(
-            '请在此刻，放下杂念，只留一心愿。',
+            text,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 18,
@@ -267,6 +277,13 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
 
   Widget _buildWishInput() {
     const suggestions = ['坚持', '自律', '变好', '平安', '成为想成为的人'];
+    final title = _isBottle ? '寄语' : '寄愿';
+    final subtitle = _isBottle
+        ? '写一封随江远行的信，不公开、不炫耀——只给未来的自己或流水。'
+        : '写一句只给自己看的话，不公开、不炫耀——这才是真・信念。';
+    final hint = _isBottle ? '可留空，或写下心意（128字以内）' : '可留空，或写下心愿';
+    final maxLen = _isBottle ? 128 : 20;
+    final maxLines = _isBottle ? 5 : 1;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 28),
       child: Column(
@@ -274,7 +291,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
         children: [
           const SizedBox(height: 40),
           Text(
-            '寄愿',
+            title,
             style: TextStyle(
               fontSize: 15,
               letterSpacing: 4,
@@ -283,7 +300,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           ),
           const SizedBox(height: 12),
           Text(
-            '写一句只给自己看的话，不公开、不炫耀——这才是真・信念。',
+            subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -294,14 +311,14 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           const SizedBox(height: 24),
           TextField(
             controller: _wishController,
-            maxLength: 20,
-            maxLines: 1,
+            maxLength: maxLen,
+            maxLines: maxLines,
             style: TextStyle(
               fontSize: 18,
               color: Colors.white.withOpacity(0.95),
             ),
             decoration: InputDecoration(
-              hintText: '可留空，或写下心愿',
+              hintText: hint,
               hintStyle: TextStyle(
                 color: Colors.white.withOpacity(0.68),
                 fontSize: 16,
@@ -393,9 +410,13 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            ok
-                ? '步数即灵力，可以点亮一盏河灯。'
-                : '今日步数满 $kMinStepsToReleaseLantern 步，河灯更亮；未满也可放灯，愿心不减。',
+            _isBottle
+                ? (ok
+                    ? '步数即缘分，可以寄出一只漂流瓶。'
+                    : '今日步数满 $kMinStepsToReleaseLantern 步，瓶中信更稳；未满也可寄出，心意不减。')
+                : (ok
+                    ? '步数即灵力，可以点亮一盏河灯。'
+                    : '今日步数满 $kMinStepsToReleaseLantern 步，河灯更亮；未满也可放灯，愿心不减。'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -407,7 +428,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           TextButton(
             onPressed: _next,
             child: Text(
-              ok ? '放灯' : '仍要放灯',
+              _isBottle ? (ok ? '寄出' : '仍要寄出') : (ok ? '放灯' : '仍要放灯'),
               style: TextStyle(
                 color: Colors.amber.shade200,
                 fontSize: 16,
@@ -450,7 +471,9 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           left: 24,
           right: 24,
           child: Text(
-            triggered ? '愿随水去。' : '轻托河灯，向上送入江中。',
+            triggered
+                ? (_isBottle ? '信随水去。' : '愿随水去。')
+                : (_isBottle ? '轻托漂流瓶，向上送入江中。' : '轻托河灯，向上送入江中。'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -467,7 +490,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           child: triggered
               ? FadeTransition(
                   opacity: Tween<double>(begin: 1, end: 0).animate(_lanternFadeOutController),
-                  child: _buildLanternImage(currentSize),
+                  child: _buildReleaseImage(currentSize),
                 )
               : GestureDetector(
                   onVerticalDragStart: (_) {
@@ -496,7 +519,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
                     if (velocityPxPerSec.abs() < 20) return;
                     _startFling(triggerDistance, -velocityPxPerSec);
                   },
-                  child: _buildLanternImage(currentSize),
+                  child: _buildReleaseImage(currentSize),
                 ),
         ),
         Positioned(
@@ -517,7 +540,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
                 ),
               if (!triggered) const SizedBox(height: 12),
               Text(
-                triggered ? '河灯已入江。' : '松手即放。',
+                triggered ? (_isBottle ? '瓶已入江。' : '河灯已入江。') : '松手即放。',
                 style: TextStyle(
                   fontSize: 13,
                   letterSpacing: 3,
@@ -532,8 +555,9 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     );
   }
 
-  Widget _buildLanternImage(double size) {
-    const String assetPath = 'assets/icons/light.png';
+  Widget _buildReleaseImage(double size) {
+    final assetPath = _isBottle ? 'assets/icons/bottle.png' : 'assets/icons/light.png';
+    final fallbackIcon = _isBottle ? Icons.send_outlined : Icons.nightlight_round_outlined;
     return SizedBox(
       width: size,
       height: size,
@@ -541,7 +565,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
         assetPath,
         fit: BoxFit.contain,
         errorBuilder: (_, __, ___) => Icon(
-          Icons.nightlight_round_outlined,
+          fallbackIcon,
           size: size,
           color: Colors.amber.shade200.withOpacity(0.9),
         ),
@@ -550,6 +574,9 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   }
 
   Widget _buildClosing() {
+    final text = _isBottle
+        ? '你走过的路，会化作江流；\n你写下的字，会装进漂流瓶。\n水会带走，风会读到，未来的自己也会收到。'
+        : '你走过的路，会化作江流；\n你许下的愿，会变成河灯。\n风会记得，水会记得，你自己更会记得。';
     return FadeTransition(
       opacity: _fadeController,
       child: Padding(
@@ -558,7 +585,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '你走过的路，会化作江流；\n你许下的愿，会变成河灯。\n风会记得，水会记得，你自己更会记得。',
+              text,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 17,

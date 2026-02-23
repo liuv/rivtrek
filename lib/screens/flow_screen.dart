@@ -479,9 +479,27 @@ class _FlowScreenState extends State<FlowScreen>
           child: ChangeNotifierProvider<ChallengeProvider>.value(
             value: context.read<ChallengeProvider>(),
             child: LanternRitualScreen(
-              onComplete: (wish) {
-                _addLantern(wish: wish);
-              },
+              mode: RitualMode.lantern,
+              onComplete: (wish) => _addLantern(wish: wish),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openBottleRitual() {
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        pageBuilder: (ctx, _, __) => ChangeNotifierProvider<FlowController>.value(
+          value: context.read<FlowController>(),
+          child: ChangeNotifierProvider<ChallengeProvider>.value(
+            value: context.read<ChallengeProvider>(),
+            child: LanternRitualScreen(
+              mode: RitualMode.bottle,
+              onComplete: (message) => _addBottle(message: message),
             ),
           ),
         ),
@@ -542,6 +560,11 @@ class _FlowScreenState extends State<FlowScreen>
     );
     DatabaseService.instance.recordEvent(event);
     setState(() => _driftEvents.add(event));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _lastAddedLanternTimestamp = event.timestamp;
+      _driftFadeInController.forward(from: 0);
+    });
   }
 
   Future<void> _showBlessingInputDialog(Size size) async {
@@ -558,22 +581,6 @@ class _FlowScreenState extends State<FlowScreen>
     );
     if (!mounted) return;
     if (text != null) _addBlessing(Offset(size.width / 2, size.height / 2), text: text);
-  }
-
-  Future<void> _showBottleInputDialog() async {
-    final message = await showDialog<String>(
-      context: context,
-      barrierColor: Colors.black26,
-      builder: (ctx) => _RitualTextInputDialog(
-        title: '水畔寄书',
-        hint: '写下心意，随江远行（128字以内）',
-        maxLength: 128,
-        maxLines: 5,
-        confirmLabel: '寄出',
-      ),
-    );
-    if (!mounted) return;
-    if (message != null) _addBottle(message: message);
   }
 
   void _showRitualSheet() {
@@ -635,10 +642,10 @@ class _FlowScreenState extends State<FlowScreen>
                   ctx,
                   icon: Icons.send_outlined,
                   title: '水畔寄书',
-                  subtitle: '写下心意，随江远行',
+                  subtitle: '净心 · 寄语 · 放瓶入江',
                   onTap: () {
                     Navigator.pop(ctx);
-                    _showBottleInputDialog();
+                    _openBottleRitual();
                   },
                 ),
                 const SizedBox(height: 12),
