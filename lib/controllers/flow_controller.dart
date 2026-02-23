@@ -142,9 +142,7 @@ class FlowController extends ChangeNotifier {
       try {
         await StepSyncService.syncAndroidSensor(currentHardwareSteps: event.steps);
         await _updateUIFromDB();
-      } catch (e) {
-        if (kDebugMode) debugPrint('StepSyncService.syncAndroidSensor error: $e');
-      }
+      } catch (e) {}
     });
   }
 
@@ -173,9 +171,7 @@ class FlowController extends ChangeNotifier {
           aqi: _aqi,
         ));
       }
-    } catch (e) {
-      debugPrint("Weather DB Save Error: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> fetchWeather(double lat, double lon) async {
@@ -186,10 +182,7 @@ class FlowController extends ChangeNotifier {
       final url = Uri.parse(
           'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto');
       final res = await http.get(url);
-      if (res.statusCode != 200) {
-        debugPrint("Fetch weather HTTP ${res.statusCode}: ${res.body.length} bytes");
-        return;
-      }
+      if (res.statusCode != 200) return;
       final data = json.decode(res.body) as Map<String, dynamic>;
       final current = data['current'] as Map<String, dynamic>;
       _temp = "${current['temperature_2m']}°";
@@ -204,9 +197,7 @@ class FlowController extends ChangeNotifier {
       _saveWeatherToCache();
       await saveWeatherToDatabase();
       notifyListeners();
-    } catch (e, stack) {
-      debugPrint("Fetch weather error: $e");
-      if (kDebugMode) debugPrint("$stack");
+    } catch (e) {
       return;
     }
 
@@ -222,9 +213,7 @@ class FlowController extends ChangeNotifier {
         _pm2_5 = aqCurrent['pm2_5'].toString();
         notifyListeners();
       }
-    } catch (e) {
-      debugPrint("Fetch AQI error: $e");
-    }
+    } catch (e) {}
 
     // 3. 城市名可选：失败保留默认
     try {
@@ -237,9 +226,7 @@ class FlowController extends ChangeNotifier {
         _saveWeatherToCache();
         notifyListeners();
       }
-    } catch (e) {
-      debugPrint("Fetch city error: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> _loadCachedWeather() async {

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -121,15 +120,10 @@ class DatabaseService {
         final byteData = await rootBundle.load(_baseDbAssetPath);
         await file.writeAsBytes(byteData.buffer.asUint8List());
         await prefs.setInt(_prefKeyBaseDbVersion, _baseDbAssetVersion);
-        if (kDebugMode) debugPrint('[POI] baseDatabase copied from asset (version $_baseDbAssetVersion)');
       }
 
       return await openDatabase(path, readOnly: true);
-    } catch (e, st) {
-      if (kDebugMode) {
-        debugPrint('[POI] baseDatabase open failed: $e');
-        debugPrint('$st');
-      }
+    } catch (e) {
       return null;
     }
   }
@@ -242,17 +236,10 @@ class DatabaseService {
   /// river_pois.distance_km 与 fetch_river_pois 写入一致，为挑战里程，故直接用 accumulatedKm 查，不乘修正系数。
   /// 若基础库未就绪、无 river_pois 表，静默返回 null，不抛错。
   Future<RiverPoi?> getNearestPoi(int numericId, double accumulatedKm) async {
-    const _tag = '[POI]';
-    if (kDebugMode)
-      debugPrint(
-          '$_tag getNearestPoi(numericId=$numericId, accumulatedKm=$accumulatedKm)');
     try {
       final pathKm = accumulatedKm;
       final db = await instance.baseDatabase;
-      if (db == null) {
-        if (kDebugMode) debugPrint('$_tag baseDatabase is null, return null');
-        return null;
-      }
+      if (db == null) return null;
       final before = await db.query(
         'river_pois',
         where: 'numeric_id = ? AND distance_km <= ?',
@@ -267,40 +254,15 @@ class DatabaseService {
         orderBy: 'distance_km ASC',
         limit: 1,
       );
-      if (kDebugMode)
-        debugPrint('$_tag before=${before.length} after=${after.length}');
       RiverPoi? pick(Map<String, dynamic> row) => RiverPoi.fromMap(row);
-      if (before.isEmpty && after.isEmpty) {
-        if (kDebugMode)
-          debugPrint(
-              '$_tag both empty (no rows for numeric_id=$numericId, pathKm=$pathKm), return null');
-        return null;
-      }
-      if (before.isEmpty) {
-        final p = pick(after.first);
-        if (kDebugMode)
-          debugPrint('$_tag picked after distance_km=${p!.distanceKm}');
-        return p;
-      }
-      if (after.isEmpty) {
-        final p = pick(before.first);
-        if (kDebugMode)
-          debugPrint('$_tag picked before distance_km=${p!.distanceKm}');
-        return p;
-      }
+      if (before.isEmpty && after.isEmpty) return null;
+      if (before.isEmpty) return pick(after.first);
+      if (after.isEmpty) return pick(before.first);
       final dBefore = (before.first['distance_km'] as num).toDouble();
       final dAfter = (after.first['distance_km'] as num).toDouble();
       final useBefore = (pathKm - dBefore) <= (dAfter - pathKm);
-      final p = pick(useBefore ? before.first : after.first);
-      if (kDebugMode)
-        debugPrint(
-            '$_tag picked ${useBefore ? "before" : "after"} distance_km=${p!.distanceKm}');
-      return p;
-    } catch (e, st) {
-      if (kDebugMode) {
-        debugPrint('$_tag getNearestPoi failed: $e');
-        debugPrint('$_tag $st');
-      }
+      return pick(useBefore ? before.first : after.first);
+    } catch (e) {
       return null;
     }
   }

@@ -2,7 +2,6 @@
 // UI 只调 playAmbient/stopAmbient，由 audio_service 转给 Handler 执行。
 // 设计依据与官方范例：docs/AMBIENT_AUDIO_REFERENCES.md
 
-import 'package:flutter/foundation.dart';
 import 'package:audio_service/audio_service.dart';
 import '../models/ambient_mix.dart';
 import 'ambient_audio_handler.dart';
@@ -23,20 +22,15 @@ class AmbientAudioService {
         androidNotificationChannelName: '河声',
       ),
     );
-    if (kDebugMode) debugPrint('[Ambient] init ok, handler=${_handler != null}');
   }
 
   /// 开始混音（不 await，由 Handler 在后台加载与播放）
   static void playAmbient(AmbientMixSpec spec) {
-    if (kDebugMode) {
-      debugPrint('[Ambient] playAmbient spec: murmur=${spec.murmur} rain=${spec.rain} wind=${spec.wind} frog=${spec.frog} rumble=${spec.rumble}');
-    }
     _handler?.customAction('playAmbient', spec.toMap());
   }
 
   /// 停止混音（退出仪式/听水时调用）
   static void stopAmbient() {
-    if (kDebugMode) debugPrint('[Ambient] stopAmbient called, handler=${_handler != null}');
     _handler?.customAction('stopAmbient');
   }
 

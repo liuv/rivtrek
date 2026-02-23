@@ -48,7 +48,6 @@ class CoverPathService {
       _cache[pointsJsonPath] = pathData;
       return pathData;
     } catch (e) {
-      debugPrint('CoverPathService.loadPathForCover error: $e');
       return null;
     }
   }

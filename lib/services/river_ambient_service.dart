@@ -9,7 +9,6 @@
 //   3. 用 _session（int 自增）标记当前播放轮次；setAsset.then() 里比对 session，
 //      若已变更则直接 dispose 并返回，避免旧轮次的 player 混入当前 _players。
 
-import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/ambient_mix.dart';
 
@@ -37,11 +36,6 @@ class RiverAmbientService {
   void play(AmbientMixSpec spec) {
     _session++;
     final mySession = _session;
-    if (kDebugMode) {
-      debugPrint('[Ambient] play session=$mySession '
-          'murmur=${spec.murmur} wind=${spec.wind} '
-          'rain=${spec.rain} frog=${spec.frog} rumble=${spec.rumble}');
-    }
     _disposeAll();
 
     final toLoad = <String, double>{};
@@ -59,7 +53,6 @@ class RiverAmbientService {
   /// 停止所有轨并释放资源
   void stop() {
     _session++;
-    if (kDebugMode) debugPrint('[Ambient] stop session=$_session');
     _disposeAll();
   }
 
@@ -74,7 +67,6 @@ class RiverAmbientService {
         .then((_) async {
           // session 已变更 → 这一轮已被取消，直接释放
           if (_session != mySession) {
-            if (kDebugMode) debugPrint('[Ambient] session stale, discard $path');
             player.dispose();
             return;
           }
@@ -88,13 +80,9 @@ class RiverAmbientService {
             return;
           }
           _players.add(player);
-          if (kDebugMode) debugPrint('[Ambient] playing $path vol=$vol, total=${_players.length}');
         })
         .catchError((e) {
           // PlayerInterruptedException = dispose() 在 setAsset 完成前被调用，属正常中断
-          if (e is! PlayerInterruptedException && kDebugMode) {
-            debugPrint('[Ambient] load failed $path: $e');
-          }
           player.dispose();
         });
   }
@@ -103,7 +91,6 @@ class RiverAmbientService {
     if (_players.isEmpty) return;
     final copy = List<AudioPlayer>.from(_players);
     _players.clear();
-    if (kDebugMode) debugPrint('[Ambient] disposeAll ${copy.length} players');
     for (final p in copy) {
       // 只调 dispose()，just_audio 内部会 stop；分开调会触发 "Cannot complete future with itself"
       p.dispose();

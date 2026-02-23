@@ -105,9 +105,7 @@ class ChallengeProvider extends ChangeNotifier {
       }
       _allSubSections = flatList;
       _updateSubSection();
-    } catch (e) {
-      debugPrint("Error loading river details: $e");
-    }
+    } catch (e) {}
   }
 
   void _updateSubSection() {

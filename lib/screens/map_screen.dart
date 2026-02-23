@@ -86,7 +86,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         });
       }
     } catch (e) {
-      debugPrint("Error loading map data: $e");
       if (mounted) {
         setState(() => isLoading = false);
       }

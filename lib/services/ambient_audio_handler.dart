@@ -2,7 +2,6 @@
 // 音频逻辑在 AudioHandler 内，UI 只发 customAction(playAmbient/stopAmbient、playBlessing/preloadBlessingBowl/cancelBlessing)。
 // 范例与约定见：docs/AMBIENT_AUDIO_REFERENCES.md（audio_service Tutorial / Example）
 
-import 'package:flutter/foundation.dart';
 import 'package:audio_service/audio_service.dart';
 import '../models/ambient_mix.dart';
 import 'river_ambient_service.dart';
@@ -28,7 +27,6 @@ class AmbientAudioHandler extends BaseAudioHandler {
   @override
   Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async {
     if (name == 'playAmbient' && extras != null) {
-      if (kDebugMode) debugPrint('[Ambient] handler playAmbient');
       _broadcastState(AudioProcessingState.loading, false);
       final spec = AmbientMixSpec.fromMap(extras);
       _service.play(spec);
@@ -36,7 +34,6 @@ class AmbientAudioHandler extends BaseAudioHandler {
       return null;
     }
     if (name == 'stopAmbient') {
-      if (kDebugMode) debugPrint('[Ambient] handler stopAmbient');
       _service.stop();
       _broadcastState(AudioProcessingState.idle, false);
       return null;
@@ -46,7 +43,6 @@ class AmbientAudioHandler extends BaseAudioHandler {
       return null;
     }
     if (name == 'playBlessing') {
-      if (kDebugMode) debugPrint('[BlessingSound] handler playBlessing');
       _blessingSound.play();
       return null;
     }
@@ -59,7 +55,6 @@ class AmbientAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> stop() async {
-    if (kDebugMode) debugPrint('[Ambient] handler stop()');
     _service.stop();
     _blessingSound.cancel();
     _broadcastState(AudioProcessingState.idle, false);

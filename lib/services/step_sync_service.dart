@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:health/health.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,8 +43,6 @@ class StepSyncService {
         types: types,
       );
 
-      debugPrint("Health Connect: got ${healthData.length} raw data points for STEPS.");
-
       // 按日期分组统计步数
       Map<String, int> dailySteps = {};
       for (var point in healthData) {
@@ -64,14 +61,7 @@ class StepSyncService {
         if (totalToday != null && totalToday > 0) {
           final todayStr = DateFormat('yyyy-MM-dd').format(now);
           dailySteps[todayStr] = totalToday;
-          debugPrint("Health Connect: getTotalStepsInInterval(today) = $totalToday.");
         }
-      }
-
-      if (dailySteps.isEmpty) {
-        debugPrint("Health Data Sync: no step data from Health Connect (0 points, 0 daily).");
-      } else {
-        debugPrint("Health Data Sync: dailySteps = $dailySteps");
       }
 
       final prefs = await SharedPreferences.getInstance();
@@ -91,14 +81,9 @@ class StepSyncService {
       if (activitiesForRiver.isEmpty) {
         challengeStartDate = todayStr;
         await prefs.setString(kChallengeStartDate, todayStr);
-        if (kDebugMode) {
-          debugPrint(
-              "Health Data Sync: no activities for river, set challenge_start_date=$todayStr (fresh/reinstall).");
-        }
       } else if (challengeStartDate.isEmpty) {
         challengeStartDate = todayStr;
         await prefs.setString(kChallengeStartDate, todayStr);
-        debugPrint("Health Data Sync: challenge_start_date set to $challengeStartDate (first run, legacy).");
       }
 
       final startDateStr = DateFormat('yyyy-MM-dd').format(startDate);
@@ -143,9 +128,7 @@ class StepSyncService {
       if (sortedDates.isNotEmpty) {
         await prefs.setString('last_steps_source', 'health_connect');
       }
-      debugPrint("Health Data Sync Completed for $days days.");
     } catch (e) {
-      debugPrint("Health Data Sync Error: $e");
     }
   }
 
@@ -160,9 +143,7 @@ class StepSyncService {
     if (currentHardwareSteps != null) {
       try {
         await _writeSensorStepsToDb(currentHardwareSteps);
-      } catch (e) {
-        debugPrint("Android Sensor Sync (with steps) Error: $e");
-      }
+      } catch (e) {}
       return;
     }
 
@@ -181,14 +162,10 @@ class StepSyncService {
     subscription = Pedometer.stepCountStream.listen((event) async {
       try {
         await _writeSensorStepsToDb(event.steps);
-        debugPrint("Android Sensor Sync: today from stream (cumulative=${event.steps})");
-      } catch (e) {
-        debugPrint("Android Sensor Sync Error: $e");
-      } finally {
+      } catch (e) {} finally {
         finish();
       }
-    }, onError: (e) {
-      debugPrint("Pedometer Error: $e");
+    }, onError: (_) {
       finish();
     });
 
@@ -267,7 +244,5 @@ class StepSyncService {
       riverId: riverId,
     ));
     await prefs.setString('last_steps_source', 'sensor');
-
-    debugPrint("Android Sensor Sync: today=$stepsToWrite (cumulative=$hardwareTotal, baseline=$stepsAtDayStart)");
   }
 }

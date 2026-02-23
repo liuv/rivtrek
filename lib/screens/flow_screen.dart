@@ -363,7 +363,6 @@ class _FlowScreenState extends State<FlowScreen>
             ),
           );
         } catch (e) {
-          debugPrint("getCurrentPosition failed: $e");
           // Android 授权后有时需稍等再取位置，重试一次
           if (Platform.isAndroid) {
             await Future.delayed(const Duration(milliseconds: 800));
@@ -374,9 +373,7 @@ class _FlowScreenState extends State<FlowScreen>
                   timeLimit: Duration(seconds: 10),
                 ),
               );
-            } catch (e2) {
-              debugPrint("getCurrentPosition retry failed: $e2");
-            }
+            } catch (e2) {}
           }
         }
       }
@@ -409,9 +406,7 @@ class _FlowScreenState extends State<FlowScreen>
       if (lat != null && lon != null && mounted) {
         context.read<FlowController>().fetchWeather(lat, lon);
       }
-    } catch (e) {
-      debugPrint("_refreshWeather error: $e");
-    }
+    } catch (e) {}
   }
 
   /// 仅更新祭江祈福的动画；河灯/漂流瓶位置由虚拟源头时间戳每帧计算
@@ -796,9 +791,7 @@ class _FlowScreenState extends State<FlowScreen>
         });
         _updatePathOffsets(_visualDistance);
       }
-    } catch (e) {
-      debugPrint("Path Error: $e");
-    }
+    } catch (e) {}
   }
 
   void _updatePathOffsets(double dist) {

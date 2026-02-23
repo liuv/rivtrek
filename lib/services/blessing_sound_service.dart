@@ -8,7 +8,6 @@
 //   4. 用 _session 标记当前轮次，异步回调中比对 session，旧轮次直接 dispose 并返回。
 
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 
 class BlessingSoundService {
@@ -16,6 +15,11 @@ class BlessingSoundService {
 
   static const String _bowl  = 'assets/audio/bowl.ogg';
   static const String _murmur = 'assets/audio/murmur_01.ogg';
+
+  /// 混音权重：颂钵轨音量（0.0~1.0 标准；>1.0 部分设备会放大，可能削波）
+  static const double bowlVolume = 1.2;
+  /// 混音权重：河水轨音量（调低可让颂钵更突出）
+  static const double riverVolume = 0.55;
 
   AudioPlayer? _bowlPlayer;
   AudioPlayer? _riverPlayer;
@@ -41,8 +45,6 @@ class BlessingSoundService {
     _riverPlayer?.dispose();
     _riverPlayer = null;
 
-    if (kDebugMode) debugPrint('[BlessingSound] start session=$mySession');
-
     // ── 颂钵轨 ────────────────────────────────────────────────────
     final bowlPlayer = AudioPlayer();
     bowlPlayer
@@ -52,7 +54,7 @@ class BlessingSoundService {
             bowlPlayer.dispose();
             return;
           }
-          await bowlPlayer.setVolume(1.0);
+          await bowlPlayer.setVolume(bowlVolume);
           // ★ 不 await play()：bowl 单次播完即止，Future 完成后 player 自然结束
           bowlPlayer.play();
           if (_session != mySession) {
@@ -61,7 +63,6 @@ class BlessingSoundService {
           }
           // 只在确认已播后才赋值给成员变量，避免 catchError 误操作
           _bowlPlayer = bowlPlayer;
-          if (kDebugMode) debugPrint('[BlessingSound] bowl playing, 5s then river');
 
           _startRiverTimer = Timer(const Duration(seconds: 5), () {
             if (_session != mySession) return;
@@ -70,9 +71,6 @@ class BlessingSoundService {
         })
         .catchError((e) {
           // PlayerInterruptedException = dispose() 在 setAsset 期间被调用，属正常中断
-          if (e is! PlayerInterruptedException && kDebugMode) {
-            debugPrint('[BlessingSound] bowl load error: $e');
-          }
           // 只 dispose 局部变量，不碰 _bowlPlayer（可能已指向新实例）
           bowlPlayer.dispose();
         });
@@ -89,7 +87,7 @@ class BlessingSoundService {
             return;
           }
           await riverPlayer.setLoopMode(LoopMode.one);
-          await riverPlayer.setVolume(0.7);
+          await riverPlayer.setVolume(riverVolume);
           // ★ 不 await play()：LoopMode.one 的 Future 永远不会完成
           riverPlayer.play();
           if (_session != mySession) {
@@ -97,7 +95,6 @@ class BlessingSoundService {
             return;
           }
           _riverPlayer = riverPlayer;
-          if (kDebugMode) debugPrint('[BlessingSound] river playing, 3s then fade 2s');
 
           _fadeOutTimer = Timer(const Duration(seconds: 3), () {
             if (_session != mySession) return;
@@ -105,22 +102,19 @@ class BlessingSoundService {
           });
         })
         .catchError((e) {
-          if (e is! PlayerInterruptedException && kDebugMode) {
-            debugPrint('[BlessingSound] river load error: $e');
-          }
           riverPlayer.dispose();
         });
   }
 
-  // ── 2 秒淡出 ─────────────────────────────────────────────────
+  // ── 2 秒淡出（只淡出河水，颂钵保持满音量直到结束）─────────────────
   Future<void> _fadeOutAndDispose() async {
     const steps = 40;
     const stepMs = 50; // 40 × 50 ms = 2000 ms
     for (int i = 1; i <= steps; i++) {
-      final v = 1.0 - (i / steps);
+      final v = 1.0 - (i / steps); // 河水从 riverVolume 淡到 0
       try {
-        await _bowlPlayer?.setVolume(v);
-        await _riverPlayer?.setVolume(0.7 * v);
+        // 颂钵不参与淡出，保持 bowlVolume
+        await _riverPlayer?.setVolume(riverVolume * v);
       } catch (_) {}
       await Future<void>.delayed(const Duration(milliseconds: stepMs));
     }
@@ -132,7 +126,6 @@ class BlessingSoundService {
     _bowlPlayer = null;
     _riverPlayer?.dispose();
     _riverPlayer = null;
-    if (kDebugMode) debugPrint('[BlessingSound] stopped after fade');
   }
 
   /// 立即取消当前轮次（dispose 时调）。
@@ -146,6 +139,5 @@ class BlessingSoundService {
     _bowlPlayer = null;
     _riverPlayer?.dispose();
     _riverPlayer = null;
-    if (kDebugMode) debugPrint('[BlessingSound] cancelled');
   }
 }
