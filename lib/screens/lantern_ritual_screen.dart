@@ -1,20 +1,20 @@
 // 放河灯仪式：净心 → 寄愿 → 步数灵力 → 滑动放灯 → 结语
 
 import 'dart:convert';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/scheduler.dart' show Ticker;
 import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../controllers/flow_controller.dart';
 
-/// 仪式页河水声资源（10 秒，循环播放）
-const String _kRiverSoundAsset = 'audio/murmur_01.mp3';
+/// 仪式页河水声：进入即播，离开时淡出（无淡入，避免部分设备 OGG 解码延迟导致无声）
+const String _kRiverSoundAsset = 'assets/audio/murmur_01.ogg';
+const String _kRiverSoundAssetMp3 = 'assets/audio/murmur_01.mp3';
 const double _kRiverSoundVolume = 0.35;
-const Duration _kRiverSoundFadeIn = Duration(milliseconds: 1800);
-const Duration _kRiverSoundFadeOut = Duration(milliseconds: 1900);
+const Duration _kRiverSoundFadeOut = Duration(milliseconds: 400);
 
 /// 放灯所需最少步数（步数即「灵力」，满则灯更亮）
 const int kMinStepsToReleaseLantern = 3000;
@@ -44,7 +44,6 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   double _flingElapsed = 0;
   double _flingTriggerDistance = 0;
   late AnimationController _fadeController;
-  late AnimationController _volumeFadeController;
   late AnimationController _dimController;
   late AnimationController _lanternFadeOutController;
   AudioPlayer? _riverSound;
@@ -56,10 +55,6 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
-    );
-    _volumeFadeController = AnimationController(
-      vsync: this,
-      duration: _kRiverSoundFadeIn,
     );
     _dimController = AnimationController(
       vsync: this,
@@ -73,35 +68,28 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _dimController.forward();
   }
 
+  /// 进入即播：直接目标音量循环播放，无淡入
   Future<void> _startRiverSound() async {
     final player = AudioPlayer();
     _riverSound = player;
     try {
-      await player.setReleaseMode(ReleaseMode.loop);
-      await player.setVolume(0);
-      await player.setSource(AssetSource(_kRiverSoundAsset));
-      await player.resume();
-      if (!mounted || _riverSound != player) return;
-      _volumeFadeController.forward(from: 0);
-      _volumeFadeController.addListener(_onVolumeFadeTick);
+      try {
+        await player.setAsset(_kRiverSoundAsset);
+      } catch (_) {
+        await player.setAsset(_kRiverSoundAssetMp3);
+      }
+      await player.setLoopMode(LoopMode.one);
+      await player.setVolume(_kRiverSoundVolume);
+      await player.play();
     } catch (e) {
       if (kDebugMode) debugPrint('LanternRitual river sound: $e');
     }
   }
 
-  void _onVolumeFadeTick() {
-    final v = _volumeFadeController.value * _kRiverSoundVolume;
-    _riverSound?.setVolume(v);
-    if (_volumeFadeController.isCompleted) {
-      _volumeFadeController.removeListener(_onVolumeFadeTick);
-    }
-  }
-
   Future<void> _fadeOutRiverSound() async {
-    _volumeFadeController.removeListener(_onVolumeFadeTick);
     final player = _riverSound;
     if (player == null) return;
-    const steps = 12;
+    const steps = 4;
     final stepMs = _kRiverSoundFadeOut.inMilliseconds / steps;
     final stepVol = _kRiverSoundVolume / steps;
     for (var i = steps; i >= 0 && mounted; i--) {
@@ -115,8 +103,6 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
 
   @override
   void dispose() {
-    _volumeFadeController.removeListener(_onVolumeFadeTick);
-    _volumeFadeController.dispose();
     _dimController.dispose();
     _lanternFadeOutController.dispose();
     _flingTicker?.dispose();
