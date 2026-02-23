@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
+import 'package:flutter/scheduler.dart' show Ticker;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../controllers/flow_controller.dart';
@@ -12,7 +14,7 @@ import '../controllers/flow_controller.dart';
 const String _kRiverSoundAsset = 'audio/murmur_01.mp3';
 const double _kRiverSoundVolume = 0.35;
 const Duration _kRiverSoundFadeIn = Duration(milliseconds: 1800);
-const Duration _kRiverSoundFadeOut = Duration(milliseconds: 900);
+const Duration _kRiverSoundFadeOut = Duration(milliseconds: 1900);
 
 /// 放灯所需最少步数（步数即「灵力」，满则灯更亮）
 const int kMinStepsToReleaseLantern = 3000;
@@ -35,7 +37,12 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   final TextEditingController _wishController = TextEditingController();
   double _dragOffset = 0;
   double _lanternOffsetY = 0; // 河灯相对初始位置的垂直偏移（上滑为正）
+  double _dragTargetOffsetY = 0; // 手指目标，河灯用弹簧跟随
   bool _released = false;
+  Ticker? _flingTicker;
+  Simulation? _flingSimulation;
+  double _flingElapsed = 0;
+  double _flingTriggerDistance = 0;
   late AnimationController _fadeController;
   late AnimationController _volumeFadeController;
   late AnimationController _dimController;
@@ -60,7 +67,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     );
     _lanternFadeOutController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 450),
+      duration: const Duration(milliseconds: 1450),
     );
     _startRiverSound();
     _dimController.forward();
@@ -112,6 +119,8 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     _volumeFadeController.dispose();
     _dimController.dispose();
     _lanternFadeOutController.dispose();
+    _flingTicker?.dispose();
+    _flingTicker = null;
     if (!_released) {
       _riverSound?.stop();
       _riverSound?.dispose();
@@ -143,8 +152,8 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
     HapticFeedback.mediumImpact();
     _lanternFadeOutController.forward(from: 0);
     _fadeController.forward();
-    // 尽量缩短停留：河灯渐隐约 450ms，再留极短时间即返回，音乐在后台淡出
-    const stayMs = 550;
+    _fadeOutRiverSound(); // 立即开始声音渐隐，与画面同步，由动到静
+    const stayMs = 1550;
     Future.delayed(const Duration(milliseconds: stayMs), () {
       if (!mounted) return;
       final wish = _wishController.text.trim().isEmpty
@@ -152,8 +161,43 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
           : _wishController.text.trim();
       widget.onComplete(wish);
       Navigator.of(context).pop();
-      _fadeOutRiverSound(); // 不 await，返回后后台淡出
     });
+  }
+
+  /// 松手后惯性：用摩擦模拟，带初速度滑一段再停
+  void _startFling(double triggerDistance, double velocityPxPerSec) {
+    _flingTriggerDistance = triggerDistance;
+    _flingSimulation = FrictionSimulation(0.02, _dragOffset, velocityPxPerSec);
+    _flingElapsed = 0;
+    _flingTicker?.dispose();
+    _flingTicker = createTicker((elapsed) {
+      _flingElapsed += elapsed.inMilliseconds / 1000.0;
+      final sim = _flingSimulation!;
+      final x = sim.x(_flingElapsed);
+      if (!mounted || _released) {
+        _flingTicker?.dispose();
+        _flingTicker = null;
+        _flingSimulation = null;
+        return;
+      }
+      setState(() {
+        _dragOffset = x.clamp(0.0, double.infinity);
+        _lanternOffsetY = _dragOffset;
+        if (_dragOffset >= _flingTriggerDistance) {
+          _onRelease();
+          _flingTicker?.dispose();
+          _flingTicker = null;
+          _flingSimulation = null;
+          return;
+        }
+        if (sim.isDone(_flingElapsed)) {
+          _flingTicker?.dispose();
+          _flingTicker = null;
+          _flingSimulation = null;
+        }
+      });
+    });
+    _flingTicker!.start();
   }
 
   /// 遮罩不随滑动变化，保持场景切换感，弱化卡顿感
@@ -440,16 +484,31 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
                   child: _buildLanternImage(currentSize),
                 )
               : GestureDetector(
+                  onVerticalDragStart: (_) {
+                    if (_released) return;
+                    _flingTicker?.dispose();
+                    _flingTicker = null;
+                    _flingSimulation = null;
+                    _dragTargetOffsetY = _dragOffset;
+                  },
                   onVerticalDragUpdate: (d) {
                     if (_released) return;
                     setState(() {
-                      _dragOffset -= d.delta.dy;
-                      if (_dragOffset < 0) _dragOffset = 0;
-                      _lanternOffsetY -= d.delta.dy;
+                      _dragTargetOffsetY -= d.delta.dy;
+                      if (_dragTargetOffsetY < 0) _dragTargetOffsetY = 0;
+                      if (_dragTargetOffsetY > triggerDistance) _dragTargetOffsetY = triggerDistance;
+                      _dragOffset = _dragTargetOffsetY;
+                      _lanternOffsetY = _lanternOffsetY + (_dragTargetOffsetY - _lanternOffsetY) * 0.42;
                       if (_lanternOffsetY < 0) _lanternOffsetY = 0;
                       if (_lanternOffsetY > triggerDistance) _lanternOffsetY = triggerDistance;
                       if (_dragOffset >= triggerDistance) _onRelease();
                     });
+                  },
+                  onVerticalDragEnd: (d) {
+                    if (_released) return;
+                    final velocityPxPerSec = d.velocity.pixelsPerSecond.dy;
+                    if (velocityPxPerSec.abs() < 20) return;
+                    _startFling(triggerDistance, -velocityPxPerSec);
                   },
                   child: _buildLanternImage(currentSize),
                 ),
