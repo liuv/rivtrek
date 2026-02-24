@@ -212,6 +212,7 @@ class PoiItem {
   final String? name;
   final String? type;
   final String? tel;
+  /// 该 POI 到逆地理查询点的距离，单位：米（高德 API 约定）
   final double? distance;
   final String? direction;
   final String? address;
@@ -359,4 +360,44 @@ class RiverPoi {
     if (name != null && name.isNotEmpty) return '$region · $name';
     return region;
   }
+
+  /// 下一站等导航用：只取层级最后两段（如 抚松县 漫江镇），省略省、市，避免过长
+  String get shortLabelForNextStop {
+    final parts = [province, city, district, township].whereType<String>().where((s) => s.isNotEmpty).toList();
+    final lastTwo = parts.length >= 2 ? parts.sublist(parts.length - 2) : parts;
+    final region = lastTwo.isEmpty ? (formattedAddress ?? '') : lastTwo.join(' ');
+    final name = primaryPoi?.name;
+    if (name != null && name.isNotEmpty) return '$region · $name';
+    return region;
+  }
+}
+
+/// 从「当前」与「下一站」的 formatted_address 精简出下一站展示文案：
+/// 去掉两者最长公共前缀，只显示下一站的后缀（如 331国道 → 头道松花江 显示「头道松花江」）；
+/// 若后缀为空则回退为「下一站中最后一个省/市/县/镇之后的片段」。
+String shortLabelForNextFromFormattedAddress(String? currentAddress, String? nextAddress) {
+  final cur = currentAddress?.trim() ?? '';
+  final next = nextAddress?.trim() ?? '';
+  if (next.isEmpty) return '';
+  if (cur.isEmpty) return _fallbackSuffixOfAddress(next);
+
+  // 最长公共前缀：O(min(n,m))，已是最优（必须扫到第一个不同字符）
+  int i = 0;
+  while (i < cur.length && i < next.length && cur[i] == next[i]) i++;
+  String suffix = next.substring(i).trim();
+  if (suffix.isNotEmpty) return suffix;
+  return _fallbackSuffixOfAddress(next);
+}
+
+/// 取地址中最后一个行政区（省/市/县/镇）之后的片段，无则返回原串
+String _fallbackSuffixOfAddress(String address) {
+  const markers = ['省', '市', '县', '镇', '乡'];
+  int last = -1;
+  for (final m in markers) {
+    final idx = address.lastIndexOf(m);
+    if (idx != -1 && idx > last) last = idx;
+  }
+  if (last == -1) return address;
+  final rest = address.substring(last + 1).trim();
+  return rest.isEmpty ? address : rest;
 }

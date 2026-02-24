@@ -72,6 +72,8 @@ class _FlowScreenState extends State<FlowScreen>
 
   // 当前里程对应 POI（按行进距离查最近点，约 0.5 km 刷新一次）
   RiverPoi? _currentPoi;
+  /// 当前位置之后的下一个 POI，用于导航式「下一站 · 还有 x.x km」
+  RiverPoi? _nextPoi;
   double? _lastPoiRequestKm;
 
   late AnimationController _timeController;
@@ -189,6 +191,7 @@ class _FlowScreenState extends State<FlowScreen>
           challenge.activeRiver!.pointsJsonPath, challenge.activeRiver!.id);
       _lastPoiRequestKm = null;
       _currentPoi = null;
+      _nextPoi = null;
     }
 
     // 切换河流时重建漂流时间轴并重新加载漂流事件
@@ -214,10 +217,19 @@ class _FlowScreenState extends State<FlowScreen>
         (_lastPoiRequestKm == null || (km - _lastPoiRequestKm!).abs() >= 0.5);
     if (canQueryPoi) {
       _lastPoiRequestKm = km;
-      DatabaseService.instance.getNearestPoi(river.numericId, km).then((p) {
+      // 必须先拿到「当前最近点」再用其 formatted_address 查下一站，否则首帧 _currentPoi 为 null 会漏掉地址过滤
+      DatabaseService.instance.getNearestPoi(river.numericId, km).then((nearest) async {
         if (!mounted) return;
-        // 仅在有结果时更新，避免查询抛错被 catch 成 null 后把之前有效的 POI 清掉
-        if (p != null) setState(() => _currentPoi = p);
+        final next = await DatabaseService.instance.getNextPoiWithDistinctAddress(
+          river.numericId,
+          km,
+          nearest?.formattedAddress,
+        );
+        if (!mounted) return;
+        setState(() {
+          _currentPoi = nearest;
+          _nextPoi = next;
+        });
       });
     }
 
@@ -1020,7 +1032,7 @@ class _FlowScreenState extends State<FlowScreen>
                   const SizedBox(height: 25),
                   _buildHeader(sub, controller),
                   const SizedBox(height: 20),
-                  _buildPoiCard(sub, controller),
+                  _buildPoiCard(sub, controller, challenge.currentDistance),
                   const Spacer(flex: 3),
                   _buildStepsAndProgress(
                       controller, challenge, challenge.currentDistance),
@@ -1270,17 +1282,25 @@ class _FlowScreenState extends State<FlowScreen>
     ];
   }
 
-  Widget _buildPoiCard(SubSection? sub, FlowController controller) {
+  Widget _buildPoiCard(SubSection? sub, FlowController controller, double accumulatedKm) {
     final poi = _currentPoi;
+    final nextPoi = _nextPoi;
     final themeColor = sub?.color ?? const Color(0xFF2196F3);
     final isLight = themeColor.computeLuminance() > 0.4;
-    // 地址主文案：有 POI 时用 shortLabel（省市区 + 最近 POI 名，如「青海省 海西 格尔木市 唐古拉山镇 · 沱沱河」）；无 POI 用天气城市名兜底
+    // 当前位置：优先用 formatted_address（信息最全），无 POI 用天气城市名兜底
     final addressLine = poi != null
-        ? poi.shortLabel
+        ? (poi.formattedAddress?.trim() ?? poi.shortLabel)
         : (controller.cityName.isNotEmpty && controller.cityName != "待定位"
             ? controller.cityName
             : "江心云水间");
     final hasAddress = addressLine.trim().isNotEmpty && addressLine != "江心云水间";
+    final distanceToNext = nextPoi != null
+        ? (nextPoi.distanceKm - accumulatedKm).clamp(0.0, double.infinity)
+        : null;
+    final nextStopShortLabel = shortLabelForNextFromFormattedAddress(
+      poi?.formattedAddress,
+      nextPoi?.formattedAddress,
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -1301,55 +1321,87 @@ class _FlowScreenState extends State<FlowScreen>
                 offset: const Offset(0, 4)),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: themeColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.place_rounded,
-                  size: 22, color: themeColor.withOpacity(0.85)),
+            // 第一行：定位图标与「此刻行至」同级，图标服从字体层级、弱化色块
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.place_rounded,
+                  size: 14,
+                  color: const Color(0xFF222222).withOpacity(0.42),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  "此刻行至",
+                  style: TextStyle(
+                    color: const Color(0xFF222222).withOpacity(0.45),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 2.2,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+            const SizedBox(height: 4),
+            // 下面每行与定位图标左对齐：位置信息、下一站、POI 各占一行
+            Text(
+              addressLine,
+              style: TextStyle(
+                color: Color(0xFF222222)
+                    .withOpacity(hasAddress ? 0.95 : 0.35),
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.5,
+                height: 1.35,
+                fontStyle: hasAddress ? FontStyle.normal : FontStyle.italic,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (nextPoi != null &&
+                distanceToNext != null &&
+                distanceToNext > 0 &&
+                nextStopShortLabel.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
                 children: [
-                  Text(
-                    "此刻行至",
-                    style: TextStyle(
-                      color: const Color(0xFF222222).withOpacity(0.45),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 2.2,
+                  Icon(Icons.navigation_rounded,
+                      size: 14, color: themeColor.withOpacity(0.75)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      '下一站 $nextStopShortLabel',
+                      style: TextStyle(
+                        color: const Color(0xFF555555).withOpacity(0.82),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.3,
+                        height: 1.3,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(width: 8),
                   Text(
-                    addressLine,
+                    '还有 ${distanceToNext.toStringAsFixed(1)} km',
                     style: TextStyle(
-                      color: Color(0xFF222222)
-                          .withOpacity(hasAddress ? 0.95 : 0.35),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.5,
-                      height: 1.35,
-                      fontStyle:
-                          hasAddress ? FontStyle.normal : FontStyle.italic,
+                      color: themeColor.withOpacity(0.9),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (poi != null) ...[
-                    ..._buildPoiNamesRow(poi.poisList),
-                  ],
                 ],
               ),
-            ),
+            ],
+            if (poi != null) ...[
+              ..._buildPoiNamesRow(poi.poisList),
+            ],
           ],
         ),
       ),
@@ -1422,10 +1474,14 @@ class _FlowScreenState extends State<FlowScreen>
         ]));
   }
 
-  /// 步数与进度区：显示实际累计里程（非视口偏移），起步与到江尾时如实显示 0 与总长
+  /// 步数与进度区：主数字为当日步数，下方小字为累计步数；里程为实际累计
   Widget _buildStepsAndProgress(FlowController controller,
       ChallengeProvider challenge, double accumulatedKm) {
-    String steps = controller.displaySteps.toString().replaceAllMapped(
+    final dailySteps = controller.displaySteps;
+    final cumulativeSteps = controller.cumulativeSteps;
+    String dailyStr = dailySteps.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    String cumulativeStr = cumulativeSteps.toString().replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     final sub = challenge.currentSubSection;
     final all = challenge.allSubSections;
@@ -1445,35 +1501,55 @@ class _FlowScreenState extends State<FlowScreen>
     final isHealthConnect = stepsSource == 'health_connect';
     final isSensor = stepsSource == 'sensor';
     return Column(children: [
-      Row(
+      // 当日步数：主数字单独一行，不占左侧图标列，避免行距被撑开
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 6, bottom: 8),
-            child: Tooltip(
-              message: isHealthConnect
-                  ? '步数来自 Health Connect'
-                  : isSensor
-                      ? '步数来自计步传感器'
-                      : '步数来源未知',
-              child: Icon(
-                isHealthConnect
-                    ? Icons.health_and_safety_outlined
-                    : isSensor
-                        ? Icons.sensors_outlined
-                        : Icons.help_outline_rounded,
-                size: 20,
-                color: const Color(0xFF888888),
-              ),
-            ),
-          ),
-          Text(steps,
+          Text(dailyStr,
               style: TextStyle(
                   color: const Color(0xFF222222),
-                  fontSize: steps.length > 7 ? 82 : 105,
+                  fontSize: dailyStr.length > 7 ? 82 : 105,
                   fontWeight: FontWeight.w100,
-                  letterSpacing: -2)),
+                  letterSpacing: -2,
+                  height: 1.0)),
+          const SizedBox(height: 2),
+          // 累计步数：图标与文案同级、服从 13px 字体层级，紧凑一行
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Tooltip(
+                message: isHealthConnect
+                    ? '步数来自 Health Connect'
+                    : isSensor
+                        ? '步数来自计步传感器'
+                        : '步数来源未知',
+                child: Icon(
+                  isHealthConnect
+                      ? Icons.health_and_safety_outlined
+                      : isSensor
+                          ? Icons.sensors_outlined
+                          : Icons.help_outline_rounded,
+                  size: 14,
+                  color: const Color(0xFF555555).withOpacity(0.55),
+                ),
+              ),
+              const SizedBox(width: 6),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '累计 $cumulativeStr 步',
+                  style: TextStyle(
+                    color: const Color(0xFF555555).withOpacity(0.65),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       Text(

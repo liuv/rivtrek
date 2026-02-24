@@ -44,7 +44,10 @@ class FlowController extends ChangeNotifier {
   String? _activeRiverId;
 
   // Getters
+  /// 当日步数（来自今日 daily_activities.steps）
   int get displaySteps => _displaySteps;
+  /// 累计步数（由累计里程换算，用于小字展示；6500km 约 930 万步）
+  int get cumulativeSteps => (_currentDistance / _stepLengthKm).round();
   double get currentDistance => _currentDistance;
   String get stepsSource => _stepsSource;
   String get temp => _temp;
@@ -122,7 +125,8 @@ class FlowController extends ChangeNotifier {
       _currentDistance = challenge.currentDistance;
     }
     if (riverChanged) {
-      _displaySteps = (_currentDistance / _stepLengthKm).round();
+      _updateUIFromDB();
+      return;
     }
 
     notifyListeners();

@@ -266,4 +266,63 @@ class DatabaseService {
       return null;
     }
   }
+
+  /// 当前位置之后的下一个 POI（用于导航式「下一站 · 还有 x.x km」）
+  /// 查 river_pois 中 distance_km > accumulatedKm 的第一条，按 distance_km 升序。
+  Future<RiverPoi?> getNextPoi(int numericId, double accumulatedKm) async {
+    try {
+      final db = await instance.baseDatabase;
+      if (db == null) return null;
+      final rows = await db.query(
+        'river_pois',
+        where: 'numeric_id = ? AND distance_km > ?',
+        whereArgs: [numericId, accumulatedKm],
+        orderBy: 'distance_km ASC',
+        limit: 1,
+      );
+      if (rows.isEmpty) return null;
+      return RiverPoi.fromMap(rows.first);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// 下一站（路线上的下一处「不同地址」路径点）：只取 formatted_address 与当前位置不同的下一个点。
+  /// 这样展示的是「下一段路的目的地」，而不是同一条路名下的多条 POI 记录，更符合导航语义。
+  /// [currentFormattedAddress] 为当前最近点的 formatted_address（如 null 则等价于 getNextPoi）。
+  Future<RiverPoi?> getNextPoiWithDistinctAddress(
+    int numericId,
+    double accumulatedKm,
+    String? currentFormattedAddress,
+  ) async {
+    try {
+      final db = await instance.baseDatabase;
+      if (db == null) return null;
+      final trimmed = currentFormattedAddress?.trim();
+      final bool filterByAddress = trimmed != null && trimmed.isNotEmpty;
+
+      final List<Map<String, dynamic>> rows;
+      if (filterByAddress) {
+        rows = await db.query(
+          'river_pois',
+          where: "numeric_id = ? AND distance_km > ? AND (formatted_address IS NULL OR trim(COALESCE(formatted_address, '')) != ?)",
+          whereArgs: [numericId, accumulatedKm, trimmed],
+          orderBy: 'distance_km ASC',
+          limit: 1,
+        );
+      } else {
+        rows = await db.query(
+          'river_pois',
+          where: 'numeric_id = ? AND distance_km > ?',
+          whereArgs: [numericId, accumulatedKm],
+          orderBy: 'distance_km ASC',
+          limit: 1,
+        );
+      }
+      if (rows.isEmpty) return null;
+      return RiverPoi.fromMap(rows.first);
+    } catch (e) {
+      return null;
+    }
+  }
 }
