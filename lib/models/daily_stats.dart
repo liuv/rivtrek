@@ -242,6 +242,14 @@ class PoiItem {
         location: json['location'] is String ? json['location'] as String? : null,
         businessarea: _optString(json['businessarea']),
       );
+
+  /// 带方位的展示名，文言衔接：有 direction 时为「X侧 名称」（如 北侧 沱沱河），无则仅名称
+  String get displayNameWithDirection {
+    final n = name?.trim() ?? '';
+    if (n.isEmpty) return '';
+    final d = direction?.trim();
+    return (d != null && d.isNotEmpty) ? '$d侧 $n' : n;
+  }
 }
 
 /// 高德 API 可能返回 String 或 List（如 tel: [], businessarea: []），统一成 String?

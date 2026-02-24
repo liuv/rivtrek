@@ -26,6 +26,14 @@ class ShareCardWidget extends StatelessWidget {
   /// 用户头像文件路径；为 null 时显示昵称首字或默认
   final String? avatarPath;
   final GlobalKey? repaintBoundaryKey;
+  /// 挑战已开始天数；为 null 时不显示「Xxx 之旅 开始了 N 天」
+  final int? daysSinceStart;
+  /// 累计步数；为 null 时不显示
+  final int? totalSteps;
+  /// 今日步数；为 null 时不显示
+  final int? dailySteps;
+  /// 底部结语（用户可选或自定义）；为空时使用默认「步履不停 丈量江山」
+  final String? closingPhrase;
 
   const ShareCardWidget({
     super.key,
@@ -42,6 +50,10 @@ class ShareCardWidget extends StatelessWidget {
     this.displayName,
     this.avatarPath,
     this.repaintBoundaryKey,
+    this.daysSinceStart,
+    this.totalSteps,
+    this.dailySteps,
+    this.closingPhrase,
   });
 
   @override
@@ -325,9 +337,32 @@ class ShareCardWidget extends StatelessWidget {
                         ),
                       ),
                     ],
+                    if (daysSinceStart != null || totalSteps != null || dailySteps != null) ...[
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.timeline_rounded,
+                            size: 16,
+                            color: Colors.white.withOpacity(0.78),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _daysStepsLine(daysSinceStart, totalSteps, dailySteps),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: 1.2,
+                              color: Colors.white.withOpacity(0.88),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const Spacer(),
                     Text(
-                      "步履不停，丈量江山",
+                      (closingPhrase?.trim().isEmpty ?? true) ? '步履不停 丈量江山' : closingPhrase!,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w300,
@@ -353,6 +388,21 @@ class ShareCardWidget extends StatelessWidget {
       ),
     ),
     );
+  }
+
+  String _formatSteps(int n) {
+    return n.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+  }
+
+  /// 文言式一行：历时 X天　行进 X步　今日 X步（有数据就显示，0 也显示）
+  String _daysStepsLine(int? daysSinceStart, int? totalSteps, int? dailySteps) {
+    final d = daysSinceStart ?? 0;
+    final s = totalSteps ?? 0;
+    final today = dailySteps ?? 0;
+    return '历时 ${d}天　行进 ${_formatSteps(s)} 步　今日 $today 步';
   }
 
   Widget _buildFallbackGradient() {

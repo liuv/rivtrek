@@ -25,9 +25,11 @@ class AboutRivtrekScreen extends StatelessWidget {
                         title: "项目概述",
                         icon: Icons.auto_awesome_outlined,
                         children: [
-                          _paragraph("涉川 (Walking the River) 是一款文艺、极简的健康运动 App。"),
+                          _paragraph(
+                              "涉川 (Walking the River) 是一款文艺、极简的健康运动 App。"),
                           _paragraph("将每日步行数映射为在地理名川（如长江）上的虚拟徒步距离，步履不停，终达江海。"),
-                          _paragraph("设计风格：Digital Zen（数字禅意）、极简主义、高通透感、磨砂玻璃效果。"),
+                          _paragraph(
+                              "设计风格：Digital Zen（数字禅意）、极简主义、高通透感、磨砂玻璃效果。"),
                         ],
                       ),
                       _buildSectionCard(
@@ -47,7 +49,8 @@ class AboutRivtrekScreen extends StatelessWidget {
                           _subTitle("动态流体首页"),
                           _paragraph("步数驱动流体流速，成就增强发光；垂直 S 形流体与 Perlin 噪声动效。"),
                           _subTitle("步数与地理逻辑"),
-                          _paragraph("步长约 0.7m 换算里程，按河段难度系数映射；每河多节点，含里程、环境与 Shader 参数。"),
+                          _paragraph(
+                              "步长约 0.7m 换算里程，按河段难度系数映射；每河多节点，含里程、环境与 Shader 参数。"),
                           _subTitle("拾遗与成就"),
                           _paragraph("累计里程达节点时触发拾遗/成就弹窗，极简图标，拾取后飞入背包。"),
                         ],
@@ -56,9 +59,12 @@ class AboutRivtrekScreen extends StatelessWidget {
                         title: "技术实现",
                         icon: Icons.code_rounded,
                         children: [
-                          _bullet("Flutter：Canvas / CustomPainter、FragmentShader (GLSL)"),
-                          _bullet("状态管理：Provider / Riverpod，shared_preferences 持久化"),
-                          _bullet("传感器：iOS HealthKit、Android Google Fit / Step Counter"),
+                          _bullet(
+                              "Flutter：Canvas / CustomPainter、FragmentShader (GLSL)"),
+                          _bullet(
+                              "状态管理：Provider / Riverpod，shared_preferences 持久化"),
+                          _bullet(
+                              "传感器：iOS HealthKit、Android Google Fit / Step Counter"),
                         ],
                       ),
                       const SizedBox(height: 100),
@@ -82,7 +88,8 @@ class AboutRivtrekScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: Color(0xFF555555)),
+                        icon: const Icon(Icons.arrow_back_ios_rounded,
+                            size: 20, color: Color(0xFF555555)),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Expanded(
@@ -131,7 +138,7 @@ class AboutRivtrekScreen extends StatelessWidget {
               ],
             ),
             child: const Text(
-              "步履不停，终达江海",
+              "一条江河，一场行走，一次内心的朝圣之旅。",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,

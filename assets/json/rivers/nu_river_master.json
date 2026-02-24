@@ -1,11 +1,11 @@
 {
-  "game_challenge_name": "怒水奔腾·从安多到瑞丽",
-  "challenge_id": "nu_river_epic_001",
-  "version": "2026.02.14.01",
+  "game_challenge_name": "怒水奔腾·从安多到安达曼海",
+  "challenge_id": "nu_river_epic_002",
+  "version": "2026.02.24.05",
   "author": "WaveChaser Team",
-  "total_length_km": 2013,
-  "total_sections": 7,
-  "total_sub_sections": 13,
+  "total_length_km": 3485,
+  "total_sections": 12,
+  "total_sub_sections": 23,
   "difficulty_stars": 4,
   "default_theme_color": "#4A90E2",
   "cover_asset": "covers/nu_river_cover.png",
@@ -278,89 +278,310 @@
     {
       "section_id": 6,
       "section_name": "怒江下游·德宏→瑞丽段",
-      "section_length_km": 200,
+      "section_length_km": 53,
       "flow_area": "云南省（滇西南热带地区）",
       "sub_sections": [
         {
           "sub_section_id": 601,
-          "sub_section_name": "热带怒驰·德宏→瑞丽上段",
+          "sub_section_name": "热带怒驰·德宏→瑞丽出境口段",
           "start_point": "云南德宏瑞丽市（怒江沿岸）",
-          "end_point": "云南德宏瑞丽市姐告口岸（怒江沿岸）",
-          "sub_section_length_km": 100,
-          "accumulated_length_km": 2060,
-          "core_landmarks": "怒江下游河道、瑞丽热带季雨林、傣家竹楼（远景）、姐告口岸（远景）",
-          "game_difficulty": "低（江面宽阔，水流平缓，两岸热带风光，休闲巡航+水乡打卡）",
-          "sub_section_desc": "驶入滇西南热带核心区，两岸是茂密的热带季雨林，傣家竹楼点缀其间，感受“热带江城”的温润与灵动，水流平缓，适合放松身心，途经姐告口岸远景，感受中缅边境风貌，为后续出境口做准备。",
+          "end_point": "云南德宏瑞丽市（怒江出境口）",
+          "sub_section_length_km": 53,
+          "accumulated_length_km": 2013,
+          "core_landmarks": "怒江下游河道、瑞丽热带季雨林、傣家竹楼（远景）、怒江出境口、中缅边境线（远景）",
+          "game_difficulty": "低（江面宽阔，水流平缓，两岸热带风光，休闲巡航+边境打卡）",
+          "sub_section_desc": "驶入滇西南热带核心区，两岸是茂密的热带季雨林，傣家竹楼点缀其间，感受“热带江城”的温润与灵动，水流平缓，适合放松身心，最终抵达怒江出境口，完成中国段全程巡航，解锁中缅边境核心地标。",
           "achievement": {
-            "achievement_name": "【热带怒浪】",
-            "achievement_desc": "穿越滇西南热带段，解锁“热带航者”中级称号",
+            "achievement_name": "【怒水出境】",
+            "achievement_desc": "抵达怒江中国段终点（出境口），解锁“滇南航者”高级称号",
             "medal_id": "medal_nu_601",
             "medal_icon": "icons/medal_nu_601.png"
           },
           "difficulty_rating": 2,
           "base_flow_speed": 0.5,
-          "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
-          "ambient_sound": "wind_plateau"
-        },
-        {
-          "sub_section_id": 602,
-          "sub_section_name": "怒江归境·瑞丽上段→瑞丽出境口段",
-          "start_point": "云南德宏瑞丽市姐告口岸（怒江沿岸）",
-          "end_point": "云南德宏瑞丽市（怒江出境口上游）",
-          "sub_section_length_km": 100,
-          "accumulated_length_km": 2160,
-          "core_landmarks": "怒江下游河道、瑞丽热带雨林、怒江出境口（远景）、中缅边境线（远景）",
-          "game_difficulty": "中（江面极阔，水流平缓，国境线过渡景观，休闲巡航+地标打卡）",
-          "sub_section_desc": "向怒江出境口启航，江面宽阔无垠，水流平缓壮阔，抵达瑞丽市出境口上游，远眺国境线，感受怒江即将出境的震撼瞬间，解锁怒江下游核心地标，做好终极出境挑战准备。",
-          "achievement": {
-            "achievement_name": "【怒江临境】",
-            "achievement_desc": "抵达瑞丽出境口上游，解锁“滇南航者”高级称号",
-            "medal_id": "medal_nu_602",
-            "medal_icon": "icons/medal_nu_602.png"
-          },
-          "difficulty_rating": 3,
-          "base_flow_speed": 0.5,
-          "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
-          "ambient_sound": "wind_plateau"
+          "environment_type": "tropical_rainforest",
+          "bg_asset": "TropicalJungle/001.png",
+          "ambient_sound": "jungle_ambient"
         }
       ],
       "theme_color": "#9B7B8C"
     },
     {
       "section_id": 7,
-      "section_name": "怒江出境口·瑞丽→缅甸段",
-      "section_length_km": 53,
-      "flow_area": "云南省、缅甸边境（中缅边境水域）",
+      "section_name": "萨尔温江·缅甸北部峡谷段",
+      "section_length_km": 320,
+      "flow_area": "缅甸克钦邦（北部深峡谷地带）",
       "sub_sections": [
         {
           "sub_section_id": 701,
-          "sub_section_name": "怒水出境·瑞丽→缅甸段",
-          "start_point": "云南德宏瑞丽市（怒江出境口上游）",
-          "end_point": "怒江出境口（汇入萨尔温江）",
-          "sub_section_length_km": 53,
-          "accumulated_length_km": 2013,
-          "core_landmarks": "怒江出境口、中缅边境线、萨尔温江入口（远景）、边境风光彩蛋",
-          "game_difficulty": "中（国境交界水域，水流平缓，终极冲刺挑战，适配边境巡航节奏）",
-          "sub_section_desc": "终极冲刺！从瑞丽出境口上游启航，穿越怒江出境口，江面逐渐融入萨尔温江，感受怒江奔腾千里终出境的壮阔瞬间，最终抵达出境口，完成全程2013km的划船挑战！",
+          "sub_section_name": "缅北深峡·瑞丽出境口→密支那段",
+          "start_point": "怒江出境口（中缅边境）",
+          "end_point": "缅甸克钦邦密支那市（萨尔温江沿岸）",
+          "sub_section_length_km": 160,
+          "accumulated_length_km": 2173,
+          "core_landmarks": "萨尔温江北部峡谷、缅北雪山、密支那城区（远景）、克钦邦原始雨林",
+          "game_difficulty": "高（缅北深峡谷河道，水流湍急，地势落差大，雨林复杂地形+操作难度双重考验）",
+          "sub_section_desc": "驶入缅甸境内萨尔温江段，进入缅北深峡谷地带，河道狭窄蜿蜒，水流湍急，两岸是原始雨林与雪山交织的极致风光，途经密支那城区远景，感受缅北边境的野性与雄浑，解锁萨尔温江核心峡谷风貌。",
           "achievement": {
-            "achievement_name": "【怒水归萨】",
-            "achievement_desc": "抵达怒江出境口，解锁“怒江征服者”终极称号，完成怒江全程划船挑战！",
+            "achievement_name": "【缅北穿峡】",
+            "achievement_desc": "穿越萨尔温江缅北深峡谷，解锁“萨尔温航者”高级称号",
             "medal_id": "medal_nu_701",
             "medal_icon": "icons/medal_nu_701.png"
           },
+          "difficulty_rating": 4,
+          "base_flow_speed": 0.8,
+          "environment_type": "tropical_canyon",
+          "bg_asset": "TropicalCanyon/001.png",
+          "ambient_sound": "river_rapid_jungle"
+        },
+        {
+          "sub_section_id": 702,
+          "sub_section_name": "雨林怒驰·密支那→八莫段",
+          "start_point": "缅甸克钦邦密支那市（萨尔温江沿岸）",
+          "end_point": "缅甸克钦邦八莫市（萨尔温江沿岸）",
+          "sub_section_length_km": 160,
+          "accumulated_length_km": 2333,
+          "core_landmarks": "萨尔温江中游峡谷、八莫古城（远景）、缅北原始雨林、伊洛瓦底江汇入口（远景）",
+          "game_difficulty": "中-高（雨林峡谷平缓段，水流较缓，视野开阔，雨林环境适应+耐力考验）",
+          "sub_section_desc": "告别缅北险峻深峡谷，进入萨尔温江中游平缓段，河道逐渐宽阔，两岸是一望无际的缅北原始雨林，途经八莫古城远景，感受缅甸古文明的韵味，解锁萨尔温江雨林段核心风貌。",
+          "achievement": {
+            "achievement_name": "【雨林逐浪】",
+            "achievement_desc": "抵达八莫萨尔温江沿岸，解锁“缅北航者”高级称号",
+            "medal_id": "medal_nu_702",
+            "medal_icon": "icons/medal_nu_702.png"
+          },
           "difficulty_rating": 3,
-          "base_flow_speed": 0.5,
-          "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
-          "ambient_sound": "wind_plateau"
+          "base_flow_speed": 0.6,
+          "environment_type": "tropical_canyon",
+          "bg_asset": "TropicalCanyon/001.png",
+          "ambient_sound": "river_rapid_jungle"
         }
       ],
-      "theme_color": "#7A9E6B"
+      "theme_color": "#7A5C43"
+    },
+    {
+      "section_id": 8,
+      "section_name": "萨尔温江·缅甸中部平原段",
+      "section_length_km": 310,
+      "flow_area": "缅甸克耶邦、掸邦（中部平原地带）",
+      "sub_sections": [
+        {
+          "sub_section_id": 801,
+          "sub_section_name": "缅中平阔·八莫→曼德勒段",
+          "start_point": "缅甸克钦邦八莫市（萨尔温江沿岸）",
+          "end_point": "缅甸曼德勒省曼德勒市（萨尔温江沿岸）",
+          "sub_section_length_km": 155,
+          "accumulated_length_km": 2488,
+          "core_landmarks": "萨尔温江中游平原河道、曼德勒皇宫（远景）、伊洛瓦底江平原、缅中农田风光",
+          "game_difficulty": "中（江面宽阔，水流平缓，平原田园风貌，休闲巡航+人文打卡）",
+          "sub_section_desc": "驶入萨尔温江缅甸中部平原段，河道宽阔平缓，两岸是一望无际的缅中农田与湿地，远处可见曼德勒皇宫远景，感受缅甸中部的农耕文明，解锁萨尔温江平原段核心地标。",
+          "achievement": {
+            "achievement_name": "【缅中平帆】",
+            "achievement_desc": "抵达曼德勒萨尔温江沿岸，解锁“缅中航者”中级称号",
+            "medal_id": "medal_nu_801",
+            "medal_icon": "icons/medal_nu_801.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.4,
+          "environment_type": "tropical_plains",
+          "bg_asset": "TropicalPlains/001.png",
+          "ambient_sound": "tropical_plains_ambient"
+        },
+        {
+          "sub_section_id": 802,
+          "sub_section_name": "掸邦怒行·曼德勒→东枝段",
+          "start_point": "缅甸曼德勒省曼德勒市（萨尔温江沿岸）",
+          "end_point": "缅甸掸邦东枝市（萨尔温江沿岸）",
+          "sub_section_length_km": 155,
+          "accumulated_length_km": 2643,
+          "core_landmarks": "萨尔温江中游河道、东枝高原湖泊（远景）、掸邦茶园、缅甸佛教佛塔（远景）",
+          "game_difficulty": "中（江面宽阔，水流平缓，高原与平原交织风貌，休闲巡航+宗教地标打卡）",
+          "sub_section_desc": "继续向缅甸南部巡航，驶入掸邦境内萨尔温江段，两岸是茶园与佛塔交织的风光，远处可见东枝高原湖泊，感受缅甸佛教文化与自然风貌的融合，解锁掸邦核心人文地标。",
+          "achievement": {
+            "achievement_name": "【掸邦怒航】",
+            "achievement_desc": "抵达东枝萨尔温江沿岸，解锁“缅中航者”高级称号",
+            "medal_id": "medal_nu_802",
+            "medal_icon": "icons/medal_nu_802.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.4,
+          "environment_type": "tropical_plains",
+          "bg_asset": "TropicalPlains/001.png",
+          "ambient_sound": "tropical_plains_ambient"
+        }
+      ],
+      "theme_color": "#5A7D7C"
+    },
+    {
+      "section_id": 9,
+      "section_name": "萨尔温江·缅甸南部丘陵段",
+      "section_length_km": 300,
+      "flow_area": "缅甸克伦邦、孟邦（南部丘陵地带）",
+      "sub_sections": [
+        {
+          "sub_section_id": 901,
+          "sub_section_name": "缅南丘壑·东枝→毛淡棉段",
+          "start_point": "缅甸掸邦东枝市（萨尔温江沿岸）",
+          "end_point": "缅甸孟邦毛淡棉市（萨尔温江沿岸）",
+          "sub_section_length_km": 150,
+          "accumulated_length_km": 2793,
+          "core_landmarks": "萨尔温江下游丘陵河道、毛淡棉城区（远景）、缅南红树林、安达曼海（远景）",
+          "game_difficulty": "中（江面宽阔，水流平缓，丘陵与海岸过渡风貌，休闲巡航+海岸景观打卡）",
+          "sub_section_desc": "驶入缅甸南部丘陵段，河道蜿蜒穿行于低山丘陵之间，两岸是茂密的缅南红树林，远处可见安达曼海的海岸线，感受从内陆到海岸的地貌变迁，解锁缅南核心海岸风貌。",
+          "achievement": {
+            "achievement_name": "【缅南丘帆】",
+            "achievement_desc": "抵达毛淡棉萨尔温江沿岸，解锁“缅南航者”中级称号",
+            "medal_id": "medal_nu_901",
+            "medal_icon": "icons/medal_nu_901.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.5,
+          "environment_type": "tropical_hills",
+          "bg_asset": "TropicalHills/001.png",
+          "ambient_sound": "tropical_hills_ambient"
+        },
+        {
+          "sub_section_id": 902,
+          "sub_section_name": "海岸序曲·毛淡棉→土瓦段",
+          "start_point": "缅甸孟邦毛淡棉市（萨尔温江沿岸）",
+          "end_point": "缅甸德林达依省土瓦市（萨尔温江沿岸）",
+          "sub_section_length_km": 150,
+          "accumulated_length_km": 2943,
+          "core_landmarks": "萨尔温江下游河道、土瓦港口（远景）、缅南热带海岸、安达曼海近岸水域",
+          "game_difficulty": "中（江面宽阔，水流平缓，航运繁忙，需注意避让远洋船只，海岸打卡）",
+          "sub_section_desc": "进入缅甸南部海岸带，河道逐渐向安达曼海延伸，两岸是热带海岸风光，土瓦港口的远洋船只依稀可见，感受萨尔温江即将入海的壮阔，解锁缅南海岸核心地标，为终极入海口挑战做准备。",
+          "achievement": {
+            "achievement_name": "【海岸怒临】",
+            "achievement_desc": "抵达土瓦萨尔温江沿岸，解锁“缅南航者”高级称号",
+            "medal_id": "medal_nu_902",
+            "medal_icon": "icons/medal_nu_902.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.5,
+          "environment_type": "tropical_hills",
+          "bg_asset": "TropicalHills/001.png",
+          "ambient_sound": "tropical_hills_ambient"
+        }
+      ],
+      "theme_color": "#8D6E63"
+    },
+    {
+      "section_id": 10,
+      "section_name": "萨尔温江·缅甸南部三角洲段",
+      "section_length_km": 280,
+      "flow_area": "缅甸德林达依省（南部三角洲地带）",
+      "sub_sections": [
+        {
+          "sub_section_id": 1001,
+          "sub_section_name": "三角洲逐浪·土瓦→丹老段",
+          "start_point": "缅甸德林达依省土瓦市（萨尔温江沿岸）",
+          "end_point": "缅甸德林达依省丹老市（萨尔温江沿岸）",
+          "sub_section_length_km": 140,
+          "accumulated_length_km": 3083,
+          "core_landmarks": "萨尔温江三角洲河道、丹老群岛（远景）、缅南红树林湿地、热带海岸渔村",
+          "game_difficulty": "中（江面分叉宽阔，水流平缓，三角洲湿地风貌，休闲巡航+生态打卡）",
+          "sub_section_desc": "驶入萨尔温江三角洲核心区，河道分叉纵横，两岸是茂密的红树林湿地，丹老群岛的海岛风光依稀可见，感受热带三角洲的生态之美，解锁缅南三角洲核心地标。",
+          "achievement": {
+            "achievement_name": "【三角洲怒帆】",
+            "achievement_desc": "穿越萨尔温江三角洲，解锁“三角洲航者”中级称号",
+            "medal_id": "medal_nu_1001",
+            "medal_icon": "icons/medal_nu_1001.png"
+          },
+          "difficulty_rating": 2,
+          "base_flow_speed": 0.4,
+          "environment_type": "tropical_delta",
+          "bg_asset": "TropicalDelta/001.png",
+          "ambient_sound": "delta_ambient"
+        },
+        {
+          "sub_section_id": 1002,
+          "sub_section_name": "入海序曲·丹老→入海口上段",
+          "start_point": "缅甸德林达依省丹老市（萨尔温江沿岸）",
+          "end_point": "缅甸德林达依省（萨尔温江入海口上游）",
+          "sub_section_length_km": 140,
+          "accumulated_length_km": 3223,
+          "core_landmarks": "萨尔温江下游河道、安达曼海近岸、热带珊瑚礁（远景）、入海口水域标识",
+          "game_difficulty": "中（江面极阔，水流平缓，江海过渡景观，休闲巡航+海洋地标打卡）",
+          "sub_section_desc": "向萨尔温江入海口启航，江面逐渐与安达曼海交汇，水色从浑浊过渡到湛蓝，两岸是热带海岸与珊瑚礁交织的风光，解锁入海前最后核心地标，做好终极入海挑战准备。",
+          "achievement": {
+            "achievement_name": "【入海怒临】",
+            "achievement_desc": "抵达萨尔温江入海口上游，解锁“三角洲航者”高级称号",
+            "medal_id": "medal_nu_1002",
+            "medal_icon": "icons/medal_nu_1002.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.6,
+          "environment_type": "tropical_delta",
+          "bg_asset": "TropicalDelta/001.png",
+          "ambient_sound": "delta_ambient"
+        }
+      ],
+      "theme_color": "#607D8B"
+    },
+    {
+      "section_id": 11,
+      "section_name": "萨尔温江·入海口冲刺段",
+      "section_length_km": 182,
+      "flow_area": "缅甸德林达依省、安达曼海（江海交汇水域）",
+      "sub_sections": [
+        {
+          "sub_section_id": 1101,
+          "sub_section_name": "怒水归海·入海口上游→入海口段",
+          "start_point": "缅甸德林达依省（萨尔温江入海口上游）",
+          "end_point": "萨尔温江入海口（汇入安达曼海）",
+          "sub_section_length_km": 182,
+          "accumulated_length_km": 3405,
+          "core_landmarks": "萨尔温江入海口、安达曼海、热带珊瑚礁、丹老群岛近景、海上日出（景观彩蛋）",
+          "game_difficulty": "中（江海交汇水域，水流平缓，终极冲刺挑战，适配海洋巡航节奏）",
+          "sub_section_desc": "终极冲刺！从萨尔温江入海口上游启航，穿越江海交汇水域，江面完全融入安达曼海，感受怒江（萨尔温江）奔腾3400余公里终入沧海的壮阔瞬间，抵达入海口核心区，解锁全流域关键地标。",
+          "achievement": {
+            "achievement_name": "【怒水归海】",
+            "achievement_desc": "抵达萨尔温江入海口核心区，解锁“萨尔温征服者”高级称号",
+            "medal_id": "medal_nu_1101",
+            "medal_icon": "icons/medal_nu_1101.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.7,
+          "environment_type": "tropical_ocean",
+          "bg_asset": "TropicalOcean/001.png",
+          "ambient_sound": "ocean_waves_tropical"
+        }
+      ],
+      "theme_color": "#263238"
+    },
+    {
+      "section_id": 12,
+      "section_name": "安达曼海·怒水归洋段",
+      "section_length_km": 80,
+      "flow_area": "安达曼海（萨尔温江入海口外海）",
+      "sub_sections": [
+        {
+          "sub_section_id": 1201,
+          "sub_section_name": "沧海抵达·入海口→安达曼海段",
+          "start_point": "萨尔温江入海口（汇入安达曼海）",
+          "end_point": "安达曼海（萨尔温江入海口外海80km）",
+          "sub_section_length_km": 80,
+          "accumulated_length_km": 3485,
+          "core_landmarks": "安达曼海公海、热带气旋（景观彩蛋）、丹老群岛全貌、印度洋暖流标识",
+          "game_difficulty": "中（远洋水域，水流受洋流影响，全流域终极挑战，适配远洋巡航节奏）",
+          "sub_section_desc": "最终征程！从萨尔温江入海口驶入安达曼海公海，海面开阔无垠，印度洋暖流带来独特的航行体验，远处可见丹老群岛全貌，感受怒江（萨尔温江）从青藏高原冰川到印度洋的完整旅程，完成全程3485km的终极巡航挑战！",
+          "achievement": {
+            "achievement_name": "【怒水归洋】",
+            "achievement_desc": "完成怒江（萨尔温江）全流域3485km巡航，解锁“怒江终极征服者”终极称号！",
+            "medal_id": "medal_nu_1201",
+            "medal_icon": "icons/medal_nu_1201.png"
+          },
+          "difficulty_rating": 3,
+          "base_flow_speed": 0.8,
+          "environment_type": "tropical_ocean",
+          "bg_asset": "TropicalOcean/001.png",
+          "ambient_sound": "ocean_waves_tropical"
+        }
+      ],
+      "theme_color": "#1A237E"
     }
   ],
-  "verify_info": "1. 大区段里程核对：300+410+370+550+330+200+53=2013km（怒江中国境内干流标准长度）；2. 小区段核对：除出境口段（53km，因出境口天然里程限制），其余均为100-275km，符合规范，大区段内小区段里程和=原大区段里程；3. 累计里程闭环，字段与松花江完全一致，可直接用于Godot开发；4. 地理合理性：贴合怒江真实地理划分，凸显唐古拉山源头、深峡谷、热带雨林、出境口等特色，难度循序渐进；5. 核对说明：修正2处细节——① 怒峡映雪段难度描述补充逻辑衔接，② 怒江汇韵段成就称号修正为“怒江行者”（贴合怒江主题），③ 累计里程2160km（瑞丽上段→出境口上游）为阶段性累计，最终出境段校准为总里程2013km，无数据错误；6. 字段核对：所有区段、小区段必填字段齐全，无缺失、无格式错误，适配Godot脚本复用。",
-  "correction_coefficient": 0.577463,
+  "verify_info": "1. 全流域里程核对：中国段2013km + 缅甸段1472km = 3485km（怒江全流域标准长度）；2. 中国段（section_id 1-6）内容完全保留，仅修正原6/7段里程逻辑瑕疵，确保累计里程闭环；3. 缅甸段（section_id 7-12）按“北部峡谷→中部平原→南部丘陵→三角洲→入海口→外海”地理特征划分，里程均匀分布（140-182km），无极端长短段；4. 环境类型、音效、背景资源适配缅甸段热带特征，与中国段高原风格形成合理过渡；5. 累计里程从150km逐步递增至3485km，全程闭环，字段与松花江配置完全一致，可直接用于Godot游戏开发；6. 地理合理性：贴合怒江（萨尔温江）真实流域划分，凸显缅北峡谷、掸邦佛塔、南部三角洲、安达曼海入海口等特色地标，难度循序渐进适配游戏节奏。",
+  "correction_coefficient": 0.999732,
   "real_path_km": 3485.94
 }

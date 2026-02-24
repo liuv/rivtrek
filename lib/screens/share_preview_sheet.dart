@@ -2,14 +2,18 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:rivtrek/constants/share_phrases.dart';
+import 'package:rivtrek/controllers/flow_controller.dart';
 import 'package:rivtrek/models/daily_stats.dart';
 import 'package:rivtrek/providers/challenge_provider.dart';
 import 'package:rivtrek/services/database_service.dart';
 import 'package:rivtrek/widgets/share_card.dart';
 import 'package:rivtrek/providers/user_profile_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 分享预览：展示分享卡片，支持「分享图片」生成截图并调起系统分享
 class SharePreviewSheet extends StatefulWidget {
@@ -19,14 +23,245 @@ class SharePreviewSheet extends StatefulWidget {
   State<SharePreviewSheet> createState() => _SharePreviewSheetState();
 }
 
+const String _prefClosingPhrase = 'share_closing_phrase';
+const String _prefChallengeStartDate = 'challenge_start_date';
+
 class _SharePreviewSheetState extends State<SharePreviewSheet> {
   final GlobalKey _cardKey = GlobalKey();
   RiverPoi? _poi;
+  int? _daysSinceStart;
+  int _selectedPhraseIndex = 0;
+  String _customPhraseText = '';
+  bool _phraseLoaded = false;
+  final TextEditingController _customPhraseController = TextEditingController();
+  final FocusNode _customPhraseFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _customPhraseController.dispose();
+    _customPhraseFocus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadDaysAndPhrase() async {
+    final prefs = await SharedPreferences.getInstance();
+    final startStr = prefs.getString(_prefChallengeStartDate);
+    if (startStr != null && startStr.isNotEmpty) {
+      try {
+        final start = DateFormat('yyyy-MM-dd').parse(startStr);
+        final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        final days = today.difference(start).inDays;
+        if (mounted) setState(() => _daysSinceStart = days >= 0 ? days : 0);
+      } catch (_) {}
+    }
+    final saved = prefs.getString(_prefClosingPhrase);
+    if (saved != null && saved.trim().isNotEmpty) {
+      final idx = kShareClosingPhraseOptions.indexOf(saved.trim());
+      if (mounted) {
+        setState(() {
+          if (idx >= 0) {
+            _selectedPhraseIndex = idx;
+            _customPhraseText = '';
+          } else {
+            _selectedPhraseIndex = -1;
+            _customPhraseText = saved.trim();
+            _customPhraseController.text = _customPhraseText;
+          }
+          _phraseLoaded = true;
+        });
+      }
+      return;
+    }
+    if (mounted) setState(() => _phraseLoaded = true);
+  }
+
+  String get _effectiveClosingPhrase {
+    if (_selectedPhraseIndex >= 0 && _selectedPhraseIndex < kShareClosingPhraseOptions.length) {
+      return kShareClosingPhraseOptions[_selectedPhraseIndex];
+    }
+    return _customPhraseText.trim().isEmpty ? kShareClosingPhraseDefault : _customPhraseText.trim();
+  }
+
+  Future<void> _saveClosingPhrase(String phrase) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefClosingPhrase, phrase);
+  }
 
   void _loadPoi(int numericId, double km) {
     DatabaseService.instance.getNearestPoi(numericId, km).then((p) {
       if (mounted) setState(() => _poi = p);
     });
+  }
+
+  /// 落款：单行展示当前结语 + 笔形编辑图标，弱交互，不编辑也可直接分享
+  Widget _buildClosingPhraseRow(Color themeColor) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showClosingPhrasePicker(themeColor),
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _effectiveClosingPhrase,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: 1.2,
+                    color: const Color(0xFF555555).withOpacity(0.88),
+                    height: 1.35,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                Icons.edit_outlined,
+                size: 18,
+                color: const Color(0xFF888888).withOpacity(0.7),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showClosingPhrasePicker(Color themeColor) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFFFAFAFA),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '落款结语',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black.withOpacity(0.5),
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...List.generate(kShareClosingPhraseOptions.length, (i) {
+                final selected = _selectedPhraseIndex == i;
+                return ListTile(
+                  title: Text(
+                    kShareClosingPhraseOptions[i],
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+                      color: selected ? themeColor : const Color(0xFF333333),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  trailing: selected
+                      ? Icon(Icons.check_rounded, size: 20, color: themeColor)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedPhraseIndex = i;
+                      _saveClosingPhrase(kShareClosingPhraseOptions[i]);
+                    });
+                    Navigator.of(ctx).pop();
+                  },
+                );
+              }),
+              ListTile(
+                title: Text(
+                  '自定义一句',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: _selectedPhraseIndex == -1 ? FontWeight.w500 : FontWeight.w400,
+                    color: _selectedPhraseIndex == -1
+                        ? themeColor
+                        : const Color(0xFF333333),
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                trailing: _selectedPhraseIndex == -1
+                    ? Icon(Icons.check_rounded, size: 20, color: themeColor)
+                    : null,
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _showCustomPhraseDialog(themeColor);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCustomPhraseDialog(Color themeColor) {
+    final controller = TextEditingController(text: _customPhraseText);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          '自定义落款',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: kShareClosingPhraseDefault,
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          ),
+          style: const TextStyle(fontSize: 15),
+          maxLength: 24,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('取消', style: TextStyle(color: Colors.black54)),
+          ),
+          FilledButton(
+            onPressed: () {
+              final v = controller.text.trim();
+              setState(() {
+                _selectedPhraseIndex = -1;
+                _customPhraseText = v.isEmpty ? kShareClosingPhraseDefault : v;
+                _customPhraseController.text = _customPhraseText;
+                _saveClosingPhrase(_customPhraseText);
+              });
+              Navigator.of(ctx).pop();
+            },
+            style: FilledButton.styleFrom(backgroundColor: themeColor),
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _captureAndShare() async {
@@ -61,8 +296,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
           final addr =
               parts.isEmpty ? (_poi!.formattedAddress ?? '') : parts.join(' ');
           final names = _poi!.poisList
-              .map((p) => p.name?.trim())
-              .whereType<String>()
+              .map((p) => p.displayNameWithDirection)
               .where((s) => s.isNotEmpty)
               .take(3)
               .join('、');
@@ -106,11 +340,18 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
     final medalIconPath =
         sub?.medalIcon != null ? 'assets/${sub!.medalIcon}' : null;
 
-    // 打开弹窗时按当前河流 numericId 与里程拉取一次最近 POI（用数字 id 避免字符串匹配问题）
+    // 打开弹窗时按当前河流 numericId 与里程拉取一次最近 POI；并加载开始天数与结语
     if (_poi == null) {
       WidgetsBinding.instance.addPostFrameCallback(
           (_) => _loadPoi(river.numericId, challenge.currentDistance));
     }
+    if (!_phraseLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadDaysAndPhrase());
+    }
+
+    final flowController = context.read<FlowController>();
+    final cumulativeSteps = flowController.cumulativeSteps;
+    final dailySteps = flowController.displaySteps;
 
     final addressParts = _poi != null
         ? [_poi!.province, _poi!.city, _poi!.district, _poi!.township]
@@ -125,8 +366,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
         : null;
     final poiNames = _poi != null
         ? _poi!.poisList
-            .map((p) => p.name?.trim())
-            .whereType<String>()
+            .map((p) => p.displayNameWithDirection)
             .where((s) => s.isNotEmpty)
             .join('、')
         : null;
@@ -166,7 +406,13 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
               poiNames: hasPoiNames ? poiNames : null,
               displayName: profile.displayNameForShare,
               avatarPath: profile.avatarPath,
+              daysSinceStart: _daysSinceStart ?? 0,
+              totalSteps: cumulativeSteps,
+              dailySteps: dailySteps,
+              closingPhrase: _effectiveClosingPhrase,
             ),
+            const SizedBox(height: 12),
+            _buildClosingPhraseRow(river.color),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,

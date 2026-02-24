@@ -10,7 +10,7 @@ const String _keyNickname = 'user_nickname';
 const String _keyAvatarPath = 'user_avatar_path';
 const String _keySignature = 'user_signature';
 const String _defaultNickname = '江河行者';
-const String _defaultSignature = '步履不停，终达江海';
+const String _defaultSignature = '一条江河，一场行走，一次内心的朝圣之旅。';
 
 class UserProfileProvider extends ChangeNotifier {
   String _nickname = _defaultNickname;

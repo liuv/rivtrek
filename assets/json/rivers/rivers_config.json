@@ -33,7 +33,7 @@
       "id": "songhua_river",
       "name": "松花江",
       "description": "北国明珠，穿越林海雪原，感受冰雪与森林的交响。",
-      "total_length_km": 2309,
+      "total_length_km": 1840,
       "theme_color": "#00BCD4",
       "master_json_path": "assets/json/rivers/songhua_river_master.json",
       "points_json_path": "assets/json/rivers/songhua_river_points.json",

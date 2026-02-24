@@ -11,14 +11,16 @@ class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
   static Database? _database;
   static Database? _baseDatabase;
+
   /// 单次初始化，避免多路并发复制 asset/打开导致竞态或重复失败
   static Future<Database?>? _baseDatabaseFuture;
 
   /// 基础数据库文件名，可存 POI、今后其他静态/配置数据等
   static const String _baseDbFileName = 'rivtrek_base.db';
   static const String _baseDbAssetPath = 'assets/db/rivtrek_base.db';
+
   /// 与 asset 中 rivtrek_base.db 对应；更新 POI 并重新打库后请 +1，以便安装/升级后覆盖旧文件
-  static const int _baseDbAssetVersion = 1;
+  static const int _baseDbAssetVersion = 3;
   static const String _prefKeyBaseDbVersion = 'rivtrek_base_asset_version';
 
   DatabaseService._init();
@@ -102,8 +104,10 @@ class DatabaseService {
     if (_baseDatabase != null) return _baseDatabase;
     _baseDatabaseFuture ??= _openBaseDatabaseOnce();
     final db = await _baseDatabaseFuture!;
-    if (db != null) _baseDatabase = db;
-    else _baseDatabaseFuture = null; // 失败时清空，下次调用可重试
+    if (db != null)
+      _baseDatabase = db;
+    else
+      _baseDatabaseFuture = null; // 失败时清空，下次调用可重试
     return db;
   }
 
@@ -114,7 +118,8 @@ class DatabaseService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final storedVersion = prefs.getInt(_prefKeyBaseDbVersion) ?? 0;
-      final needCopy = !file.existsSync() || storedVersion < _baseDbAssetVersion;
+      final needCopy =
+          !file.existsSync() || storedVersion < _baseDbAssetVersion;
 
       if (needCopy) {
         final byteData = await rootBundle.load(_baseDbAssetPath);
@@ -305,7 +310,8 @@ class DatabaseService {
       if (filterByAddress) {
         rows = await db.query(
           'river_pois',
-          where: "numeric_id = ? AND distance_km > ? AND (formatted_address IS NULL OR trim(COALESCE(formatted_address, '')) != ?)",
+          where:
+              "numeric_id = ? AND distance_km > ? AND (formatted_address IS NULL OR trim(COALESCE(formatted_address, '')) != ?)",
           whereArgs: [numericId, accumulatedKm, trimmed],
           orderBy: 'distance_km ASC',
           limit: 1,

@@ -1244,11 +1244,10 @@ class _FlowScreenState extends State<FlowScreen>
     );
   }
 
-  /// 多个 POI 名称用顿号拼接，图标与文字同色且同一行
+  /// 多个 POI 名称用顿号拼接（带方位时文言「X侧 名称」），图标与文字同色且同一行
   List<Widget> _buildPoiNamesRow(List<PoiItem> poisList) {
     final names = poisList
-        .map((p) => p.name?.trim())
-        .whereType<String>()
+        .map((p) => p.displayNameWithDirection)
         .where((s) => s.isNotEmpty)
         .toList();
     if (names.isEmpty) return [];

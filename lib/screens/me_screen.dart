@@ -318,28 +318,36 @@ class MeScreen extends StatelessWidget {
                                   size: 40, color: Color(0xFF888888)),
                         ),
                         const SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile.nickname,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w300,
-                                color: Color(0xFF222222),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                profile.nickname,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w300,
+                                  color: Color(0xFF222222),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Text(
-                              profile.signature,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w300,
-                                color: Color(0xFF888888),
+                              const SizedBox(height: 4),
+                              Text(
+                                profile.signature,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                  color: Color(0xFF888888),
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 8),
                         Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
                       ],
                     ),
