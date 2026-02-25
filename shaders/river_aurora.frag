@@ -15,6 +15,9 @@ uniform float uPath[32];
 uniform float uPulse;
 uniform float uPulseX;
 uniform float uPulseY;
+uniform float uBgR;
+uniform float uBgG;
+uniform float uBgB;
 
 out vec4 fragColor;
 
@@ -90,10 +93,9 @@ void main() {
     float core = exp(-dist * 15.0) * 0.8;
     float outerGlow = exp(-dist * 5.0) * 0.4;
 
-    // 改进后的背景 (深邃夜空 - 移除星星)
-    // 淡淡的星云感
+    // 背景随主题/深色模式，极光风格保留淡淡星云
     float nebula = fbm(uv * 1.5 + uTime * 0.02) * 0.08;
-    vec3 bgColor = vec3(0.01, 0.015, 0.04) + auroraColor * nebula;
+    vec3 bgColor = vec3(uBgR, uBgG, uBgB) + auroraColor * nebula;
 
     // 最终合成
     vec3 riverColor = auroraColor * (auroraStrands + core + outerGlow);

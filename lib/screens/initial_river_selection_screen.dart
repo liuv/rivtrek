@@ -67,20 +67,22 @@ class _InitialRiverSelectionScreenState extends State<InitialRiverSelectionScree
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: cs.surface,
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator(color: cs.primary))
             : Column(
                 children: [
                   const SizedBox(height: 32),
-                  const Text(
+                  Text(
                     '选择你的第一条江河',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
+                      color: cs.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -88,7 +90,7 @@ class _InitialRiverSelectionScreenState extends State<InitialRiverSelectionScree
                     '步履不停，丈量江山',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black.withOpacity(0.4),
+                      color: cs.onSurfaceVariant,
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -115,8 +117,8 @@ class _InitialRiverSelectionScreenState extends State<InitialRiverSelectionScree
                       child: ElevatedButton(
                         onPressed: _onConfirm,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _rivers.isNotEmpty ? _rivers[_currentPage].color : Colors.grey,
-                          foregroundColor: Colors.white,
+                          backgroundColor: _rivers.isNotEmpty ? _rivers[_currentPage].color : cs.surfaceContainerHighest,
+                          foregroundColor: _rivers.isNotEmpty ? Colors.white : cs.onSurface,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                           elevation: 4,
                           shadowColor: _rivers.isNotEmpty ? _rivers[_currentPage].color.withOpacity(0.4) : null,

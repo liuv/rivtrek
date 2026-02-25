@@ -95,6 +95,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
 
   /// 落款：单行展示当前结语 + 笔形编辑图标，弱交互，不编辑也可直接分享
   Widget _buildClosingPhraseRow(Color themeColor) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -111,7 +112,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
                     fontSize: 13,
                     fontWeight: FontWeight.w300,
                     letterSpacing: 1.2,
-                    color: const Color(0xFF555555).withOpacity(0.88),
+                    color: cs.onSurfaceVariant.withValues(alpha: 0.9),
                     height: 1.35,
                   ),
                   maxLines: 1,
@@ -121,7 +122,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
               Icon(
                 Icons.edit_outlined,
                 size: 18,
-                color: const Color(0xFF888888).withOpacity(0.7),
+                color: cs.onSurfaceVariant.withValues(alpha: 0.8),
               ),
             ],
           ),
@@ -134,85 +135,88 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFFFAFAFA),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(2),
+      builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
+        return Container(
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerHigh,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: cs.onSurface.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '落款结语',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black.withOpacity(0.5),
-                  letterSpacing: 1.5,
+                const SizedBox(height: 16),
+                Text(
+                  '落款结语',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: cs.onSurfaceVariant,
+                    letterSpacing: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              ...List.generate(kShareClosingPhraseOptions.length, (i) {
-                final selected = _selectedPhraseIndex == i;
-                return ListTile(
+                const SizedBox(height: 12),
+                ...List.generate(kShareClosingPhraseOptions.length, (i) {
+                  final selected = _selectedPhraseIndex == i;
+                  return ListTile(
+                    title: Text(
+                      kShareClosingPhraseOptions[i],
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+                        color: selected ? themeColor : cs.onSurface,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    trailing: selected
+                        ? Icon(Icons.check_rounded, size: 20, color: themeColor)
+                        : null,
+                    onTap: () {
+                      setState(() {
+                        _selectedPhraseIndex = i;
+                        _saveClosingPhrase(kShareClosingPhraseOptions[i]);
+                      });
+                      Navigator.of(ctx).pop();
+                    },
+                  );
+                }),
+                ListTile(
                   title: Text(
-                    kShareClosingPhraseOptions[i],
+                    '自定义一句',
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
-                      color: selected ? themeColor : const Color(0xFF333333),
+                      fontWeight: _selectedPhraseIndex == -1 ? FontWeight.w500 : FontWeight.w400,
+                      color: _selectedPhraseIndex == -1
+                          ? themeColor
+                          : cs.onSurface,
                       letterSpacing: 0.8,
                     ),
                   ),
-                  trailing: selected
+                  trailing: _selectedPhraseIndex == -1
                       ? Icon(Icons.check_rounded, size: 20, color: themeColor)
                       : null,
                   onTap: () {
-                    setState(() {
-                      _selectedPhraseIndex = i;
-                      _saveClosingPhrase(kShareClosingPhraseOptions[i]);
-                    });
                     Navigator.of(ctx).pop();
+                    _showCustomPhraseDialog(themeColor);
                   },
-                );
-              }),
-              ListTile(
-                title: Text(
-                  '自定义一句',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: _selectedPhraseIndex == -1 ? FontWeight.w500 : FontWeight.w400,
-                    color: _selectedPhraseIndex == -1
-                        ? themeColor
-                        : const Color(0xFF333333),
-                    letterSpacing: 0.8,
-                  ),
                 ),
-                trailing: _selectedPhraseIndex == -1
-                    ? Icon(Icons.check_rounded, size: 20, color: themeColor)
-                    : null,
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  _showCustomPhraseDialog(themeColor);
-                },
-              ),
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -220,34 +224,37 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
     final controller = TextEditingController(text: _customPhraseText);
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          '自定义落款',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
+      builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
+        return AlertDialog(
+          backgroundColor: cs.surfaceContainerHigh,
+          title: Text(
+            '自定义落款',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: cs.onSurface,
+            ),
           ),
-        ),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: kShareClosingPhraseDefault,
-            border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: kShareClosingPhraseDefault,
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            ),
+            style: TextStyle(fontSize: 15, color: cs.onSurface),
+            maxLength: 24,
+            autofocus: true,
           ),
-          style: const TextStyle(fontSize: 15),
-          maxLength: 24,
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('取消', style: TextStyle(color: Colors.black54)),
-          ),
-          FilledButton(
-            onPressed: () {
-              final v = controller.text.trim();
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('取消', style: TextStyle(color: cs.onSurfaceVariant)),
+            ),
+            FilledButton(
+              onPressed: () {
+                final v = controller.text.trim();
               setState(() {
                 _selectedPhraseIndex = -1;
                 _customPhraseText = v.isEmpty ? kShareClosingPhraseDefault : v;
@@ -260,7 +267,8 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
             child: const Text('确定'),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 
@@ -327,10 +335,15 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
     final river = challenge.activeRiver;
 
     if (river == null) {
+      final cs = Theme.of(context).colorScheme;
       return Container(
         padding: const EdgeInsets.all(24),
-        child: const Center(
-          child: Text('请先选择一条江河挑战', style: TextStyle(color: Color(0xFF888888))),
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHigh,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Center(
+          child: Text('请先选择一条江河挑战', style: TextStyle(color: cs.onSurfaceVariant)),
         ),
       );
     }
@@ -372,11 +385,12 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
         : null;
     final hasPoiNames = poiNames != null && poiNames.isNotEmpty;
 
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFAFAFA),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHigh,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         top: false,
@@ -388,7 +402,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: cs.onSurface,
               ),
             ),
             const SizedBox(height: 20),
@@ -422,7 +436,7 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
                 label: const Text('分享图片'),
                 style: FilledButton.styleFrom(
                   backgroundColor: river.color,
-                  foregroundColor: Colors.white,
+                  foregroundColor: cs.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

@@ -7,8 +7,9 @@ class AboutRivtrekScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: cs.surface,
       body: Stack(
         children: [
           SafeArea(
@@ -22,48 +23,52 @@ class AboutRivtrekScreen extends StatelessWidget {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       _buildSectionCard(
+                        context,
                         title: "项目概述",
                         icon: Icons.auto_awesome_outlined,
                         children: [
-                          _paragraph(
+                          _paragraph(context,
                               "涉川 (Walking the River) 是一款文艺、极简的健康运动 App。"),
-                          _paragraph("将每日步行数映射为在地理名川（如长江）上的虚拟徒步距离，步履不停，终达江海。"),
-                          _paragraph(
+                          _paragraph(context,"将每日步行数映射为在地理名川（如长江）上的虚拟徒步距离，步履不停，终达江海。"),
+                          _paragraph(context,
                               "设计风格：Digital Zen（数字禅意）、极简主义、高通透感、磨砂玻璃效果。"),
                         ],
                       ),
                       _buildSectionCard(
+                        context,
                         title: "视觉规范",
                         icon: Icons.palette_outlined,
                         children: [
-                          _bullet("主背景：暖白 #F9F9F9 / 深色模式 #121212"),
-                          _bullet("河流流体：电光青 #00E5FF → 深海蓝 #2979FF 动态渐变"),
-                          _bullet("文字：纤细无衬线体，主色 #333333"),
-                          _bullet("交互：全屏竖排布局，磨砂玻璃菜单与弹出面板"),
+                          _bullet(context,"主背景：暖白 #F9F9F9 / 深色模式 #121212"),
+                          _bullet(context,"河流流体：电光青 #00E5FF → 深海蓝 #2979FF 动态渐变"),
+                          _bullet(context,"文字：纤细无衬线体，主色 #333333"),
+                          _bullet(context,"交互：全屏竖排布局，磨砂玻璃菜单与弹出面板"),
                         ],
                       ),
                       _buildSectionCard(
+                        context,
                         title: "核心功能",
                         icon: Icons.waves_rounded,
                         children: [
-                          _subTitle("动态流体首页"),
-                          _paragraph("步数驱动流体流速，成就增强发光；垂直 S 形流体与 Perlin 噪声动效。"),
-                          _subTitle("步数与地理逻辑"),
-                          _paragraph(
+                          _subTitle(context,"动态流体首页"),
+                          _paragraph(context,"步数驱动流体流速，成就增强发光；垂直 S 形流体与 Perlin 噪声动效。"),
+                          _subTitle(context,"步数与地理逻辑"),
+                          _paragraph(context,
                               "步长约 0.7m 换算里程，按河段难度系数映射；每河多节点，含里程、环境与 Shader 参数。"),
-                          _subTitle("拾遗与成就"),
-                          _paragraph("累计里程达节点时触发拾遗/成就弹窗，极简图标，拾取后飞入背包。"),
+                          _subTitle(context,"拾遗与成就"),
+                          _paragraph(context,"累计里程达节点时触发拾遗/成就弹窗，极简图标，拾取后飞入背包。"),
                         ],
                       ),
                       _buildSectionCard(
+                        context,
                         title: "技术实现",
                         icon: Icons.code_rounded,
                         children: [
-                          _bullet(
+                          _bullet(context,
                               "Flutter：Canvas / CustomPainter、FragmentShader (GLSL)"),
-                          _bullet(
+                          _bullet(context,
                               "状态管理：Provider / Riverpod，shared_preferences 持久化"),
-                          _bullet(
+                          _bullet(context,
                               "传感器：iOS HealthKit、Android Google Fit / Step Counter"),
                         ],
                       ),
@@ -84,22 +89,22 @@ class AboutRivtrekScreen extends StatelessWidget {
                 child: Container(
                   height: 100,
                   padding: const EdgeInsets.only(top: 50, left: 8, right: 8),
-                  color: Colors.white.withOpacity(0.6),
+                  color: cs.surfaceContainerHighest.withValues(alpha: 0.7),
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_rounded,
-                            size: 20, color: Color(0xFF555555)),
+                        icon: Icon(Icons.arrow_back_ios_rounded,
+                            size: 20, color: cs.onSurfaceVariant),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           "关于涉川",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF222222),
+                            color: cs.onSurface,
                           ),
                         ),
                       ),
@@ -116,6 +121,7 @@ class AboutRivtrekScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 80, 24, 32),
       child: Column(
@@ -123,26 +129,26 @@ class AboutRivtrekScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF00E5FF), Color(0xFF2979FF)],
+              gradient: LinearGradient(
+                colors: [cs.primary, cs.tertiary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF2979FF).withOpacity(0.25),
+                  color: cs.primary.withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
               ],
             ),
-            child: const Text(
+            child: Text(
               "一条江河，一场行走，一次内心的朝圣之旅。",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
-                color: Colors.white,
+                color: cs.onPrimary,
                 letterSpacing: 0.5,
               ),
             ),
@@ -153,7 +159,7 @@ class AboutRivtrekScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w300,
-              color: Colors.black.withOpacity(0.45),
+              color: cs.onSurfaceVariant,
             ),
           ),
         ],
@@ -161,20 +167,22 @@ class AboutRivtrekScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionCard({
+  Widget _buildSectionCard(
+    BuildContext context, {
     required String title,
     required IconData icon,
     required List<Widget> children,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: cs.shadow.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -189,18 +197,18 @@ class AboutRivtrekScreen extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withOpacity(0.15),
+                  color: cs.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, size: 20, color: const Color(0xFF0097A7)),
+                child: Icon(icon, size: 20, color: cs.primary),
               ),
               const SizedBox(width: 12),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF222222),
+                  color: cs.onSurface,
                 ),
               ),
             ],
@@ -212,22 +220,24 @@ class AboutRivtrekScreen extends StatelessWidget {
     );
   }
 
-  Widget _paragraph(String text) {
+  Widget _paragraph(BuildContext context, String text) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           height: 1.55,
           fontWeight: FontWeight.w300,
-          color: Color(0xFF555555),
+          color: cs.onSurfaceVariant,
         ),
       ),
     );
   }
 
-  Widget _bullet(String text) {
+  Widget _bullet(BuildContext context, String text) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -238,8 +248,8 @@ class AboutRivtrekScreen extends StatelessWidget {
             child: Container(
               width: 5,
               height: 5,
-              decoration: const BoxDecoration(
-                color: Color(0xFF00E5FF),
+              decoration: BoxDecoration(
+                color: cs.primary,
                 shape: BoxShape.circle,
               ),
             ),
@@ -247,11 +257,11 @@ class AboutRivtrekScreen extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 height: 1.5,
                 fontWeight: FontWeight.w300,
-                color: Color(0xFF555555),
+                color: cs.onSurfaceVariant,
               ),
             ),
           ),
@@ -260,15 +270,16 @@ class AboutRivtrekScreen extends StatelessWidget {
     );
   }
 
-  Widget _subTitle(String text) {
+  Widget _subTitle(BuildContext context, String text) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 4),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF333333),
+          color: cs.onSurface,
         ),
       ),
     );

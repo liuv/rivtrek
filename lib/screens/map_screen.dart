@@ -153,6 +153,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final challenge = context.watch<ChallengeProvider>();
     
     if (_loadedRiverId != challenge.activeRiver?.id) {
@@ -266,28 +267,29 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildMapProviderChip(),
+                _buildMapProviderChip(context),
                 const SizedBox(height: 8),
                 FloatingActionButton(
                   mini: true,
-                  backgroundColor: Colors.white.withOpacity(0.8),
+                  backgroundColor: cs.surfaceContainerHigh.withValues(alpha: 0.95),
                   onPressed: () => setState(() => isSatellite = !isSatellite),
-                  child: Icon(isSatellite ? Icons.map : Icons.satellite_alt, color: Colors.black87),
+                  child: Icon(isSatellite ? Icons.map : Icons.satellite_alt, color: cs.onSurface),
                 ),
               ],
             ),
           ),
 
-          _buildHeader(challenge.activeRiver?.name ?? "徒步地图"),
+          _buildHeader(context, challenge.activeRiver?.name ?? "徒步地图"),
           if (selectedSubSectionIdx != -1) _buildSectionInfo(),
         ],
       ),
     );
   }
 
-  Widget _buildMapProviderChip() {
+  Widget _buildMapProviderChip(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
-      color: Colors.white.withOpacity(0.8),
+      color: cs.surfaceContainerHigh.withValues(alpha: 0.95),
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: () => setState(() {
@@ -299,9 +301,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(mapProvider == MapProvider.tianditu ? Icons.public : Icons.map, size: 18, color: Colors.black87),
+              Icon(mapProvider == MapProvider.tianditu ? Icons.public : Icons.map, size: 18, color: cs.onSurface),
               const SizedBox(width: 6),
-              Text(mapProvider == MapProvider.tianditu ? '天地图' : '高德', style: const TextStyle(fontSize: 13, color: Colors.black87)),
+              Text(mapProvider == MapProvider.tianditu ? '天地图' : '高德', style: TextStyle(fontSize: 13, color: cs.onSurface)),
             ],
           ),
         ),
@@ -352,94 +354,98 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
     return Positioned(
       top: 110,
-      left: 20, right: 20,
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutQuint,
-        tween: Tween(begin: 0.0, end: 1.0),
-        builder: (context, value, child) {
-          return Transform.translate(
-            offset: Offset(0, -20 * (1 - value)),
-            child: Opacity(opacity: value, child: child),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              )
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          left: 20, right: 20,
+      child: Builder(
+        builder: (ctx) {
+          final csc = Theme.of(ctx).colorScheme;
+          final t = target!;
+          return TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutQuint,
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, -20 * (1 - value)),
+                child: Opacity(opacity: value, child: child),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: csc.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: csc.shadow.withValues(alpha: 0.12),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  )
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildBadgeIcon(target),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildBadgeIcon(t),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Expanded(child: Text(target.subSectionName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600))),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              icon: const Icon(Icons.close, size: 18, color: Colors.black26),
-                              onPressed: () => setState(() => selectedSubSectionIdx = -1),
+                            Row(
+                              children: [
+                                Expanded(child: Text(t.subSectionName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: csc.onSurface))),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  icon: Icon(Icons.close, size: 18, color: csc.onSurface.withValues(alpha: 0.5)),
+                                  onPressed: () => setState(() => selectedSubSectionIdx = -1),
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 4),
+                            Text("${t.startPoint} → ${t.endPoint}", style: TextStyle(fontSize: 12, color: csc.onSurfaceVariant)),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text("${target.startPoint} → ${target.endPoint}", style: const TextStyle(fontSize: 12, color: Colors.black45)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(target.subSectionDesc, style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.6), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
-              ),
-              const SizedBox(height: 16),
-              const Divider(height: 1, color: Colors.black12),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // 上一段按钮
-                  IconButton(
-                    onPressed: subIdx > 0 ? () => setState(() => selectedSubSectionIdx--) : null,
-                    icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: subIdx > 0 ? Colors.black87 : Colors.black12),
-                  ),
-                  Row(
-                    children: [
-                      _buildInfoTag("${target.subSectionLengthKm}km", Colors.blue),
-                      const SizedBox(width: 8),
-                      _buildInfoTag("累计 ${target.accumulatedLengthKm}km", Colors.green),
+                      ),
                     ],
                   ),
-                  // 下一段按钮
-                  IconButton(
-                    onPressed: subIdx < allFlattened.length - 1 ? () => setState(() => selectedSubSectionIdx++) : null,
-                    icon: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: subIdx < allFlattened.length - 1 ? Colors.black87 : Colors.black12),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(t.subSectionDesc, style: TextStyle(fontSize: 13, color: csc.onSurface.withValues(alpha: 0.7), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(height: 1, color: csc.outline.withValues(alpha: 0.2)),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: subIdx > 0 ? () => setState(() => selectedSubSectionIdx--) : null,
+                        icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: subIdx > 0 ? csc.onSurface : csc.onSurface.withValues(alpha: 0.2)),
+                      ),
+                      Row(
+                        children: [
+                          _buildInfoTag("${t.subSectionLengthKm}km", csc.primary),
+                          const SizedBox(width: 8),
+                          _buildInfoTag("累计 ${t.accumulatedLengthKm}km", csc.tertiary),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: subIdx < allFlattened.length - 1 ? () => setState(() => selectedSubSectionIdx++) : null,
+                        icon: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: subIdx < allFlattened.length - 1 ? csc.onSurface : csc.onSurface.withValues(alpha: 0.2)),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -503,7 +509,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildHeader(String title) {
+  Widget _buildHeader(BuildContext context, String title) {
+    final cs = Theme.of(context).colorScheme;
     return Positioned(
       top: 0, left: 0, right: 0,
       child: ClipRect(
@@ -512,8 +519,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           child: Container(
             height: 100,
             padding: const EdgeInsets.only(top: 50, left: 25),
-            color: Colors.white.withOpacity(0.4),
-            child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+            color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+            child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: cs.onSurface)),
           ),
         ),
       ),

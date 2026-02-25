@@ -33,9 +33,10 @@ void _showMedalFullScreen(
 }) {
   if (medals.isEmpty) return;
   final index = initialIndex.clamp(0, medals.length - 1);
+  final cs = Theme.of(context).colorScheme;
   showGeneralDialog<void>(
     context: context,
-    barrierColor: Colors.black87,
+    barrierColor: cs.scrim.withValues(alpha: 0.9),
     barrierDismissible: true,
     barrierLabel: '关闭',
     transitionDuration: const Duration(milliseconds: 200),
@@ -81,6 +82,7 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final medals = widget.medals;
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -103,11 +105,11 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: cs.surfaceContainerHigh,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: cs.shadow.withValues(alpha: 0.25),
                                 blurRadius: 24,
                                 offset: const Offset(0, 8),
                               ),
@@ -123,10 +125,10 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                                   width: 220,
                                   height: 220,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
+                                  errorBuilder: (_, __, ___) => Icon(
                                     Icons.military_tech_outlined,
                                     size: 120,
-                                    color: Colors.black26,
+                                    color: cs.onSurface.withValues(alpha: 0.26),
                                   ),
                                 )
                               else
@@ -137,10 +139,10 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                                     width: 220,
                                     height: 220,
                                     fit: BoxFit.contain,
-                                    errorBuilder: (_, __, ___) => const Icon(
+                                    errorBuilder: (_, __, ___) => Icon(
                                       Icons.military_tech_outlined,
                                       size: 120,
-                                      color: Colors.black26,
+                                      color: cs.onSurface.withValues(alpha: 0.26),
                                     ),
                                   ),
                                 ),
@@ -151,13 +153,13 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                                     child: Container(
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: Colors.black38,
+                                        color: cs.onSurface.withValues(alpha: 0.5),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.lock_outline_rounded,
                                         size: 48,
-                                        color: Colors.white,
+                                        color: cs.surface,
                                       ),
                                     ),
                                   ),
@@ -171,20 +173,20 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(vertical: 10),
                                     decoration: BoxDecoration(
-                                      color: Colors.black54,
+                                      color: cs.onSurface.withValues(alpha: 0.6),
                                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.lock_outline_rounded, size: 18, color: Colors.white.withOpacity(0.95)),
+                                        Icon(Icons.lock_outline_rounded, size: 18, color: cs.surface.withValues(alpha: 0.95)),
                                         const SizedBox(width: 6),
                                         Text(
                                           "未解锁",
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.white.withOpacity(0.95),
+                                            color: cs.surface.withValues(alpha: 0.95),
                                           ),
                                         ),
                                       ],
@@ -200,10 +202,10 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                           child: Text(
                             item.sectionName,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
-                              color: Colors.white,
+                              color: cs.onInverseSurface,
                             ),
                           ),
                         ),
@@ -214,7 +216,7 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                               "尚未解锁",
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.white.withOpacity(0.7),
+                                color: cs.onInverseSurface.withValues(alpha: 0.8),
                               ),
                             ),
                           ),
@@ -236,7 +238,7 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
                       '${_currentPage + 1} / ${medals.length}',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.9),
+                        color: cs.onInverseSurface.withValues(alpha: 0.9),
                       ),
                     ),
                 ],
@@ -246,7 +248,7 @@ class _MedalFullScreenViewState extends State<_MedalFullScreenView> {
               top: 8,
               right: 16,
               child: IconButton(
-                icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
+                icon: Icon(Icons.close_rounded, color: cs.onInverseSurface, size: 28),
                 onPressed: widget.onClose,
               ),
             ),
@@ -262,11 +264,12 @@ class MeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final challenge = context.watch<ChallengeProvider>();
     final profile = context.watch<UserProfileProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: cs.surface,
       body: Stack(
         children: [
           // Background subtle decoration or gradient could go here
@@ -294,11 +297,11 @@ class MeScreen extends StatelessWidget {
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: cs.surfaceContainerHigh,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
+                                  color: cs.shadow.withValues(alpha: 0.06),
                                   blurRadius: 20,
                                   offset: const Offset(0, 10),
                                 ),
@@ -314,8 +317,8 @@ class MeScreen extends StatelessWidget {
                                       fit: BoxFit.cover,
                                     ),
                                   )
-                              : const Icon(Icons.person_outline_rounded,
-                                  size: 40, color: Color(0xFF888888)),
+                              : Icon(Icons.person_outline_rounded,
+                                  size: 40, color: cs.onSurfaceVariant),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -325,10 +328,10 @@ class MeScreen extends StatelessWidget {
                             children: [
                               Text(
                                 profile.nickname,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w300,
-                                  color: Color(0xFF222222),
+                                  color: cs.onSurface,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -336,10 +339,10 @@ class MeScreen extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 profile.signature,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w300,
-                                  color: Color(0xFF888888),
+                                  color: cs.onSurfaceVariant,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -348,33 +351,34 @@ class MeScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
+                        Icon(Icons.chevron_right_rounded, color: cs.onSurfaceVariant),
                       ],
                     ),
                   ),
                 ),
                   const SizedBox(height: 50),
                   // Stats Section
-                  _buildStatItem("当前挑战", challenge.activeRiver?.name ?? "未选择",
+                  _buildStatItem(context, "当前挑战", challenge.activeRiver?.name ?? "未选择",
                       Icons.explore_outlined),
-                  _buildStatItem(
+                  _buildStatItem(context,
                       "累计徒步",
                       "${challenge.currentDistance.toStringAsFixed(1)} km",
                       Icons.auto_awesome_outlined),
-                  _buildStatItem(
+                  _buildStatItem(context,
                       "解锁河段",
                       "${challenge.allSubSections.indexWhere((s) => s.name == challenge.currentSubSection?.name) + 1} / ${challenge.allSubSections.length}",
                       Icons.waves_rounded),
-                  _buildStatItem("收集物件", "12 个", Icons.inventory_2_outlined),
+                  _buildStatItem(context, "收集物件", "12 个", Icons.inventory_2_outlined),
                   const SizedBox(height: 40),
 
                   // 勋章成就墙
-                  const Text(
+                  Text(
                     "江河勋章",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
-                        letterSpacing: 0.5),
+                        letterSpacing: 0.5,
+                        color: cs.onSurface),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -406,63 +410,66 @@ class MeScreen extends StatelessWidget {
                               if (challenge.allSubSections[i].medalIcon != null) initialIndex++;
                             _showMedalFullScreen(context, medals: medalItems, initialIndex: initialIndex);
                           },
-                          child: Container(
-                            width: 80,
-                            margin: const EdgeInsets.only(right: 15),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.02),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
+                          child: Builder(
+                            builder: (ctx) {
+                              final csc = Theme.of(ctx).colorScheme;
+                              return Container(
+                                width: 80,
+                                margin: const EdgeInsets.only(right: 15),
+                                decoration: BoxDecoration(
+                                  color: csc.surfaceContainerHigh,
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: csc.shadow.withValues(alpha: 0.04),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              clipBehavior: Clip.none,
-                              children: [
-                                if (medalIcon != null)
-                                  isUnlocked
-                                      ? Image.asset(
-                                          'assets/$medalIcon',
-                                          width: 50,
-                                          height: 50,
-                                          errorBuilder: (context, error, stackTrace) =>
-                                              const Icon(Icons.military_tech_outlined, color: Colors.black12),
-                                        )
-                                      : Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // 灰度 + 压低亮度，保留轮廓但增加神秘感
-                                            Opacity(
-                                              opacity: 0.35,
-                                              child: ColorFiltered(
-                                                colorFilter: _kMedalGrayscaleFilter,
-                                                child: Image.asset(
-                                                  'assets/$medalIcon',
-                                                  width: 50,
-                                                  height: 50,
-                                                  errorBuilder: (context, error, stackTrace) =>
-                                                      const Icon(Icons.military_tech_outlined, color: Colors.black12),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    if (medalIcon != null)
+                                      isUnlocked
+                                          ? Image.asset(
+                                              'assets/$medalIcon',
+                                              width: 50,
+                                              height: 50,
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  Icon(Icons.military_tech_outlined, color: csc.onSurface.withValues(alpha: 0.12)),
+                                            )
+                                          : Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Opacity(
+                                                  opacity: 0.35,
+                                                  child: ColorFiltered(
+                                                    colorFilter: _kMedalGrayscaleFilter,
+                                                    child: Image.asset(
+                                                      'assets/$medalIcon',
+                                                      width: 50,
+                                                      height: 50,
+                                                      errorBuilder: (context, error, stackTrace) =>
+                                                          Icon(Icons.military_tech_outlined, color: csc.onSurface.withValues(alpha: 0.12)),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                            // 徽章上居中锁图标
-                                            Icon(Icons.lock_outline_rounded, size: 22, color: Colors.black54),
-                                          ],
-                                        )
-                                else
-                                  const Icon(Icons.military_tech_outlined, color: Colors.black12),
-                                if (!isUnlocked && medalIcon != null)
-                                  Positioned(
-                                    bottom: 2,
-                                    child: Text("未解锁", style: TextStyle(fontSize: 9, color: Colors.black45)),
-                                  ),
-                              ],
-                            ),
+                                                Icon(Icons.lock_outline_rounded, size: 22, color: csc.onSurface.withValues(alpha: 0.54)),
+                                              ],
+                                            )
+                                    else
+                                      Icon(Icons.military_tech_outlined, color: csc.onSurface.withValues(alpha: 0.12)),
+                                    if (!isUnlocked && medalIcon != null)
+                                      Positioned(
+                                        bottom: 2,
+                                        child: Text("未解锁", style: TextStyle(fontSize: 9, color: csc.onSurface.withValues(alpha: 0.45))),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
@@ -470,10 +477,10 @@ class MeScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 40),
-                  const Divider(color: Color(0xFFEEEEEE)),
+                  Divider(color: cs.outline.withValues(alpha: 0.2)),
                   const SizedBox(height: 20),
                   // Settings/Menu
-                  _buildMenuItem("分享进度", Icons.share_rounded, onTap: () {
+                  _buildMenuItem(context, "分享进度", Icons.share_rounded, onTap: () {
                     showModalBottomSheet<void>(
                       context: context,
                       backgroundColor: Colors.transparent,
@@ -481,7 +488,7 @@ class MeScreen extends StatelessWidget {
                       builder: (ctx) => const SharePreviewSheet(),
                     );
                   }),
-                  _buildMenuItem("挑战记录", Icons.history_rounded, onTap: () {
+                  _buildMenuItem(context, "挑战记录", Icons.history_rounded, onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -489,14 +496,14 @@ class MeScreen extends StatelessWidget {
                       ),
                     );
                   }),
-                  _buildMenuItem("应用设置", Icons.settings_outlined, onTap: () {
+                  _buildMenuItem(context, "应用设置", Icons.settings_outlined, onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const SettingsScreen()),
                     );
                   }),
-                  _buildMenuItem("关于涉川", Icons.info_outline_rounded, onTap: () {
+                  _buildMenuItem(context, "关于涉川", Icons.info_outline_rounded, onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -504,7 +511,7 @@ class MeScreen extends StatelessWidget {
                       ),
                     );
                   }),
-                  _buildMenuItem("退出登录", Icons.logout_rounded),
+                  _buildMenuItem(context, "退出登录", Icons.logout_rounded),
                   const SizedBox(height: 120), // Padding for bottom nav
                 ],
               ),
@@ -521,13 +528,13 @@ class MeScreen extends StatelessWidget {
                 child: Container(
                   height: 100,
                   padding: const EdgeInsets.only(top: 50, left: 25),
-                  color: Colors.white.withOpacity(0.4),
-                  child: const Text(
+                  color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+                  child: Text(
                     "个人中心",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF222222),
+                      color: cs.onSurface,
                     ),
                   ),
                 ),
@@ -539,17 +546,18 @@ class MeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String title, String value, IconData icon) {
+  Widget _buildStatItem(BuildContext context, String title, String value, IconData icon) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 25),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cs.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: cs.shadow.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -557,23 +565,23 @@ class MeScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 24, color: const Color(0xFF0097A7)),
+            Icon(icon, size: 24, color: cs.primary),
             const SizedBox(width: 20),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w300,
-                color: Color(0xFF555555),
+                color: cs.onSurfaceVariant,
               ),
             ),
             const Spacer(),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF222222),
+                color: cs.onSurface,
               ),
             ),
           ],
@@ -582,26 +590,27 @@ class MeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(String title, IconData icon, {VoidCallback? onTap}) {
+  Widget _buildMenuItem(BuildContext context, String title, IconData icon, {VoidCallback? onTap}) {
+    final cs = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Row(
           children: [
-            Icon(icon, size: 22, color: const Color(0xFF888888)),
+            Icon(icon, size: 22, color: cs.onSurfaceVariant),
             const SizedBox(width: 15),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w300,
-                color: Color(0xFF555555),
+                color: cs.onSurfaceVariant,
               ),
             ),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios_rounded,
-                size: 14, color: Color(0xFFCCCCCC)),
+            Icon(Icons.arrow_forward_ios_rounded,
+                size: 14, color: cs.outline),
           ],
         ),
       ),

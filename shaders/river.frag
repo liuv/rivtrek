@@ -18,6 +18,9 @@ uniform float uPath[32];    // 真实路径偏移数据
 uniform float uPulse;       // 脉冲进度 (0.0 - 1.0)
 uniform float uPulseX;      // 脉冲中心 X (UV 坐标)
 uniform float uPulseY;      // 脉冲中心 Y
+uniform float uBgR;         // 背景色 R（0~1），随主题/深色模式
+uniform float uBgG;         // 背景色 G
+uniform float uBgB;         // 背景色 B
 
 out vec4 fragColor;
 
@@ -139,12 +142,11 @@ void main() {
     riverColor = mix(riverColor, coreColor, core);
 
     // ============================================================
-    // 6. 背景
-    //    0.02  —— 【可调】纸质噪点强度，建议 0.01~0.03
-    //    0.97,0.97,0.96 —— 【可调】背景色 RGB
+    // 6. 背景（由 Dart 传入 uBgR/uBgG/uBgB，随深色模式切换）
+    //    0.02  —— 【可调】纸质噪点强度
     // ============================================================
     float grain = (hash(uv + uTime * 0.01) - 0.5) * 0.02;
-    vec3 bgColor = vec3(0.97, 0.97, 0.96) + grain;
+    vec3 bgColor = vec3(uBgR, uBgG, uBgB) + grain;
 
     // ============================================================
     //    1.3   —— 【可调】strands 对最终可见度的放大系数

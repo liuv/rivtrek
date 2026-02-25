@@ -67,11 +67,12 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       height: size.height * 0.85,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: cs.surfaceContainerHigh.withValues(alpha: 0.98),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: ClipRRect(
@@ -79,7 +80,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: _isLoading 
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator(color: cs.primary))
             : Column(
                 children: [
                   const SizedBox(height: 12),
@@ -87,17 +88,18 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.black12,
+                      color: cs.onSurface.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   const SizedBox(height: 40),
-                  const Text(
+                  Text(
                     "切换挑战线路",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
+                      color: cs.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -105,7 +107,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
                     "步履不停，丈量江山",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black.withOpacity(0.4),
+                      color: cs.onSurfaceVariant,
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -213,7 +215,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
                           ),
                         ),
                         if (context.watch<ChallengeProvider>().activeRiver?.id == river.id)
-                          const Icon(Icons.check_circle_rounded, color: Colors.greenAccent, size: 28),
+                          Icon(Icons.check_circle_rounded, color: Theme.of(context).colorScheme.primary, size: 28),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -268,6 +270,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
   }
 
   Widget _buildActionButton() {
+    final cs = Theme.of(context).colorScheme;
     final activeRiverId = context.watch<ChallengeProvider>().activeRiver?.id;
     final selectedRiver = _rivers[_currentPage];
     final isCurrent = activeRiverId == selectedRiver.id;
@@ -287,7 +290,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
         child: Container(
           height: 60,
           decoration: BoxDecoration(
-            color: isCurrent ? Colors.grey[200] : selectedRiver.color,
+            color: isCurrent ? cs.surfaceContainerHighest : selectedRiver.color,
             borderRadius: BorderRadius.circular(30),
             boxShadow: isCurrent ? [] : [
               BoxShadow(
@@ -301,7 +304,7 @@ class _RiverSelectorSheetState extends State<RiverSelectorSheet> {
             child: Text(
               isCurrent ? "正在挑战中" : "开启 ${selectedRiver.name} 挑战",
               style: TextStyle(
-                color: isCurrent ? Colors.black38 : Colors.white,
+                color: isCurrent ? cs.onSurfaceVariant : Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),

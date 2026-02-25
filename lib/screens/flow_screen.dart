@@ -16,6 +16,7 @@ import 'dart:math' as math;
 import '../models/flow_models.dart';
 import '../controllers/flow_controller.dart';
 import '../providers/challenge_provider.dart';
+import '../providers/theme_provider.dart';
 import '../models/river_section.dart';
 import '../services/river_drift_service.dart';
 import '../services/ambient_audio_service.dart';
@@ -598,7 +599,7 @@ class _FlowScreenState extends State<FlowScreen>
   Future<void> _showBlessingInputDialog(Size size) async {
     final text = await showDialog<String>(
       context: context,
-      barrierColor: Colors.black26,
+      barrierColor: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.5),
       builder: (ctx) => _RitualTextInputDialog(
         title: '临川祈愿',
         hint: '八字以内，写下祈福',
@@ -617,14 +618,16 @@ class _FlowScreenState extends State<FlowScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
+      builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
+        return Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.96),
+          color: cs.surfaceContainerHigh.withValues(alpha: 0.98),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(color: const Color(0xFF222222).withOpacity(0.06)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.08)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: cs.shadow.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -641,7 +644,7 @@ class _FlowScreenState extends State<FlowScreen>
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF222222).withOpacity(0.12),
+                    color: cs.onSurface.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -652,7 +655,7 @@ class _FlowScreenState extends State<FlowScreen>
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                     letterSpacing: 3,
-                    color: const Color(0xFF222222).withOpacity(0.5),
+                    color: cs.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -703,7 +706,8 @@ class _FlowScreenState extends State<FlowScreen>
             ),
           ),
         ),
-      ),
+      );
+      },
     );
   }
 
@@ -714,6 +718,7 @@ class _FlowScreenState extends State<FlowScreen>
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final cs = Theme.of(ctx).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -727,10 +732,10 @@ class _FlowScreenState extends State<FlowScreen>
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF222222).withOpacity(0.06),
+                  color: cs.onSurface.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, size: 22, color: const Color(0xFF222222).withOpacity(0.65)),
+                child: Icon(icon, size: 22, color: cs.onSurface.withValues(alpha: 0.65)),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -740,10 +745,10 @@ class _FlowScreenState extends State<FlowScreen>
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF222222),
+                        color: cs.onSurface,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -753,14 +758,14 @@ class _FlowScreenState extends State<FlowScreen>
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFF222222).withOpacity(0.45),
+                        color: cs.onSurface.withValues(alpha: 0.45),
                         letterSpacing: 0.3,
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, size: 20, color: const Color(0xFF222222).withOpacity(0.25)),
+              Icon(Icons.chevron_right_rounded, size: 20, color: cs.onSurface.withValues(alpha: 0.25)),
             ],
           ),
         ),
@@ -857,26 +862,29 @@ class _FlowScreenState extends State<FlowScreen>
     final weatherType = _mapWeatherCode(controller.wmoCode);
     showDialog(
         context: context,
-        builder: (c) => AlertDialog(
-              backgroundColor: Colors.white.withOpacity(0.9),
+        builder: (c) {
+          final cs = Theme.of(c).colorScheme;
+          return AlertDialog(
+              backgroundColor: cs.surfaceContainerHigh,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25)),
-              title: const Text("环境详情",
-                  style: TextStyle(fontWeight: FontWeight.w300)),
+              title: Text("环境详情",
+                  style: TextStyle(fontWeight: FontWeight.w300, color: cs.onSurface)),
               content: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 18, color: Colors.blueGrey),
+                        Icon(Icons.location_on_outlined,
+                            size: 18, color: cs.primary),
                         const SizedBox(width: 8),
                         Expanded(
                             child: Text("${controller.cityName}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w400))),
+                                    fontWeight: FontWeight.w400,
+                                    color: cs.onSurface))),
                       ],
                     ),
                     Padding(
@@ -885,44 +893,46 @@ class _FlowScreenState extends State<FlowScreen>
                         "经纬度: ${controller.lat.toStringAsFixed(4)}, ${controller.lon.toStringAsFixed(4)}",
                         style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            color: cs.onSurfaceVariant,
                             fontFamily: 'monospace'),
                       ),
                     ),
                     const Divider(height: 30),
-                    _buildWeatherRow(weatherType.icon, "当前天气",
+                    _buildWeatherRow(c, weatherType.icon, "当前天气",
                         "${controller.temp} (${weatherType.label})"),
-                    _buildWeatherRow(Icons.thermostat_outlined, "体感温度",
+                    _buildWeatherRow(c, Icons.thermostat_outlined, "体感温度",
                         controller.apparentTemp),
-                    _buildWeatherRow(Icons.wb_sunny_outlined, "今日温差",
+                    _buildWeatherRow(c, Icons.wb_sunny_outlined, "今日温差",
                         "${controller.minTemp} ~ ${controller.maxTemp}"),
-                    _buildWeatherRow(Icons.air_rounded, "实时风速",
+                    _buildWeatherRow(c, Icons.air_rounded, "实时风速",
                         "${controller.windSpeed} km/h"),
-                    _buildWeatherRow(
+                    _buildWeatherRow(c,
                         Icons.water_drop_outlined, "相对湿度", controller.humidity),
-                    _buildWeatherRow(Icons.cloud_circle_outlined, "空气质量",
+                    _buildWeatherRow(c, Icons.cloud_circle_outlined, "空气质量",
                         "AQI ${controller.aqi} (PM2.5: ${controller.pm2_5})"),
                   ]),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.pop(c), child: const Text("确定"))
+                    onPressed: () => Navigator.pop(c), child: Text("确定", style: TextStyle(color: cs.primary)))
               ],
-            ));
+            );
+        });
   }
 
-  Widget _buildWeatherRow(IconData icon, String label, String value) {
+  Widget _buildWeatherRow(BuildContext context, IconData icon, String label, String value) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.blueGrey.shade700),
+          Icon(icon, size: 20, color: cs.onSurfaceVariant),
           const SizedBox(width: 12),
           Text(label,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14)),
           const Spacer(),
           Text(value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+              style: TextStyle(
+                  fontWeight: FontWeight.w500, fontSize: 14, color: cs.onSurface)),
         ],
       ),
     );
@@ -1014,7 +1024,10 @@ class _FlowScreenState extends State<FlowScreen>
                       settings.turbulence + ((sub?.difficulty ?? 3) * 0.1),
                   width: settings.width + ((sub?.baseFlowSpeed ?? 0.5) * 0.02),
                   speed: settings.speed + ((sub?.baseFlowSpeed ?? 0.5) * 0.1),
-                  themeColor: sub?.color ?? Colors.blue,
+                  themeColor: context.watch<ThemeProvider>().useThemeColorForRiver
+                      ? Theme.of(context).colorScheme.primary
+                      : (sub?.color ?? Colors.blue),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   offset: _visualDistance / 10.0,
                   pulse: _pulseController.value,
                   pulseX: _pulseCenter.dx,
@@ -1246,16 +1259,15 @@ class _FlowScreenState extends State<FlowScreen>
 
   /// 多个 POI 名称用顿号拼接（带方位时文言「X侧 名称」），图标与文字同色且同一行
   List<Widget> _buildPoiNamesRow(List<PoiItem> poisList) {
+    final cs = Theme.of(context).colorScheme;
     final names = poisList
         .map((p) => p.displayNameWithDirection)
         .where((s) => s.isNotEmpty)
         .toList();
     if (names.isEmpty) return [];
     final label = names.join('、');
-    const textColor = Color(0xFF555555);
-    const textOpacity = 0.9;
     final style = TextStyle(
-      color: textColor.withOpacity(textOpacity),
+      color: cs.onSurfaceVariant.withValues(alpha: 0.9),
       fontSize: 13,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.3,
@@ -1269,7 +1281,7 @@ class _FlowScreenState extends State<FlowScreen>
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: Icon(Icons.explore_rounded,
-                size: 14, color: textColor.withOpacity(textOpacity)),
+                size: 14, color: cs.onSurfaceVariant.withValues(alpha: 0.9)),
           ),
           const SizedBox(width: 4),
           Expanded(
@@ -1282,9 +1294,10 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   Widget _buildPoiCard(SubSection? sub, FlowController controller, double accumulatedKm) {
+    final cs = Theme.of(context).colorScheme;
     final poi = _currentPoi;
     final nextPoi = _nextPoi;
-    final themeColor = sub?.color ?? const Color(0xFF2196F3);
+    final themeColor = sub?.color ?? cs.primary;
     final isLight = themeColor.computeLuminance() > 0.4;
     // 当前位置：优先用 formatted_address（信息最全），无 POI 用天气城市名兜底
     final addressLine = poi != null
@@ -1306,12 +1319,12 @@ class _FlowScreenState extends State<FlowScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(isLight ? 0.78 : 0.9),
+          color: cs.surfaceContainerHigh.withValues(alpha: isLight ? 0.85 : 0.95),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: themeColor.withOpacity(0.18), width: 1),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: cs.shadow.withValues(alpha: 0.06),
                 blurRadius: 24,
                 offset: const Offset(0, 8)),
             BoxShadow(
@@ -1331,13 +1344,13 @@ class _FlowScreenState extends State<FlowScreen>
                 Icon(
                   Icons.place_rounded,
                   size: 14,
-                  color: const Color(0xFF222222).withOpacity(0.42),
+                  color: cs.onSurface.withValues(alpha: 0.42),
                 ),
                 const SizedBox(width: 6),
                 Text(
                   "此刻行至",
                   style: TextStyle(
-                    color: const Color(0xFF222222).withOpacity(0.45),
+                    color: cs.onSurface.withValues(alpha: 0.45),
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
                     letterSpacing: 2.2,
@@ -1350,8 +1363,7 @@ class _FlowScreenState extends State<FlowScreen>
             Text(
               addressLine,
               style: TextStyle(
-                color: Color(0xFF222222)
-                    .withOpacity(hasAddress ? 0.95 : 0.35),
+                color: cs.onSurface.withValues(alpha: hasAddress ? 0.95 : 0.35),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 letterSpacing: 0.5,
@@ -1375,7 +1387,7 @@ class _FlowScreenState extends State<FlowScreen>
                     child: Text(
                       '下一站 $nextStopShortLabel',
                       style: TextStyle(
-                        color: const Color(0xFF555555).withOpacity(0.82),
+                        color: cs.onSurfaceVariant.withValues(alpha: 0.9),
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.3,
@@ -1408,6 +1420,7 @@ class _FlowScreenState extends State<FlowScreen>
   }
 
   Widget _buildHeader(SubSection? sub, FlowController controller) {
+    final cs = Theme.of(context).colorScheme;
     final weatherType = _mapWeatherCode(controller.wmoCode);
     final medalIcon = sub?.medalIcon;
 
@@ -1420,13 +1433,13 @@ class _FlowScreenState extends State<FlowScreen>
               child: Row(
                 children: [
                   Text(sub?.name.split('·')[0] ?? '江面',
-                      style: const TextStyle(
-                          color: Color(0xFF222222),
+                      style: TextStyle(
+                          color: cs.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.w400)),
                   const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down_rounded,
-                      size: 20, color: Color(0xFF888888)),
+                  Icon(Icons.keyboard_arrow_down_rounded,
+                      size: 20, color: cs.onSurfaceVariant),
                 ],
               ),
             ),
@@ -1438,7 +1451,7 @@ class _FlowScreenState extends State<FlowScreen>
                   child: Icon(
                     Icons.auto_awesome_outlined,
                     size: 22,
-                    color: const Color(0xFF222222).withOpacity(0.6),
+                    color: cs.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -1456,19 +1469,19 @@ class _FlowScreenState extends State<FlowScreen>
                   onTap: () => _showWeatherDetail(controller),
                   child: Row(children: [
                     Text(controller.temp,
-                        style: const TextStyle(
-                            color: Color(0xFF222222),
+                        style: TextStyle(
+                            color: cs.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w300)),
                     const SizedBox(width: 8),
                     Icon(weatherType.icon,
-                        size: 22, color: const Color(0xFF222222)),
+                        size: 22, color: cs.onSurface),
                   ])),
             ]),
           ]),
           Text(sub?.name ?? '正在加载...',
               style: TextStyle(
-                  color: const Color(0xFF222222).withOpacity(0.5),
+                  color: cs.onSurface.withValues(alpha: 0.5),
                   fontSize: 13)),
         ]));
   }
@@ -1476,6 +1489,7 @@ class _FlowScreenState extends State<FlowScreen>
   /// 步数与进度区：主数字为当日步数，下方小字为累计步数；里程为实际累计
   Widget _buildStepsAndProgress(FlowController controller,
       ChallengeProvider challenge, double accumulatedKm) {
+    final cs = Theme.of(context).colorScheme;
     final dailySteps = controller.displaySteps;
     final cumulativeSteps = controller.cumulativeSteps;
     String dailyStr = dailySteps.toString().replaceAllMapped(
@@ -1507,7 +1521,7 @@ class _FlowScreenState extends State<FlowScreen>
         children: [
           Text(dailyStr,
               style: TextStyle(
-                  color: const Color(0xFF222222),
+                  color: cs.onSurface,
                   fontSize: dailyStr.length > 7 ? 82 : 105,
                   fontWeight: FontWeight.w100,
                   letterSpacing: -2,
@@ -1531,7 +1545,7 @@ class _FlowScreenState extends State<FlowScreen>
                           ? Icons.sensors_outlined
                           : Icons.help_outline_rounded,
                   size: 14,
-                  color: const Color(0xFF555555).withOpacity(0.55),
+                  color: cs.onSurfaceVariant.withValues(alpha: 0.55),
                 ),
               ),
               const SizedBox(width: 6),
@@ -1540,7 +1554,7 @@ class _FlowScreenState extends State<FlowScreen>
                 child: Text(
                   '累计 $cumulativeStr 步',
                   style: TextStyle(
-                    color: const Color(0xFF555555).withOpacity(0.65),
+                    color: cs.onSurfaceVariant.withValues(alpha: 0.65),
                     fontSize: 13,
                     fontWeight: FontWeight.w300,
                     letterSpacing: 0.5,
@@ -1554,14 +1568,14 @@ class _FlowScreenState extends State<FlowScreen>
       Text(
           "已行至 ${accumulatedKm.toStringAsFixed(1)} km / ${challenge.activeRiver?.totalLengthKm.round()} km",
           style: TextStyle(
-              color: const Color(0xFF555555).withOpacity(0.7),
+              color: cs.onSurfaceVariant.withValues(alpha: 0.7),
               fontSize: 16,
               letterSpacing: 1.2)),
       if (segmentLine != null) ...[
         const SizedBox(height: 10),
         Text(segmentLine,
             style: TextStyle(
-                color: const Color(0xFF555555).withOpacity(0.6),
+                color: cs.onSurfaceVariant.withValues(alpha: 0.6),
                 fontSize: 14,
                 fontWeight: FontWeight.w300,
                 letterSpacing: 0.8)),
@@ -1606,16 +1620,17 @@ class _RitualTextInputDialogState extends State<_RitualTextInputDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return AlertDialog(
-      backgroundColor: Colors.white.withOpacity(0.98),
+      backgroundColor: cs.surfaceContainerHigh,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Text(
         widget.title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w400,
           letterSpacing: 1.5,
-          color: Color(0xFF222222),
+          color: cs.onSurface,
         ),
       ),
       content: TextField(
@@ -1626,36 +1641,36 @@ class _RitualTextInputDialogState extends State<_RitualTextInputDialog> {
         decoration: InputDecoration(
           hintText: widget.hint,
           hintStyle: TextStyle(
-            color: const Color(0xFF222222).withOpacity(0.35),
+            color: cs.onSurface.withValues(alpha: 0.35),
             fontSize: 14,
             fontWeight: FontWeight.w300,
           ),
           counterStyle: TextStyle(
-            color: const Color(0xFF222222).withOpacity(0.4),
+            color: cs.onSurface.withValues(alpha: 0.4),
             fontSize: 12,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: const Color(0xFF222222).withOpacity(0.12)),
+            borderSide: BorderSide(color: cs.outline.withValues(alpha: 0.3)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: const Color(0xFF222222).withOpacity(0.12)),
+            borderSide: BorderSide(color: cs.outline.withValues(alpha: 0.3)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: const Color(0xFF222222).withOpacity(0.35), width: 1.2),
+            borderSide: BorderSide(color: cs.primary.withValues(alpha: 0.6), width: 1.2),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
-        style: const TextStyle(fontSize: 15, color: Color(0xFF222222), height: 1.4),
+        style: TextStyle(fontSize: 15, color: cs.onSurface, height: 1.4),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(
             '取消',
-            style: TextStyle(color: const Color(0xFF222222).withOpacity(0.5), fontSize: 15),
+            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 15),
           ),
         ),
         TextButton(
@@ -1665,8 +1680,8 @@ class _RitualTextInputDialogState extends State<_RitualTextInputDialog> {
           },
           child: Text(
             widget.confirmLabel,
-            style: const TextStyle(
-              color: Color(0xFF222222),
+            style: TextStyle(
+              color: cs.primary,
               fontSize: 15,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.5,
@@ -1684,6 +1699,7 @@ class RiverShaderPainter extends CustomPainter {
   final List<double> pathOffsets;
   final double time, turbulence, width, speed, offset, pulse, pulseX, pulseY;
   final Color themeColor;
+  final Color backgroundColor;
 
   RiverShaderPainter(
       {required this.shader,
@@ -1694,6 +1710,7 @@ class RiverShaderPainter extends CustomPainter {
       required this.width,
       required this.speed,
       required this.themeColor,
+      required this.backgroundColor,
       required this.offset,
       required this.pulse,
       required this.pulseX,
@@ -1716,6 +1733,9 @@ class RiverShaderPainter extends CustomPainter {
     shader.setFloat(43, pulse);
     shader.setFloat(44, pulseX);
     shader.setFloat(45, pulseY);
+    shader.setFloat(46, backgroundColor.red / 255.0);
+    shader.setFloat(47, backgroundColor.green / 255.0);
+    shader.setFloat(48, backgroundColor.blue / 255.0);
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 

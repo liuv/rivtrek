@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:app_settings/app_settings.dart';
 import '../models/river_settings.dart';
+import '../providers/theme_provider.dart';
 import '../services/backup_service.dart';
 import '../providers/challenge_provider.dart';
 import '../providers/user_profile_provider.dart';
@@ -112,14 +113,26 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     return '${multiplier.toStringAsFixed(1)}x';
   }
 
+  static const List<Color> _seedColorPresets = [
+    Color(0xFF0097A7), // 青 (原默认)
+    Color(0xFF1976D2), // 蓝
+    Color(0xFF7B1FA2), // 紫
+    Color(0xFFC2185B), // 粉
+    Color(0xFFE64A19), // 橙
+    Color(0xFF388E3C), // 绿
+    Color(0xFF00796B), //  Teal
+    Color(0xFF5D4037), // 棕
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('应用设置', style: TextStyle(fontWeight: FontWeight.w300)),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
-        foregroundColor: Colors.black,
+        foregroundColor: colorScheme.onSurface,
       ),
       body: ListenableBuilder(
         listenable: RiverSettings.instance,
@@ -128,78 +141,142 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              _buildSectionTitle('权限设置'),
+              _buildSectionTitle(context, '外观'),
+              ListenableBuilder(
+                listenable: ThemeProvider.instance,
+                builder: (context, _) {
+                  final theme = ThemeProvider.instance;
+                  return Card(
+                    elevation: 0,
+                    color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Column(
+                      children: [
+                        SwitchListTile(
+                          title: const Text('深色模式'),
+                          subtitle: const Text('切换亮色 / 暗色主题'),
+                          value: theme.isDark,
+                          onChanged: (v) => theme.setBrightness(v ? Brightness.dark : Brightness.light),
+                        ),
+                        const Divider(height: 1),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                          child: Row(
+                            children: [
+                              Text('主题色', style: TextStyle(fontSize: 16, color: colorScheme.onSurface)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Wrap(
+                                  spacing: 8,
+                                  runSpacing: 6,
+                                  children: _seedColorPresets.map((c) {
+                                    final selected = theme.seedColor == c;
+                                    return Material(
+                                      color: selected ? c : c.withOpacity(0.35),
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(20),
+                                        onTap: () => theme.setSeedColor(c),
+                                        child: SizedBox(
+                                          width: 36,
+                                          height: 36,
+                                          child: selected
+                                              ? const Icon(Icons.check, color: Colors.white, size: 20)
+                                              : null,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        SwitchListTile(
+                          title: const Text('河流颜色跟随主题'),
+                          subtitle: const Text('开启后首页河流效果使用当前主题色，关闭则按河段数据配色'),
+                          value: theme.useThemeColorForRiver,
+                          onChanged: (v) => theme.setUseThemeColorForRiver(v),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 32),
+              _buildSectionTitle(context, '权限设置'),
               if (Platform.isAndroid) _buildBackendStepsSection(context),
               if (Platform.isAndroid) const SizedBox(height: 32),
-              _buildSectionTitle('效果设置'),
-              _buildSectionTitle('河道路径模式'),
+              _buildSectionTitle(context, '效果设置'),
+              _buildSectionTitle(context, '河道路径模式'),
               Card(
                 elevation: 0,
-                color: Colors.grey[100],
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Column(
                   children: [
-                    _buildPathModeTile(RiverPathMode.procedural, '程序化模拟', '算法生成的数学曲线'),
-                    _buildPathModeTile(RiverPathMode.realPath, '真实路径', '基于地理数据的真实弯折'),
+                    _buildPathModeTile(context, RiverPathMode.procedural, '程序化模拟', '算法生成的数学曲线'),
+                    _buildPathModeTile(context, RiverPathMode.realPath, '真实路径', '基于地理数据的真实弯折'),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
-              _buildSectionTitle('视觉表现风格'),
+              _buildSectionTitle(context, '视觉表现风格'),
               Card(
                 elevation: 0,
-                color: Colors.grey[100],
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Column(
                   children: [
-                    _buildStyleTile(RiverStyle.classic, '经典流体', '默认的丝绸质感渲染'),
-                    _buildStyleTile(RiverStyle.ink, '水墨意境', '复古的水墨晕染效果'),
-                    _buildStyleTile(RiverStyle.aurora, '极光之径', '绚丽的动态极光效果'),
+                    _buildStyleTile(context, RiverStyle.classic, '经典流体', '默认的丝绸质感渲染'),
+                    _buildStyleTile(context, RiverStyle.ink, '水墨意境', '复古的水墨晕染效果'),
+                    _buildStyleTile(context, RiverStyle.aurora, '极光之径', '绚丽的动态极光效果'),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
-              _buildSectionTitle('参数微调'),
+              _buildSectionTitle(context, '参数微调'),
               const SizedBox(height: 16),
-              _buildSlider('流动速度', settings.speed, 0.1, 1.0, (val) {
+              _buildSlider(context, '流动速度', settings.speed, 0.1, 1.0, (val) {
                 _saveSettings(speed: val);
               }),
-              _buildSlider('湍流强度', settings.turbulence, 0.1, 2.0, (val) {
+              _buildSlider(context, '湍流强度', settings.turbulence, 0.1, 2.0, (val) {
                 _saveSettings(turbulence: val);
               }),
-              _buildSlider('河道宽度', settings.width, 0.05, 0.4, (val) {
+              _buildSlider(context, '河道宽度', settings.width, 0.05, 0.4, (val) {
                 _saveSettings(width: val);
               }),
               const SizedBox(height: 24),
-              _buildSectionTitle('河灯 / 漂流瓶'),
+              _buildSectionTitle(context, '河灯 / 漂流瓶'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   '漂浮速度倍数，左慢右快。参考：1x 为一屏 3 公里 60 秒漂过，约合每公里 20 秒的观感；各河段仍按流速有快慢差异。',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.35),
+                  style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, height: 1.35),
                 ),
               ),
               const SizedBox(height: 8),
-              _buildDriftSpeedMultiplierSlider(settings.driftCrossScreenSeconds),
+              _buildDriftSpeedMultiplierSlider(context, settings.driftCrossScreenSeconds),
               const SizedBox(height: 32),
-              _buildSectionTitle('数据与备份'),
+              _buildSectionTitle(context, '数据与备份'),
               Card(
                 elevation: 0,
-                color: Colors.grey[100],
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.backup_outlined, size: 22),
-                      title: const Text('导出备份'),
-                      subtitle: const Text('将步数、天气、事件与个人资料打包为单文件，可分享保存或换机导入'),
+                      leading: Icon(Icons.backup_outlined, size: 22, color: colorScheme.primary),
+                      title: Text('导出备份', style: TextStyle(color: colorScheme.onSurface)),
+                      subtitle: Text('将步数、天气、事件与个人资料打包为单文件，可分享保存或换机导入', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                       onTap: _onExportBackup,
                     ),
-                    const Divider(height: 1),
+                    Divider(height: 1, color: colorScheme.outline.withValues(alpha: 0.2)),
                     ListTile(
-                      leading: const Icon(Icons.restore_outlined, size: 22),
-                      title: const Text('从备份恢复'),
-                      subtitle: const Text('选择此前导出的 .rivtrek 文件，覆盖当前数据（建议先备份当前数据）'),
+                      leading: Icon(Icons.restore_outlined, size: 22, color: colorScheme.primary),
+                      title: Text('从备份恢复', style: TextStyle(color: colorScheme.onSurface)),
+                      subtitle: Text('选择此前导出的 .rivtrek 文件，覆盖当前数据（建议先备份当前数据）', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                       onTap: _onRestoreBackup,
                     ),
                   ],
@@ -319,6 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       final prefs = await SharedPreferences.getInstance();
       final activeRiverId = prefs.getString('active_river_id') ?? 'yangtze';
       if (mounted) {
+        await ThemeProvider.loadFromPrefs();
         await context.read<ChallengeProvider>().switchRiver(activeRiverId);
         await context.read<UserProfileProvider>().reloadFromPrefs();
         await context.read<FlowController>().refreshFromDb();
@@ -351,24 +429,25 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   }
 
   Widget _buildBackendStepsSection(BuildContext context) {
-    final grantedColor = const Color(0xFF2E7D32);
+    final cs = Theme.of(context).colorScheme;
+    final grantedColor = cs.primary; // 已开启用主题主色，或保持绿色：Color(0xFF2E7D32)
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('步数记录'),
+        _buildSectionTitle(context, '步数记录'),
         Card(
           elevation: 0,
-          color: Colors.orange.shade50,
+          color: cs.surfaceContainerHigh,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '在未打开 App 时，涉川也会在后台为您记录步数。若发现某天步数为 0 或明显偏少，'
                   '建议在下方开启相应权限，以便系统允许后台记录。',
-                  style: TextStyle(fontSize: 13, height: 1.4),
+                  style: TextStyle(fontSize: 13, height: 1.4, color: cs.onSurface),
                 ),
                 const SizedBox(height: 16),
                 _buildPermissionTile(
@@ -412,7 +491,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                 const SizedBox(height: 16),
                 Text(
                   '若您曾选择「不再提示」，可在此重新开启进入时的权限提醒。',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700], height: 1.3),
+                  style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, height: 1.3),
                 ),
                 const SizedBox(height: 8),
                 TextButton.icon(
@@ -425,8 +504,8 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                       );
                     }
                   },
-                  icon: const Icon(Icons.notifications_active_outlined, size: 18),
-                  label: const Text('下次进入时再次提醒'),
+                  icon: Icon(Icons.notifications_active_outlined, size: 18, color: cs.primary),
+                  label: Text('下次进入时再次提醒', style: TextStyle(color: cs.primary)),
                 ),
               ],
             ),
@@ -445,68 +524,73 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     required VoidCallback onTap,
     required Color grantedColor,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, size: 22, color: granted ? grantedColor : Colors.grey),
+      leading: Icon(icon, size: 22, color: granted ? grantedColor : cs.onSurfaceVariant),
       title: Text(
         title,
         style: TextStyle(
           fontWeight: granted ? FontWeight.w600 : FontWeight.w400,
-          color: granted ? grantedColor : Colors.black87,
+          color: granted ? grantedColor : cs.onSurface,
         ),
       ),
       trailing: loading
-          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+          ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: cs.primary))
           : Icon(
               granted ? Icons.check_circle : Icons.check_circle_outline,
-              color: granted ? grantedColor : Colors.grey.shade400,
+              color: granted ? grantedColor : cs.outline,
               size: 22,
             ),
       onTap: onTap,
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 12),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          color: cs.onSurface,
         ),
       ),
     );
   }
 
-  Widget _buildPathModeTile(RiverPathMode mode, String title, String subtitle) {
+  Widget _buildPathModeTile(BuildContext context, RiverPathMode mode, String title, String subtitle) {
+    final cs = Theme.of(context).colorScheme;
     bool selected = RiverSettings.instance.pathMode == mode;
     return ListTile(
       title: Text(title, style: TextStyle(
         fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-        color: selected ? Colors.blue[800] : Colors.black87,
+        color: selected ? cs.primary : cs.onSurface,
       )),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-      trailing: selected ? Icon(Icons.check_circle, color: Colors.blue[800]) : null,
+      subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+      trailing: selected ? Icon(Icons.check_circle, color: cs.primary) : null,
       onTap: () => _saveSettings(pathMode: mode),
     );
   }
 
-  Widget _buildStyleTile(RiverStyle style, String title, String subtitle) {
+  Widget _buildStyleTile(BuildContext context, RiverStyle style, String title, String subtitle) {
+    final cs = Theme.of(context).colorScheme;
     bool selected = RiverSettings.instance.style == style;
     return ListTile(
       title: Text(title, style: TextStyle(
         fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-        color: selected ? Colors.blue[800] : Colors.black87,
+        color: selected ? cs.primary : cs.onSurface,
       )),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-      trailing: selected ? Icon(Icons.check_circle, color: Colors.blue[800]) : null,
+      subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+      trailing: selected ? Icon(Icons.check_circle, color: cs.primary) : null,
       onTap: () => _saveSettings(style: style),
     );
   }
 
-  Widget _buildSlider(String label, double value, double min, double max, ValueChanged<double> onChanged) {
+  Widget _buildSlider(BuildContext context, String label, double value, double min, double max, ValueChanged<double> onChanged) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -515,25 +599,31 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: const TextStyle(fontSize: 14)),
-              Text(value.toStringAsFixed(2), style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+              Text(label, style: TextStyle(fontSize: 14, color: cs.onSurface)),
+              Text(value.toStringAsFixed(2), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
             ],
           ),
         ),
-        Slider(
-          value: value,
-          min: min,
-          max: max,
-          onChanged: onChanged,
-          activeColor: Colors.blue[800],
-          inactiveColor: Colors.blue[100],
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: cs.primary,
+            inactiveTrackColor: cs.surfaceContainerHighest,
+            thumbColor: cs.primary,
+          ),
+          child: Slider(
+            value: value,
+            min: min,
+            max: max,
+            onChanged: onChanged,
+          ),
         ),
       ],
     );
   }
 
   /// 漂浮速度倍数滑块：范围 0.02x～2x，左=0.02x（慢）右=2x（快）；1x=60 秒；内部为过屏时间（秒）
-  Widget _buildDriftSpeedMultiplierSlider(double seconds) {
+  Widget _buildDriftSpeedMultiplierSlider(BuildContext context, double seconds) {
+    final cs = Theme.of(context).colorScheme;
     const minSec = kDriftCrossScreenMinSeconds;  // 2x，快（60/2）
     const maxSec = kDriftCrossScreenMaxSeconds;  // 0.02x，慢（60/0.02）
     final logMin = math.log(minSec);
@@ -549,25 +639,29 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('漂浮速度倍数', style: TextStyle(fontSize: 14)),
+              Text('漂浮速度倍数', style: TextStyle(fontSize: 14, color: cs.onSurface)),
               Text(
                 _formatDriftMultiplier(multiplier),
-                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
               ),
             ],
           ),
         ),
-        Slider(
-          value: linear,
-          min: 0,
-          max: 1,
-          onChanged: (linearVal) {
-            // linearVal 0=左(慢) 1=右(快) -> seconds 大=慢 小=快
-            final sec = math.exp(logMax - linearVal * (logMax - logMin));
-            _saveSettings(driftCrossScreenSeconds: sec);
-          },
-          activeColor: Colors.blue[800],
-          inactiveColor: Colors.blue[100],
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: cs.primary,
+            inactiveTrackColor: cs.surfaceContainerHighest,
+            thumbColor: cs.primary,
+          ),
+          child: Slider(
+            value: linear,
+            min: 0,
+            max: 1,
+            onChanged: (linearVal) {
+              final sec = math.exp(logMax - linearVal * (logMax - logMin));
+              _saveSettings(driftCrossScreenSeconds: sec);
+            },
+          ),
         ),
       ],
     );

@@ -16,6 +16,7 @@ import 'screens/settings_screen.dart';
 import 'screens/initial_river_selection_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'providers/user_profile_provider.dart';
+import 'providers/theme_provider.dart';
 import 'controllers/flow_controller.dart';
 import 'models/river_settings.dart';
 import 'repositories/river_repository.dart';
@@ -69,6 +70,9 @@ void main() async {
   // 从 prefs 加载河流/漂流等效果设置，使首页与设置页一致
   await RiverSettings.loadFromPrefs();
 
+  // 从 prefs 加载主题设置（亮/暗、种子色、河流色是否跟随主题）
+  await ThemeProvider.loadFromPrefs();
+
   // 行业做法：音频由 audio_service 管理，UI 只发指令不跑加载/混音
   try {
     await AmbientAudioService.init();
@@ -77,6 +81,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider.instance),
         ChangeNotifierProvider(create: (_) => ChallengeProvider()),
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProxyProvider<ChallengeProvider, FlowController>(
@@ -93,15 +98,17 @@ class RivtrekApp extends StatelessWidget {
   const RivtrekApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: '涉川',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        fontFamily: 'Inter',
-        scaffoldBackgroundColor: const Color(0xFFF9F9F9),
-      ),
-      home: const MainContainer(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: '涉川',
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
+          themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
+          home: const MainContainer(),
+        );
+      },
     );
   }
 }
@@ -220,9 +227,10 @@ class _MainContainerState extends State<MainContainer> {
     }
     // 未读完 pref 时短暂显示空白/加载，避免闪屏
     if (_hasCompletedInitialRiverSelection != true) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF9F9F9),
-        body: Center(child: CircularProgressIndicator()),
+      final colorScheme = Theme.of(context).colorScheme;
+      return Scaffold(
+        backgroundColor: colorScheme.surface,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
     return Scaffold(
@@ -249,6 +257,7 @@ class _MainContainerState extends State<MainContainer> {
   }
 
   Widget _buildBottomNavBar() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Positioned(
       left: 35,
       right: 35,
@@ -256,11 +265,11 @@ class _MainContainerState extends State<MainContainer> {
       child: Container(
         height: 85,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.4),
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.6),
           borderRadius: BorderRadius.circular(44),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: colorScheme.shadow.withOpacity(0.06),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -320,8 +329,9 @@ class _MainContainerState extends State<MainContainer> {
           children: [
             Icon(
               icon,
-              color:
-                  isActive ? const Color(0xFF0097A7) : const Color(0xFF888888),
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
               size: 26,
             ),
             const SizedBox(height: 4),
@@ -329,8 +339,8 @@ class _MainContainerState extends State<MainContainer> {
               label,
               style: TextStyle(
                 color: isActive
-                    ? const Color(0xFF222222)
-                    : const Color(0xFF888888),
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.w500 : FontWeight.w300,
               ),

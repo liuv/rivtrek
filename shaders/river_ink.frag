@@ -15,6 +15,9 @@ uniform float uPath[32];
 uniform float uPulse;
 uniform float uPulseX;
 uniform float uPulseY;
+uniform float uBgR;
+uniform float uBgG;
+uniform float uBgB;
 
 out vec4 fragColor;
 
@@ -114,9 +117,9 @@ void main() {
 
     float glow = exp(-dist * 7.0) * 0.3;
 
-    // 7. 背景
+    // 7. 背景（随深色模式）
     float grain = (hash(uv + t * 0.01) - 0.5) * 0.02;
-    vec3 bgColor = vec3(0.97, 0.97, 0.96) + grain;
+    vec3 bgColor = vec3(uBgR, uBgG, uBgB) + grain;
 
     float visibility = envelope * (silkTex * 0.7 + 0.3) + glow + core * envelope;
     visibility = clamp(visibility, 0.0, 1.0);
