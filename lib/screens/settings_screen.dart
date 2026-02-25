@@ -10,6 +10,7 @@ import 'package:app_settings/app_settings.dart';
 import '../models/river_settings.dart';
 import '../providers/theme_provider.dart';
 import '../services/backup_service.dart';
+import '../services/step_sync_service.dart';
 import '../providers/challenge_provider.dart';
 import '../providers/user_profile_provider.dart';
 import '../controllers/flow_controller.dart';
@@ -381,6 +382,10 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
         await ThemeProvider.loadFromPrefs();
         await context.read<ChallengeProvider>().switchRiver(activeRiverId);
         await context.read<UserProfileProvider>().reloadFromPrefs();
+        // 主动同步以建立传感器基线、消费今日步数偏移
+        try {
+          await StepSyncService.syncAll();
+        } catch (_) {}
         await context.read<FlowController>().refreshFromDb();
       }
       if (mounted) {

@@ -5,13 +5,18 @@ import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'database_service.dart';
+import 'backup_service.dart';
 import '../models/daily_stats.dart';
 
 class StepSyncService {
   static const double _stepLengthKm = 0.0007;
 
   /// 全局同步入口：根据平台选择不同的同步策略
+  /// 恢复进行中时跳过，避免与 restoreBackup 竞态。
   static Future<void> syncAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(kRestoreInProgress) == true) return;
+
     if (Platform.isIOS) {
       await syncHealthData(days: 7);
     } else if (Platform.isAndroid) {
@@ -127,6 +132,8 @@ class StepSyncService {
       }
       if (sortedDates.isNotEmpty) {
         await prefs.setString('last_steps_source', 'health_connect');
+        // iOS 无传感器同步，清除可能残留的恢复偏移 pref
+        await prefs.remove(kSensorRestoredTodaySteps);
       }
     } catch (e) {
     }
@@ -174,6 +181,8 @@ class StepSyncService {
 
   static Future<void> _writeSensorStepsToDb(int hardwareTotal) async {
     final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(kRestoreInProgress) == true) return;
+
     final now = DateTime.now();
     final today = DateFormat('yyyy-MM-dd').format(now);
 
@@ -195,13 +204,23 @@ class StepSyncService {
 
     int todaySteps;
     if (lastSyncDate == null) {
-      stepsAtDayStart = hardwareTotal;
+      // 恢复后首次同步：若有备份注入的今日步数偏移，用其建立基线，使后续传感器增量能正确累加
+      final restoredSteps = prefs.getInt(kSensorRestoredTodaySteps);
+      if (restoredSteps != null &&
+          restoredSteps > 0 &&
+          hardwareTotal >= restoredSteps) {
+        stepsAtDayStart = hardwareTotal - restoredSteps;
+        todaySteps = restoredSteps;
+        await prefs.remove(kSensorRestoredTodaySteps);
+      } else {
+        stepsAtDayStart = hardwareTotal;
+        todaySteps = 0;
+      }
       lastSyncDate = today;
       lastDayEnd = hardwareTotal;
-      todaySteps = 0;
       await prefs.setString(kLastSyncDate, today);
       await prefs.setInt(kLastDayEndCumulative, hardwareTotal);
-      await prefs.setInt(kStepsAtDayStart, hardwareTotal);
+      await prefs.setInt(kStepsAtDayStart, stepsAtDayStart);
     } else if (lastSyncDate != today) {
       stepsAtDayStart = lastDayEnd;
       if (hardwareTotal < stepsAtDayStart) stepsAtDayStart = hardwareTotal;

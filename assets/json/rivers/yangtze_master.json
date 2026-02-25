@@ -8,7 +8,7 @@
   "total_sub_sections": 20,
   "difficulty_stars": 5,
   "default_theme_color": "#2E6195",
-  "cover_asset": "covers/yangtze_cover.png",
+  "cover_asset": "covers/yangtze_cover.webp",
   "challenge_sections": [
     {
       "section_id": 1,
@@ -36,7 +36,7 @@
             "achievement_name": "【江源出发】",
             "achievement_desc": "完成长江源头第一段挑战，解锁“江源探索者”初级称号",
             "medal_id": "medal_yangtze_101",
-            "medal_icon": "icons/medal_yangtze_101.png"
+            "medal_icon": "icons/medal_yangtze_101.webp"
           }
         },
         {
@@ -58,7 +58,7 @@
             "achievement_name": "【湿地逐水】",
             "achievement_desc": "穿越通天河湿地，解锁“高原行进者”称号",
             "medal_id": "medal_yangtze_102",
-            "medal_icon": "icons/medal_yangtze_102.png"
+            "medal_icon": "icons/medal_yangtze_102.webp"
           }
         },
         {
@@ -80,7 +80,7 @@
             "achievement_name": "【通天河渡】",
             "achievement_desc": "完成长江正源全段挑战，解锁“长江开拓者”中级称号，开启下一大区段",
             "medal_id": "medal_yangtze_103",
-            "medal_icon": "icons/medal_yangtze_103.png"
+            "medal_icon": "icons/medal_yangtze_103.webp"
           }
         }
       ]
@@ -111,7 +111,7 @@
             "achievement_name": "【峡谷初涉】",
             "achievement_desc": "进入金沙江峡谷，解锁“峡谷挑战者”初级称号",
             "medal_id": "medal_yangtze_201",
-            "medal_icon": "icons/medal_yangtze_201.png"
+            "medal_icon": "icons/medal_yangtze_201.webp"
           }
         },
         {
@@ -133,7 +133,7 @@
             "achievement_name": "【虎跳惊涛】",
             "achievement_desc": "成功穿越虎跳峡，解锁“峡谷征服者”高级称号",
             "medal_id": "medal_yangtze_202",
-            "medal_icon": "icons/medal_yangtze_202.png"
+            "medal_icon": "icons/medal_yangtze_202.webp"
           }
         },
         {
@@ -155,7 +155,7 @@
             "achievement_name": "【江名初定】",
             "achievement_desc": "抵达宜宾合江门，见证金沙江正式命名为长江，解锁“大江行者”称号",
             "medal_id": "medal_yangtze_203",
-            "medal_icon": "icons/medal_yangtze_203.png"
+            "medal_icon": "icons/medal_yangtze_203.webp"
           }
         }
       ]
@@ -186,7 +186,7 @@
             "achievement_name": "【蜀南逐绿】",
             "achievement_desc": "途经蜀南竹海近岸，解锁“竹海行者”初级称号",
             "medal_id": "medal_yangtze_301",
-            "medal_icon": "icons/medal_yangtze_301.png"
+            "medal_icon": "icons/medal_yangtze_301.webp"
           }
         },
         {
@@ -208,7 +208,7 @@
             "achievement_name": "【巴蜀逐浪】",
             "achievement_desc": "抵达重庆朝天门，解锁“江城行者”高级称号",
             "medal_id": "medal_yangtze_302",
-            "medal_icon": "icons/medal_yangtze_302.png"
+            "medal_icon": "icons/medal_yangtze_302.webp"
           }
         }
       ]
@@ -239,7 +239,7 @@
             "achievement_name": "【水文寻踪】",
             "achievement_desc": "打卡白鹤梁水下博物馆，解锁“历史探索者”称号",
             "medal_id": "medal_yangtze_401",
-            "medal_icon": "icons/medal_yangtze_401.png"
+            "medal_icon": "icons/medal_yangtze_401.webp"
           }
         },
         {
@@ -261,7 +261,7 @@
             "achievement_name": "【三峡诗行】",
             "achievement_desc": "穿越瞿塘峡、巫峡，解锁“三峡行者”称号",
             "medal_id": "medal_yangtze_402",
-            "medal_icon": "icons/medal_yangtze_402.png"
+            "medal_icon": "icons/medal_yangtze_402.webp"
           }
         },
         {
@@ -283,7 +283,7 @@
             "achievement_name": "【三峡雄关】",
             "achievement_desc": "完成长江三峡全段挑战，解锁“三峡霸主”终极称号",
             "medal_id": "medal_yangtze_403",
-            "medal_icon": "icons/medal_yangtze_403.png"
+            "medal_icon": "icons/medal_yangtze_403.webp"
           }
         }
       ]
@@ -314,7 +314,7 @@
             "achievement_name": "【荆江起步】",
             "achievement_desc": "进入荆江平原段，解锁“平原行者”初级称号",
             "medal_id": "medal_yangtze_501",
-            "medal_icon": "icons/medal_yangtze_501.png"
+            "medal_icon": "icons/medal_yangtze_501.webp"
           }
         },
         {
@@ -336,7 +336,7 @@
             "achievement_name": "【洞庭抵达】",
             "achievement_desc": "抵达洞庭湖入江口，解锁“平原远行者”高级称号",
             "medal_id": "medal_yangtze_502",
-            "medal_icon": "icons/medal_yangtze_502.png"
+            "medal_icon": "icons/medal_yangtze_502.webp"
           }
         }
       ]
@@ -367,7 +367,7 @@
             "achievement_name": "【江城揽胜】",
             "achievement_desc": "抵达武汉黄鹤楼，解锁“都市行者”高级称号",
             "medal_id": "medal_yangtze_601",
-            "medal_icon": "icons/medal_yangtze_601.png"
+            "medal_icon": "icons/medal_yangtze_601.webp"
           }
         },
         {
@@ -389,7 +389,7 @@
             "achievement_name": "【鄱湖汇江】",
             "achievement_desc": "抵达鄱阳湖入江口，解锁“湖江行者”称号",
             "medal_id": "medal_yangtze_602",
-            "medal_icon": "icons/medal_yangtze_602.png"
+            "medal_icon": "icons/medal_yangtze_602.webp"
           }
         }
       ]
@@ -420,7 +420,7 @@
             "achievement_name": "【诗酒临江】",
             "achievement_desc": "打卡采石矶，解锁“诗韵行者”高级称号",
             "medal_id": "medal_yangtze_701",
-            "medal_icon": "icons/medal_yangtze_701.png"
+            "medal_icon": "icons/medal_yangtze_701.webp"
           }
         }
       ]
@@ -451,7 +451,7 @@
             "achievement_name": "【金陵飞渡】",
             "achievement_desc": "抵达南京秦淮河入江口，解锁“古都行者”高级称号",
             "medal_id": "medal_yangtze_801",
-            "medal_icon": "icons/medal_yangtze_801.png"
+            "medal_icon": "icons/medal_yangtze_801.webp"
           }
         }
       ]
@@ -482,7 +482,7 @@
             "achievement_name": "【江南长途徒步】",
             "achievement_desc": "完成扬子江下游段挑战，解锁“江南行者”高级称号",
             "medal_id": "medal_yangtze_901",
-            "medal_icon": "icons/medal_yangtze_901.png"
+            "medal_icon": "icons/medal_yangtze_901.webp"
           }
         }
       ]
@@ -513,7 +513,7 @@
             "achievement_name": "【向海而行】",
             "achievement_desc": "抵达上海陆家嘴，解锁“入海挑战者”高级称号+“都市行者”终极称号",
             "medal_id": "medal_yangtze_1001",
-            "medal_icon": "icons/medal_yangtze_1001.png"
+            "medal_icon": "icons/medal_yangtze_1001.webp"
           }
         },
         {
@@ -535,7 +535,7 @@
             "achievement_name": "【入海抵达】",
             "achievement_desc": "抵达长江入海口，解锁“长江征服者”终极称号，完成长江全程徒步挑战！",
             "medal_id": "medal_yangtze_1002",
-            "medal_icon": "icons/medal_yangtze_1002.png"
+            "medal_icon": "icons/medal_yangtze_1002.webp"
           }
         }
       ]

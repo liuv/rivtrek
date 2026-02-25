@@ -544,7 +544,7 @@ class _LanternRitualScreenState extends State<LanternRitualScreen>
   }
 
   Widget _buildReleaseImage(double size) {
-    final assetPath = _isBottle ? 'assets/icons/bottle.png' : 'assets/icons/light.png';
+    final assetPath = _isBottle ? 'assets/icons/bottle.webp' : 'assets/icons/light.webp';
     final fallbackIcon = _isBottle ? Icons.send_outlined : Icons.nightlight_round_outlined;
     return SizedBox(
       width: size,

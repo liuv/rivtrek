@@ -8,7 +8,7 @@
   "total_sub_sections": 23,
   "difficulty_stars": 5,
   "default_theme_color": "#D4A373",
-  "cover_asset": "covers/yellow_river_cover.png",
+  "cover_asset": "covers/yellow_river_cover.webp",
   "challenge_sections": [
     {
       "section_id": 1,
@@ -29,14 +29,14 @@
           "difficulty_rating": 4,
           "base_flow_speed": 0.3,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau",
           "sub_section_desc": "挑战开启！从黄河最源头的卡日曲泉眼出发，穿越纯净的高原湿地，感受“河源第一水”的澄澈，途经三江源保护区核心区，近距离观察藏原羚等高原生灵，抵达卡日曲与约古宗列曲汇合口，解锁源头核心打卡点。",
           "achievement": {
             "achievement_name": "【河源出发】",
             "achievement_desc": "完成黄河源头第一段挑战，解锁“河源探索者”初级称号",
             "medal_id": "medal_yellow_101",
-            "medal_icon": "icons/medal_yellow_101.png"
+            "medal_icon": "icons/medal_yellow_101.webp"
           }
         },
         {
@@ -51,14 +51,14 @@
           "difficulty_rating": 4,
           "base_flow_speed": 0.2,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau",
           "sub_section_desc": "进入约古宗列曲段，河道逐渐宽阔，两岸是一望无际的高原草甸，行进途中感受三江源的纯净与辽阔，终点抵达玛多县附近的扎陵湖西侧入口，正式结束河源段挑战，迈向黄河上游湖泊群。",
           "achievement": {
             "achievement_name": "【河源逐水】",
             "achievement_desc": "完成黄河正源全段挑战，解锁“黄河开拓者”中级称号，开启下一大区段",
             "medal_id": "medal_yellow_102",
-            "medal_icon": "icons/medal_yellow_102.png"
+            "medal_icon": "icons/medal_yellow_102.webp"
           }
         }
       ]
@@ -82,14 +82,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.1,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "lake_ambient",
           "sub_section_desc": "进入黄河上游湖泊群核心区，先后穿越扎陵湖、鄂陵湖，感受高原湖泊的湛蓝澄澈，打卡牛头碑（黄河源头地标），观察迁徙候鸟，体验“高原明珠”的独特风光，为后续峡谷挑战做准备。",
           "achievement": {
             "achievement_name": "【高原明珠】",
             "achievement_desc": "穿越扎陵湖、鄂陵湖，解锁“高原行进者”初级称号",
             "medal_id": "medal_yellow_201",
-            "medal_icon": "icons/medal_yellow_201.png"
+            "medal_icon": "icons/medal_yellow_201.webp"
           }
         },
         {
@@ -104,14 +104,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.8,
           "environment_type": "canyon",
-          "bg_asset": "LayeredCliffs/001.png",
+          "bg_asset": "LayeredCliffs/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "告别高原湖泊，进入黄河上游峡谷过渡段，河道逐渐狭窄，水流流速加快，两岸出现独特的丹霞地貌，途经湟水汇入黄河口，感受黄河水量的提升，最终抵达刘家峡水库上游，解锁峡谷挑战序幕。",
           "achievement": {
             "achievement_name": "【丹霞逐浪】",
             "achievement_desc": "途经贵德丹霞地貌，解锁“峡谷挑战者”初级称号",
             "medal_id": "medal_yellow_202",
-            "medal_icon": "icons/medal_yellow_202.png"
+            "medal_icon": "icons/medal_yellow_202.webp"
           }
         },
         {
@@ -126,14 +126,14 @@
           "difficulty_rating": 5,
           "base_flow_speed": 2.2,
           "environment_type": "canyon",
-          "bg_asset": "canyon/bg_canyon.png",
+          "bg_asset": "canyon/bg_canyon.webp",
           "ambient_sound": "river_rapid",
           "sub_section_desc": "挑战黄河上游最难路段！穿越龙羊峡（黄河上游第一大峡谷），感受“高峡出平湖”的壮阔与激流的震撼，避开湍急的漩涡和暗礁，考验控制行进能力和反应速度，是上游段的核心难点关卡。",
           "achievement": {
             "achievement_name": "【龙羊惊涛】",
             "achievement_desc": "成功穿越龙羊峡，解锁“峡谷征服者”高级称号",
             "medal_id": "medal_yellow_203",
-            "medal_icon": "icons/medal_yellow_203.png"
+            "medal_icon": "icons/medal_yellow_203.webp"
           }
         }
       ]
@@ -157,14 +157,14 @@
           "difficulty_rating": 4,
           "base_flow_speed": 1.5,
           "environment_type": "canyon",
-          "bg_asset": "LayeredCliffs/001.png",
+          "bg_asset": "LayeredCliffs/001.webp",
           "ambient_sound": "river_rapid",
           "sub_section_desc": "延续峡谷挑战节奏，穿越龙羊峡至李家峡的连续峡谷段，两岸峡谷风貌愈发明显，水流依旧湍急但相较于龙羊峡略有平缓，途经李家峡水库，感受人工水利工程与自然峡谷的融合，解锁新的峡谷景观。",
           "achievement": {
             "achievement_name": "【峡谷连横】",
             "achievement_desc": "穿越龙羊峡、李家峡连续峡谷，解锁“峡谷行进者”高级称号",
             "medal_id": "medal_yellow_301",
-            "medal_icon": "icons/medal_yellow_301.png"
+            "medal_icon": "icons/medal_yellow_301.webp"
           }
         },
         {
@@ -179,14 +179,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.4,
           "environment_type": "urban",
-          "bg_asset": "ModernSkyline/001.png",
+          "bg_asset": "ModernSkyline/001.webp",
           "ambient_sound": "city_distant",
           "sub_section_desc": "激流挑战告一段落，河道逐渐宽阔，水流趋于平缓，两岸出现人文景观，最终抵达兰州，打卡黄河母亲雕塑、兰州黄河大桥等核心地标，感受黄河岸边的都市烟火气，解锁重要人文里程碑。",
           "achievement": {
             "achievement_name": "【金城揽胜】",
             "achievement_desc": "抵达兰州黄河母亲雕塑，解锁“黄河行者”中级称号",
             "medal_id": "medal_yellow_302",
-            "medal_icon": "icons/medal_yellow_302.png"
+            "medal_icon": "icons/medal_yellow_302.webp"
           }
         },
         {
@@ -201,14 +201,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.3,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "告别兰州，进入宁夏段，行进在肥沃的宁夏平原上，两岸稻田成片，感受“塞上江南”的独特韵味，终点抵达青铜峡，打卡青铜峡大坝和一百零八塔，感受黄河水利文化与佛教文化的融合。",
           "achievement": {
             "achievement_name": "【塞上江南】",
             "achievement_desc": "穿越宁夏平原段，打卡一百零八塔，解锁“塞上行者”高级称号",
             "medal_id": "medal_yellow_303",
-            "medal_icon": "icons/medal_yellow_303.png"
+            "medal_icon": "icons/medal_yellow_303.webp"
           }
         }
       ]
@@ -232,14 +232,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.2,
           "environment_type": "river_plains",
-          "bg_asset": "OpenFarmland/001.png",
+          "bg_asset": "OpenFarmland/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "继续行进在宁夏平原末端，两岸风光从稻田过渡到草原，远处可见贺兰山轮廓，水流平缓，适合放松休息，途经石嘴山，感受宁夏北部黄河沿岸的风貌，为进入内蒙古段做准备。",
           "achievement": {
             "achievement_name": "【贺兰远景】",
             "achievement_desc": "途经贺兰山远景，解锁“草原行者”初级称号",
             "medal_id": "medal_yellow_401",
-            "medal_icon": "icons/medal_yellow_401.png"
+            "medal_icon": "icons/medal_yellow_401.webp"
           }
         },
         {
@@ -254,14 +254,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "river_plains",
-          "bg_asset": "OpenFarmland/001.png",
+          "bg_asset": "OpenFarmland/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "进入内蒙古段，行进在辽阔的河套平原上，两岸是一望无际的草原和湿地，河道逐渐呈现弯曲态势，最终抵达河口镇——黄河几字弯的起点，解锁黄河最具特色的地貌地标，开启几字弯挑战序幕。",
           "achievement": {
             "achievement_name": "【几字启弯】",
             "achievement_desc": "抵达黄河几字弯起点河口镇，解锁“河套行者”高级称号",
             "medal_id": "medal_yellow_402",
-            "medal_icon": "icons/medal_yellow_402.png"
+            "medal_icon": "icons/medal_yellow_402.webp"
           }
         }
       ]
@@ -285,14 +285,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.3,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "开启黄河几字弯挑战，穿越几字弯北段，河道弯曲度逐渐增大，两岸是辽阔的草原湿地，途经托克托县，打卡托克托古城远景，感受黄河几字弯的独特地貌，锻炼行进方向控制能力。",
           "achievement": {
             "achievement_name": "【几字起步】",
             "achievement_desc": "穿越黄河几字弯北段，解锁“几字行者”初级称号",
             "medal_id": "medal_yellow_501",
-            "medal_icon": "icons/medal_yellow_501.png"
+            "medal_icon": "icons/medal_yellow_501.webp"
           }
         },
         {
@@ -307,14 +307,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.6,
           "environment_type": "canyon",
-          "bg_asset": "LayeredCliffs/001.png",
+          "bg_asset": "LayeredCliffs/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "继续穿越黄河几字弯东段，河道弯曲度进一步加大，水流流速逐渐加快，两岸山脉开始显现，进入晋陕大峡谷前奏，远处可见吕梁山轮廓，终点抵达龙门景区上游，为穿越龙门、壶口瀑布做准备。",
           "achievement": {
             "achievement_name": "【晋陕初临】",
             "achievement_desc": "抵达晋陕大峡谷入口附近，解锁“峡谷行者”中级称号",
             "medal_id": "medal_yellow_502",
-            "medal_icon": "icons/medal_yellow_502.png"
+            "medal_icon": "icons/medal_yellow_502.webp"
           }
         },
         {
@@ -329,14 +329,14 @@
           "difficulty_rating": 5,
           "base_flow_speed": 2.5,
           "environment_type": "canyon",
-          "bg_asset": "canyon/bg_canyon.png",
+          "bg_asset": "canyon/bg_canyon.webp",
           "ambient_sound": "river_rapid",
           "sub_section_desc": "挑战黄河中游核心难点！穿越龙门景区，进入晋陕大峡谷核心段，水流愈发湍急，最终抵达壶口瀑布，感受“黄河之水天上来”的壮阔，穿越瀑布下游水域，考验行进控制的极限能力，解锁黄河标志性景观。",
           "achievement": {
             "achievement_name": "【壶口惊雷】",
             "achievement_desc": "穿越壶口瀑布下游水域，解锁“黄河勇士”高级称号",
             "medal_id": "medal_yellow_503",
-            "medal_icon": "icons/medal_yellow_503.png"
+            "medal_icon": "icons/medal_yellow_503.webp"
           }
         }
       ]
@@ -360,14 +360,14 @@
           "difficulty_rating": 4,
           "base_flow_speed": 1.2,
           "environment_type": "canyon",
-          "bg_asset": "LayeredCliffs/001.png",
+          "bg_asset": "LayeredCliffs/001.webp",
           "ambient_sound": "river_rapid",
           "sub_section_desc": "告别壶口瀑布，继续穿越晋陕大峡谷末端，河道逐渐开阔，水流依旧湍急但相较于壶口瀑布略有平缓，途经潼关古城，感受“一夫当关，万夫莫开”的历史气势，抵达黄河金三角地带，解锁历史人文地标。",
           "achievement": {
             "achievement_name": "【潼关雄关】",
             "achievement_desc": "打卡潼关古城，解锁“历史行者”高级称号",
             "medal_id": "medal_yellow_601",
-            "medal_icon": "icons/medal_yellow_601.png"
+            "medal_icon": "icons/medal_yellow_601.webp"
           }
         },
         {
@@ -382,14 +382,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.5,
           "environment_type": "river_plains",
-          "bg_asset": "OpenFarmland/001.png",
+          "bg_asset": "OpenFarmland/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "离开晋陕大峡谷，进入河南段，河道变得宽阔平缓，两岸是肥沃的黄土平原，途经三门峡大坝，感受黄河中游重要水利工程的壮阔，远处可见函谷关远景，感受黄河沿岸的历史文化底蕴。",
           "achievement": {
             "achievement_name": "【三门锁河】",
             "achievement_desc": "打卡三门峡大坝，解锁“水利行者”中级称号",
             "medal_id": "medal_yellow_602",
-            "medal_icon": "icons/medal_yellow_602.png"
+            "medal_icon": "icons/medal_yellow_602.webp"
           }
         }
       ]
@@ -413,14 +413,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.4,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "进入黄河下游豫中段，行进在肥沃的黄土平原上，水流平缓，河道宽阔，途经洛阳，打卡洛河入黄河口，远处可见龙门石窟轮廓，感受十三朝古都周边的黄河风貌，解锁人文景观彩蛋。",
           "achievement": {
             "achievement_name": "【洛河汇黄】",
             "achievement_desc": "见证洛河汇入黄河，解锁“古都行者”初级称号",
             "medal_id": "medal_yellow_701",
-            "medal_icon": "icons/medal_yellow_701.png"
+            "medal_icon": "icons/medal_yellow_701.webp"
           }
         },
         {
@@ -435,14 +435,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "urban",
-          "bg_asset": "ModernSkyline/001.png",
+          "bg_asset": "ModernSkyline/001.webp",
           "ambient_sound": "city_distant",
           "sub_section_desc": "继续向东行进，途经郑州黄河大桥，最终抵达郑州黄河风景名胜区，打卡炎黄二帝雕塑等核心地标，感受黄河作为“母亲河”的人文底蕴，这里也是黄河下游的重要节点，为后续平原段行进做准备。",
           "achievement": {
             "achievement_name": "【炎黄寻踪】",
             "achievement_desc": "打卡炎黄二帝雕塑，解锁“母亲河守护者”中级称号",
             "medal_id": "medal_yellow_702",
-            "medal_icon": "icons/medal_yellow_702.png"
+            "medal_icon": "icons/medal_yellow_702.webp"
           }
         }
       ]
@@ -466,14 +466,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.3,
           "environment_type": "river_plains",
-          "bg_asset": "OpenFarmland/001.png",
+          "bg_asset": "OpenFarmland/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "离开郑州，进入豫鲁交界段，行进在辽阔的鲁西平原上，水流平缓，河道略有弯曲，偶有浅滩需要避让，途经菏泽，打卡黄河牡丹园，感受黄河沿岸的花卉风光，解锁独特的景观彩蛋。",
           "achievement": {
             "achievement_name": "【牡丹映黄】",
             "achievement_desc": "打卡黄河牡丹园，解锁“平原行者”高级称号",
             "medal_id": "medal_yellow_801",
-            "medal_icon": "icons/medal_yellow_801.png"
+            "medal_icon": "icons/medal_yellow_801.webp"
           }
         },
         {
@@ -488,14 +488,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "urban",
-          "bg_asset": "ModernSkyline/001.png",
+          "bg_asset": "ModernSkyline/001.webp",
           "ambient_sound": "city_distant",
           "sub_section_desc": "继续向东行进，进入山东腹地，途经济南，打卡大明湖、趵突泉、千佛山等济南标志性景观远景，感受黄河与济南这座泉城的交融，解锁黄河下游重要都市打卡点，为终极入海口挑战做准备。",
           "achievement": {
             "achievement_name": "【泉城揽胜】",
             "achievement_desc": "抵达济南黄河岸边，解锁“都市行者”高级称号",
             "medal_id": "medal_yellow_802",
-            "medal_icon": "icons/medal_yellow_802.png"
+            "medal_icon": "icons/medal_yellow_802.webp"
           }
         }
       ]
@@ -519,14 +519,14 @@
           "difficulty_rating": 2,
           "base_flow_speed": 0.3,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "离开济南，继续向东行进，进入黄河三角洲平原段，两岸是大片的芦苇湿地，水流平缓，路况逐渐减少，适合放松身心，途经滨州，感受山东北部黄河沿岸的生态风貌，逐步靠近黄河入海口。",
           "achievement": {
             "achievement_name": "【芦苇寻踪】",
             "achievement_desc": "穿越黄河芦苇湿地，解锁“生态行者”高级称号",
             "medal_id": "medal_yellow_901",
-            "medal_icon": "icons/medal_yellow_901.png"
+            "medal_icon": "icons/medal_yellow_901.webp"
           }
         },
         {
@@ -541,14 +541,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "river_calm",
           "sub_section_desc": "进入黄河入海口上段，河道逐渐宽阔，咸淡水开始混合，两岸是黄河三角洲国家级自然保护区，可观察到大量迁徙候鸟，终点抵达东营黄河入海口景区上游，做好终极入海挑战的准备。",
           "achievement": {
             "achievement_name": "【向海出发】",
             "achievement_desc": "抵达黄河入海口景区上游，解锁“入海挑战者”高级称号",
             "medal_id": "medal_yellow_902",
-            "medal_icon": "icons/medal_yellow_902.png"
+            "medal_icon": "icons/medal_yellow_902.webp"
           }
         }
       ]
@@ -572,14 +572,14 @@
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "ocean_waves",
           "sub_section_desc": "终极挑战开启！从东营黄河入海口景区上游出发，向入海口门行进，江面变得无比宽阔，咸淡水混合愈发明显，两岸是独特的红海滩景观，途经黄河三角洲湿地核心区，打卡生态终极景观。",
           "achievement": {
             "achievement_name": "【红蓝交汇】",
             "achievement_desc": "打卡黄河入海口红海滩，解锁“生态守护者”终极称号+“入海行者”高级称号",
             "medal_id": "medal_yellow_1001",
-            "medal_icon": "icons/medal_yellow_1001.png"
+            "medal_icon": "icons/medal_yellow_1001.webp"
           }
         },
         {
@@ -594,14 +594,14 @@
           "difficulty_rating": 4,
           "base_flow_speed": 0.7,
           "environment_type": "river_plains",
-          "bg_asset": "RiversideVillage/001.png",
+          "bg_asset": "RiversideVillage/001.webp",
           "ambient_sound": "ocean_waves",
           "sub_section_desc": "终极冲刺！从黄河入海口门出发，穿越江海交汇处，感受黄河水奔腾入海的壮阔瞬间，江面一望无际，最终抵达黄河入海口，见证黄河水汇入渤海的神圣时刻，完成全程5464km的徒步挑战！",
           "achievement": {
             "achievement_name": "【黄河归海】",
             "achievement_desc": "抵达黄河入海口，解锁“黄河征服者”终极称号，完成黄河全程徒步挑战！",
             "medal_id": "medal_yellow_1002",
-            "medal_icon": "icons/medal_yellow_1002.png"
+            "medal_icon": "icons/medal_yellow_1002.webp"
           }
         }
       ]

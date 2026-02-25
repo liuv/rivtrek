@@ -8,7 +8,7 @@
   "total_sub_sections": 29,
   "difficulty_stars": 4,
   "default_theme_color": "#4A90E2",
-  "cover_asset": "covers/mekong_river_cover.png",
+  "cover_asset": "covers/mekong_river_cover.webp",
   "challenge_sections": [
     {
       "section_id": 1,
@@ -30,12 +30,12 @@
             "achievement_name": "【澜源启帆】",
             "achievement_desc": "完成澜沧江源头第一段挑战，解锁“澜源探索者”初级称号",
             "medal_id": "medal_mekong_101",
-            "medal_icon": "icons/medal_mekong_101.png"
+            "medal_icon": "icons/medal_mekong_101.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -52,12 +52,12 @@
             "achievement_name": "【扎曲逐水】",
             "achievement_desc": "完成澜沧江正源全段挑战，解锁“澜江开拓者”中级称号，开启下一大区段",
             "medal_id": "medal_mekong_102",
-            "medal_icon": "icons/medal_mekong_102.png"
+            "medal_icon": "icons/medal_mekong_102.webp"
           },
           "difficulty_rating": 4,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -83,12 +83,12 @@
             "achievement_name": "【高原穿峡】",
             "achievement_desc": "穿越澜沧江上游高原峡谷，解锁“高原巡航者”初级称号",
             "medal_id": "medal_mekong_201",
-            "medal_icon": "icons/medal_mekong_201.png"
+            "medal_icon": "icons/medal_mekong_201.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -105,12 +105,12 @@
             "achievement_name": "【雪岭揽胜】",
             "achievement_desc": "抵达昌都市沿岸，解锁“藏东行者”中级称号",
             "medal_id": "medal_mekong_202",
-            "medal_icon": "icons/medal_mekong_202.png"
+            "medal_icon": "icons/medal_mekong_202.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -136,12 +136,12 @@
             "achievement_name": "【丽江帆影】",
             "achievement_desc": "途经昌都、丽江两座城市，解锁“滇藏航者”初级称号",
             "medal_id": "medal_mekong_301",
-            "medal_icon": "icons/medal_mekong_301.png"
+            "medal_icon": "icons/medal_mekong_301.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -158,12 +158,12 @@
             "achievement_name": "【滇西初行】",
             "achievement_desc": "抵达滇西盆地，解锁“滇西巡航者”初级称号",
             "medal_id": "medal_mekong_302",
-            "medal_icon": "icons/medal_mekong_302.png"
+            "medal_icon": "icons/medal_mekong_302.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -189,12 +189,12 @@
             "achievement_name": "【漾濞汇韵】",
             "achievement_desc": "见证漾濞江与澜沧江汇流，解锁“澜江行者”高级称号",
             "medal_id": "medal_mekong_401",
-            "medal_icon": "icons/medal_mekong_401.png"
+            "medal_icon": "icons/medal_mekong_401.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -211,12 +211,12 @@
             "achievement_name": "【临沧揽帆】",
             "achievement_desc": "抵达临沧澜沧江沿岸，解锁“滇藏航者”高级称号",
             "medal_id": "medal_mekong_402",
-            "medal_icon": "icons/medal_mekong_402.png"
+            "medal_icon": "icons/medal_mekong_402.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -242,12 +242,12 @@
             "achievement_name": "【江阔帆舒】",
             "achievement_desc": "穿越澜沧江下游宽阔河道，解锁“澜江巡航者”高级称号",
             "medal_id": "medal_mekong_501",
-            "medal_icon": "icons/medal_mekong_501.png"
+            "medal_icon": "icons/medal_mekong_501.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -264,12 +264,12 @@
             "achievement_name": "【滇南初临】",
             "achievement_desc": "抵达滇南核心区，解锁“滇南航者”初级称号",
             "medal_id": "medal_mekong_502",
-            "medal_icon": "icons/medal_mekong_502.png"
+            "medal_icon": "icons/medal_mekong_502.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -295,12 +295,12 @@
             "achievement_name": "【热带逐浪】",
             "achievement_desc": "穿越滇南热带段，解锁“热带航者”高级称号",
             "medal_id": "medal_mekong_601",
-            "medal_icon": "icons/medal_mekong_601.png"
+            "medal_icon": "icons/medal_mekong_601.webp"
           },
           "difficulty_rating": 2,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_rainforest",
-          "bg_asset": "TropicalJungle/001.png",
+          "bg_asset": "TropicalJungle/001.webp",
           "ambient_sound": "jungle_ambient"
         },
         {
@@ -317,12 +317,12 @@
             "achievement_name": "【澜江临境】",
             "achievement_desc": "抵达澜沧江中国段终点（出境口），解锁“滇南航者”高级称号",
             "medal_id": "medal_mekong_602",
-            "medal_icon": "icons/medal_mekong_602.png"
+            "medal_icon": "icons/medal_mekong_602.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_rainforest",
-          "bg_asset": "TropicalJungle/001.png",
+          "bg_asset": "TropicalJungle/001.webp",
           "ambient_sound": "jungle_ambient"
         }
       ],
@@ -348,12 +348,12 @@
             "achievement_name": "【老北穿峡】",
             "achievement_desc": "穿越湄公河老北深峡谷，解锁“湄公航者”高级称号",
             "medal_id": "medal_mekong_701",
-            "medal_icon": "icons/medal_mekong_701.png"
+            "medal_icon": "icons/medal_mekong_701.webp"
           },
           "difficulty_rating": 4,
           "base_flow_speed": 0.8,
           "environment_type": "tropical_canyon",
-          "bg_asset": "TropicalCanyon/001.png",
+          "bg_asset": "TropicalCanyon/001.webp",
           "ambient_sound": "river_rapid_jungle"
         },
         {
@@ -370,12 +370,12 @@
             "achievement_name": "【琅勃揽胜】",
             "achievement_desc": "抵达琅勃拉邦湄公河沿岸，解锁“老北航者”高级称号",
             "medal_id": "medal_mekong_702",
-            "medal_icon": "icons/medal_mekong_702.png"
+            "medal_icon": "icons/medal_mekong_702.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.6,
           "environment_type": "tropical_canyon",
-          "bg_asset": "TropicalCanyon/001.png",
+          "bg_asset": "TropicalCanyon/001.webp",
           "ambient_sound": "river_rapid_jungle"
         }
       ],
@@ -401,12 +401,12 @@
             "achievement_name": "【边境驰帆】",
             "achievement_desc": "抵达万象湄公河沿岸，解锁“老泰航者”中级称号",
             "medal_id": "medal_mekong_801",
-            "medal_icon": "icons/medal_mekong_801.png"
+            "medal_icon": "icons/medal_mekong_801.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_plains",
-          "bg_asset": "TropicalPlains/001.png",
+          "bg_asset": "TropicalPlains/001.webp",
           "ambient_sound": "tropical_plains_ambient"
         },
         {
@@ -423,12 +423,12 @@
             "achievement_name": "【泰北寻踪】",
             "achievement_desc": "抵达清莱湄公河沿岸，解锁“老泰航者”高级称号",
             "medal_id": "medal_mekong_802",
-            "medal_icon": "icons/medal_mekong_802.png"
+            "medal_icon": "icons/medal_mekong_802.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_plains",
-          "bg_asset": "TropicalPlains/001.png",
+          "bg_asset": "TropicalPlains/001.webp",
           "ambient_sound": "tropical_plains_ambient"
         }
       ],
@@ -454,12 +454,12 @@
             "achievement_name": "【泰中平帆】",
             "achievement_desc": "抵达清迈湄公河沿岸，解锁“泰中航者”中级称号",
             "medal_id": "medal_mekong_901",
-            "medal_icon": "icons/medal_mekong_901.png"
+            "medal_icon": "icons/medal_mekong_901.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_plains",
-          "bg_asset": "TropicalPlains/001.png",
+          "bg_asset": "TropicalPlains/001.webp",
           "ambient_sound": "tropical_plains_ambient"
         },
         {
@@ -476,12 +476,12 @@
             "achievement_name": "【暹罗揽胜】",
             "achievement_desc": "抵达曼谷湄公河沿岸，解锁“泰中航者”高级称号",
             "medal_id": "medal_mekong_902",
-            "medal_icon": "icons/medal_mekong_902.png"
+            "medal_icon": "icons/medal_mekong_902.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_plains",
-          "bg_asset": "TropicalPlains/001.png",
+          "bg_asset": "TropicalPlains/001.webp",
           "ambient_sound": "tropical_plains_ambient"
         }
       ],
@@ -507,12 +507,12 @@
             "achievement_name": "【吴哥寻帆】",
             "achievement_desc": "抵达暹粒湄公河沿岸，解锁“柬泰航者”中级称号",
             "medal_id": "medal_mekong_1001",
-            "medal_icon": "icons/medal_mekong_1001.png"
+            "medal_icon": "icons/medal_mekong_1001.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_hills",
-          "bg_asset": "TropicalHills/001.png",
+          "bg_asset": "TropicalHills/001.webp",
           "ambient_sound": "tropical_hills_ambient"
         },
         {
@@ -529,12 +529,12 @@
             "achievement_name": "【金边驰航】",
             "achievement_desc": "抵达金边湄公河沿岸，解锁“柬泰航者”高级称号",
             "medal_id": "medal_mekong_1002",
-            "medal_icon": "icons/medal_mekong_1002.png"
+            "medal_icon": "icons/medal_mekong_1002.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_hills",
-          "bg_asset": "TropicalHills/001.png",
+          "bg_asset": "TropicalHills/001.webp",
           "ambient_sound": "tropical_hills_ambient"
         }
       ],
@@ -560,12 +560,12 @@
             "achievement_name": "【柬越临境】",
             "achievement_desc": "抵达柴桢湄公河沿岸，解锁“柬越航者”中级称号",
             "medal_id": "medal_mekong_1101",
-            "medal_icon": "icons/medal_mekong_1101.png"
+            "medal_icon": "icons/medal_mekong_1101.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_delta",
-          "bg_asset": "TropicalDelta/001.png",
+          "bg_asset": "TropicalDelta/001.webp",
           "ambient_sound": "delta_ambient"
         },
         {
@@ -582,12 +582,12 @@
             "achievement_name": "【西贡驰帆】",
             "achievement_desc": "抵达胡志明湄公河沿岸，解锁“柬越航者”高级称号",
             "medal_id": "medal_mekong_1102",
-            "medal_icon": "icons/medal_mekong_1102.png"
+            "medal_icon": "icons/medal_mekong_1102.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_delta",
-          "bg_asset": "TropicalDelta/001.png",
+          "bg_asset": "TropicalDelta/001.webp",
           "ambient_sound": "delta_ambient"
         }
       ],
@@ -613,12 +613,12 @@
             "achievement_name": "【九龙江帆】",
             "achievement_desc": "穿越湄公河三角洲，解锁“三角洲航者”中级称号",
             "medal_id": "medal_mekong_1201",
-            "medal_icon": "icons/medal_mekong_1201.png"
+            "medal_icon": "icons/medal_mekong_1201.webp"
           },
           "difficulty_rating": 2,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_delta",
-          "bg_asset": "TropicalDelta/001.png",
+          "bg_asset": "TropicalDelta/001.webp",
           "ambient_sound": "delta_ambient"
         },
         {
@@ -635,12 +635,12 @@
             "achievement_name": "【入海临境】",
             "achievement_desc": "抵达湄公河入海口上游，解锁“三角洲航者”高级称号",
             "medal_id": "medal_mekong_1202",
-            "medal_icon": "icons/medal_mekong_1202.png"
+            "medal_icon": "icons/medal_mekong_1202.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.6,
           "environment_type": "tropical_delta",
-          "bg_asset": "TropicalDelta/001.png",
+          "bg_asset": "TropicalDelta/001.webp",
           "ambient_sound": "delta_ambient"
         }
       ],
@@ -666,12 +666,12 @@
             "achievement_name": "【澜江归海】",
             "achievement_desc": "抵达湄公河入海口核心区，解锁“湄公征服者”高级称号",
             "medal_id": "medal_mekong_1301",
-            "medal_icon": "icons/medal_mekong_1301.png"
+            "medal_icon": "icons/medal_mekong_1301.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.7,
           "environment_type": "tropical_ocean",
-          "bg_asset": "TropicalOcean/001.png",
+          "bg_asset": "TropicalOcean/001.webp",
           "ambient_sound": "ocean_waves_tropical"
         }
       ],
@@ -697,12 +697,12 @@
             "achievement_name": "【澜江归洋】",
             "achievement_desc": "完成澜沧江-湄公河全流域4205km巡航，解锁“澜江终极征服者”终极称号！",
             "medal_id": "medal_mekong_1401",
-            "medal_icon": "icons/medal_mekong_1401.png"
+            "medal_icon": "icons/medal_mekong_1401.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.8,
           "environment_type": "tropical_ocean",
-          "bg_asset": "TropicalOcean/001.png",
+          "bg_asset": "TropicalOcean/001.webp",
           "ambient_sound": "ocean_waves_tropical"
         }
       ],

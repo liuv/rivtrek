@@ -1190,7 +1190,7 @@ class _FlowScreenState extends State<FlowScreen>
             randomX) /
         (MediaQuery.of(context).size.aspectRatio);
     final scale = scaleBase * (0.8 + (localY + 1.0) * 0.2);
-    final asset = isLantern ? 'assets/icons/light.png' : 'assets/icons/bottle.png';
+    final asset = isLantern ? 'assets/icons/light.webp' : 'assets/icons/bottle.webp';
     final content = Transform.rotate(
       angle: rotation,
       child: Opacity(

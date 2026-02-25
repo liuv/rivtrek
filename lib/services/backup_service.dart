@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:archive/archive.dart';
 import 'package:cryptography/cryptography.dart';
 
+import 'package:sqflite/sqflite.dart';
+
 import 'database_service.dart';
 import '../models/daily_stats.dart';
 
@@ -56,6 +58,14 @@ const Set<String> _deviceSpecificPrefsKeys = {
   'sensor_last_day_end_cumulative',
   'sensor_steps_at_day_start',
 };
+
+/// 恢复后首次传感器同步时使用的「今日已走步数」偏移。由 BackupService 在恢复时注入，
+/// StepSyncService 首次同步时消费并清除。用于解决：恢复后传感器基线清空，但 DB 已有今日步数，
+/// 导致 max(sensor_today, db_today) 长期取 db 值、步数无法累加的问题。
+const String kSensorRestoredTodaySteps = 'sensor_restored_today_steps';
+
+/// 恢复进行中标记。恢复期间 StepSyncService 跳过同步，避免与 WorkManager 竞态。
+const String kRestoreInProgress = 'backup_restore_in_progress';
 
 class BackupService {
   static final BackupService instance = BackupService._();
@@ -207,6 +217,13 @@ class BackupService {
       files[f.name] = f;
     }
 
+    // 拒绝 v1 明文格式：明文备份可被篡改，存在伪造风险。仅支持 v2 加密备份。
+    if (files.containsKey('data/activities.json') ||
+        files.containsKey('data/weather.json') ||
+        files.containsKey('data/events.json')) {
+      throw ArgumentError('此备份为早期明文格式，已不再支持恢复。请使用最新版本创建加密备份。');
+    }
+
     final manifestFile = files['manifest.json'];
     final prefsFile = files['prefs.json'];
     if (manifestFile == null || prefsFile == null) {
@@ -260,55 +277,77 @@ class BackupService {
       await prefs.remove('user_avatar_path');
     }
 
-    // 恢复主库
-    final db = await DatabaseService.instance.database;
-    await db.delete('daily_activities');
-    await db.delete('daily_weather');
-    await db.delete('river_events');
-
-    // 恢复主库（v2 加密格式）
+    // 恢复主库（事务保证原子性：要么全部成功，要么全部回滚）
     final activitiesEnc = files['data/activities.enc'];
     final weatherEnc = files['data/weather.enc'];
     final eventsEnc = files['data/events.enc'];
 
-    if (activitiesEnc != null && activitiesEnc.content.isNotEmpty) {
-      final jsonStr = await _decrypt(activitiesEnc.content, key);
-      final list = jsonDecode(jsonStr) as List<dynamic>;
-      for (final m in list) {
-        final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
-        await DatabaseService.instance.saveActivity(a);
+    await prefs.setBool(kRestoreInProgress, true);
+    try {
+      final db = await DatabaseService.instance.database;
+      await db.transaction((txn) async {
+        await txn.delete('daily_activities');
+        await txn.delete('daily_weather');
+        await txn.delete('river_events');
+
+        if (activitiesEnc != null && activitiesEnc.content.isNotEmpty) {
+          final jsonStr = await _decrypt(activitiesEnc.content, key);
+          final list = jsonDecode(jsonStr) as List<dynamic>;
+          for (final m in list) {
+            final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
+            await txn.insert('daily_activities', a.toMap(),
+                conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+        }
+        if (weatherEnc != null && weatherEnc.content.isNotEmpty) {
+          final jsonStr = await _decrypt(weatherEnc.content, key);
+          final list = jsonDecode(jsonStr) as List<dynamic>;
+          for (final m in list) {
+            final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
+            await txn.insert('daily_weather', w.toMap(),
+                conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+        }
+        if (eventsEnc != null && eventsEnc.content.isNotEmpty) {
+          final jsonStr = await _decrypt(eventsEnc.content, key);
+          final list = jsonDecode(jsonStr) as List<dynamic>;
+          for (final m in list) {
+            final map = Map<String, dynamic>.from(m as Map);
+            await txn.insert('river_events', {
+              'date': map['date'] as String,
+              'timestamp': (map['timestamp'] as num).toInt(),
+              'type': map['type'] as String,
+              'name': map['name'] as String,
+              'description': map['description'] as String,
+              'latitude': (map['latitude'] as num).toDouble(),
+              'longitude': (map['longitude'] as num).toDouble(),
+              'distance_at_km': (map['distance_at_km'] as num).toDouble(),
+              'extra_data': map['extra_data'] as String? ?? '{}',
+            });
+          }
+        }
+      });
+
+      // 注入今日步数偏移（事务成功后）
+      final todayStr = DateTime.now().toIso8601String().substring(0, 10);
+      final activeRiverId = prefs.getString('active_river_id') ?? 'yangtze';
+      if (activitiesEnc != null && activitiesEnc.content.isNotEmpty) {
+        final jsonStr = await _decrypt(activitiesEnc.content, key);
+        final list = jsonDecode(jsonStr) as List<dynamic>;
+        int? restoredTodaySteps;
+        for (final m in list) {
+          final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
+          if (a.date == todayStr && a.riverId == activeRiverId) {
+            restoredTodaySteps = a.steps;
+            break;
+          }
+        }
+        if (restoredTodaySteps != null && restoredTodaySteps > 0) {
+          await prefs.setInt(kSensorRestoredTodaySteps, restoredTodaySteps);
+        }
       }
-    }
-    if (weatherEnc != null && weatherEnc.content.isNotEmpty) {
-      final jsonStr = await _decrypt(weatherEnc.content, key);
-      final list = jsonDecode(jsonStr) as List<dynamic>;
-      for (final m in list) {
-        final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
-        await DatabaseService.instance.saveWeather(w);
-      }
-    }
-    if (eventsEnc != null && eventsEnc.content.isNotEmpty) {
-      final jsonStr = await _decrypt(eventsEnc.content, key);
-      final list = jsonDecode(jsonStr) as List<dynamic>;
-      for (final m in list) {
-        final map = Map<String, dynamic>.from(m as Map);
-        final e = RiverEvent(
-          id: map['id'] is int ? map['id'] as int : null,
-          date: map['date'] as String,
-          timestamp: (map['timestamp'] as num).toInt(),
-          type: RiverEventType.values.firstWhere(
-            (x) => x.name == map['type'],
-            orElse: () => RiverEventType.activity,
-          ),
-          name: map['name'] as String,
-          description: map['description'] as String,
-          latitude: (map['latitude'] as num).toDouble(),
-          longitude: (map['longitude'] as num).toDouble(),
-          distanceAtKm: (map['distance_at_km'] as num).toDouble(),
-          extraData: map['extra_data'] as String? ?? '{}',
-        );
-        await DatabaseService.instance.recordEvent(e);
-      }
+    } finally {
+      await prefs.remove(kRestoreInProgress);
     }
   }
 

@@ -11,11 +11,11 @@ class ShareCardWidget extends StatelessWidget {
   final double currentKm;
   final String sectionName;
   final Color themeColor;
-  /// 江河封面图 asset 路径，如 "assets/images/cover_yangtze.png"
+  /// 江河封面图 asset 路径，如 "assets/images/cover_yangtze.webp"
   final String? coverPath;
   /// 用于在封面上绘制路径与当前位置；为 null 则不绘制
   final River? riverForPathOverlay;
-  /// 当前河段徽章 asset 路径，如 "assets/rivers/yangtze/medal_xxx.png"
+  /// 当前河段徽章 asset 路径，如 "assets/icons/medal_xxx.webp"
   final String? medalIconPath;
   /// 此刻行至的地点文案（省市区或 formattedAddress）
   final String? locationLabel;

@@ -8,7 +8,7 @@
   "total_sub_sections": 23,
   "difficulty_stars": 4,
   "default_theme_color": "#4A90E2",
-  "cover_asset": "covers/nu_river_cover.png",
+  "cover_asset": "covers/nu_river_cover.webp",
   "challenge_sections": [
     {
       "section_id": 1,
@@ -30,12 +30,12 @@
             "achievement_name": "【怒源启帆】",
             "achievement_desc": "完成怒江源头第一段挑战，解锁“怒源探索者”初级称号",
             "medal_id": "medal_nu_101",
-            "medal_icon": "icons/medal_nu_101.png"
+            "medal_icon": "icons/medal_nu_101.webp"
           },
           "difficulty_rating": 4,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -52,12 +52,12 @@
             "achievement_name": "【那曲逐水】",
             "achievement_desc": "完成怒江正源全段挑战，解锁“怒江开拓者”中级称号，开启下一大区段",
             "medal_id": "medal_nu_102",
-            "medal_icon": "icons/medal_nu_102.png"
+            "medal_icon": "icons/medal_nu_102.webp"
           },
           "difficulty_rating": 4,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -83,12 +83,12 @@
             "achievement_name": "【深峡穿浪】",
             "achievement_desc": "穿越怒江上游深峡谷，解锁“峡谷巡航者”中级称号",
             "medal_id": "medal_nu_201",
-            "medal_icon": "icons/medal_nu_201.png"
+            "medal_icon": "icons/medal_nu_201.webp"
           },
           "difficulty_rating": 4,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -105,12 +105,12 @@
             "achievement_name": "【怒峡揽胜】",
             "achievement_desc": "抵达昌都市沿岸，解锁“藏东行者”高级称号",
             "medal_id": "medal_nu_202",
-            "medal_icon": "icons/medal_nu_202.png"
+            "medal_icon": "icons/medal_nu_202.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -136,12 +136,12 @@
             "achievement_name": "【丽江怒帆】",
             "achievement_desc": "途经昌都、丽江两座城市，解锁“滇藏航者”中级称号",
             "medal_id": "medal_nu_301",
-            "medal_icon": "icons/medal_nu_301.png"
+            "medal_icon": "icons/medal_nu_301.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -158,12 +158,12 @@
             "achievement_name": "【滇西怒行】",
             "achievement_desc": "抵达滇西盆地，解锁“滇西巡航者”中级称号",
             "medal_id": "medal_nu_302",
-            "medal_icon": "icons/medal_nu_302.png"
+            "medal_icon": "icons/medal_nu_302.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -189,12 +189,12 @@
             "achievement_name": "【怒江汇韵】",
             "achievement_desc": "途经大理景观带，解锁“怒江行者”高级称号",
             "medal_id": "medal_nu_401",
-            "medal_icon": "icons/medal_nu_401.png"
+            "medal_icon": "icons/medal_nu_401.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -211,12 +211,12 @@
             "achievement_name": "【临沧怒帆】",
             "achievement_desc": "抵达临沧怒江沿岸，解锁“滇藏航者”高级称号",
             "medal_id": "medal_nu_402",
-            "medal_icon": "icons/medal_nu_402.png"
+            "medal_icon": "icons/medal_nu_402.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -242,12 +242,12 @@
             "achievement_name": "【江阔怒舒】",
             "achievement_desc": "穿越怒江下游宽阔河道，解锁“怒江巡航者”高级称号",
             "medal_id": "medal_nu_501",
-            "medal_icon": "icons/medal_nu_501.png"
+            "medal_icon": "icons/medal_nu_501.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         },
         {
@@ -264,12 +264,12 @@
             "achievement_name": "【滇南怒临】",
             "achievement_desc": "抵达滇西南核心区，解锁“滇南航者”中级称号",
             "medal_id": "medal_nu_502",
-            "medal_icon": "icons/medal_nu_502.png"
+            "medal_icon": "icons/medal_nu_502.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "plateau_glacier",
-          "bg_asset": "JaggedPeaks/001.png",
+          "bg_asset": "JaggedPeaks/001.webp",
           "ambient_sound": "wind_plateau"
         }
       ],
@@ -295,12 +295,12 @@
             "achievement_name": "【怒水出境】",
             "achievement_desc": "抵达怒江中国段终点（出境口），解锁“滇南航者”高级称号",
             "medal_id": "medal_nu_601",
-            "medal_icon": "icons/medal_nu_601.png"
+            "medal_icon": "icons/medal_nu_601.webp"
           },
           "difficulty_rating": 2,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_rainforest",
-          "bg_asset": "TropicalJungle/001.png",
+          "bg_asset": "TropicalJungle/001.webp",
           "ambient_sound": "jungle_ambient"
         }
       ],
@@ -326,12 +326,12 @@
             "achievement_name": "【缅北穿峡】",
             "achievement_desc": "穿越萨尔温江缅北深峡谷，解锁“萨尔温航者”高级称号",
             "medal_id": "medal_nu_701",
-            "medal_icon": "icons/medal_nu_701.png"
+            "medal_icon": "icons/medal_nu_701.webp"
           },
           "difficulty_rating": 4,
           "base_flow_speed": 0.8,
           "environment_type": "tropical_canyon",
-          "bg_asset": "TropicalCanyon/001.png",
+          "bg_asset": "TropicalCanyon/001.webp",
           "ambient_sound": "river_rapid_jungle"
         },
         {
@@ -348,12 +348,12 @@
             "achievement_name": "【雨林逐浪】",
             "achievement_desc": "抵达八莫萨尔温江沿岸，解锁“缅北航者”高级称号",
             "medal_id": "medal_nu_702",
-            "medal_icon": "icons/medal_nu_702.png"
+            "medal_icon": "icons/medal_nu_702.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.6,
           "environment_type": "tropical_canyon",
-          "bg_asset": "TropicalCanyon/001.png",
+          "bg_asset": "TropicalCanyon/001.webp",
           "ambient_sound": "river_rapid_jungle"
         }
       ],
@@ -379,12 +379,12 @@
             "achievement_name": "【缅中平帆】",
             "achievement_desc": "抵达曼德勒萨尔温江沿岸，解锁“缅中航者”中级称号",
             "medal_id": "medal_nu_801",
-            "medal_icon": "icons/medal_nu_801.png"
+            "medal_icon": "icons/medal_nu_801.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_plains",
-          "bg_asset": "TropicalPlains/001.png",
+          "bg_asset": "TropicalPlains/001.webp",
           "ambient_sound": "tropical_plains_ambient"
         },
         {
@@ -401,12 +401,12 @@
             "achievement_name": "【掸邦怒航】",
             "achievement_desc": "抵达东枝萨尔温江沿岸，解锁“缅中航者”高级称号",
             "medal_id": "medal_nu_802",
-            "medal_icon": "icons/medal_nu_802.png"
+            "medal_icon": "icons/medal_nu_802.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_plains",
-          "bg_asset": "TropicalPlains/001.png",
+          "bg_asset": "TropicalPlains/001.webp",
           "ambient_sound": "tropical_plains_ambient"
         }
       ],
@@ -432,12 +432,12 @@
             "achievement_name": "【缅南丘帆】",
             "achievement_desc": "抵达毛淡棉萨尔温江沿岸，解锁“缅南航者”中级称号",
             "medal_id": "medal_nu_901",
-            "medal_icon": "icons/medal_nu_901.png"
+            "medal_icon": "icons/medal_nu_901.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_hills",
-          "bg_asset": "TropicalHills/001.png",
+          "bg_asset": "TropicalHills/001.webp",
           "ambient_sound": "tropical_hills_ambient"
         },
         {
@@ -454,12 +454,12 @@
             "achievement_name": "【海岸怒临】",
             "achievement_desc": "抵达土瓦萨尔温江沿岸，解锁“缅南航者”高级称号",
             "medal_id": "medal_nu_902",
-            "medal_icon": "icons/medal_nu_902.png"
+            "medal_icon": "icons/medal_nu_902.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.5,
           "environment_type": "tropical_hills",
-          "bg_asset": "TropicalHills/001.png",
+          "bg_asset": "TropicalHills/001.webp",
           "ambient_sound": "tropical_hills_ambient"
         }
       ],
@@ -485,12 +485,12 @@
             "achievement_name": "【三角洲怒帆】",
             "achievement_desc": "穿越萨尔温江三角洲，解锁“三角洲航者”中级称号",
             "medal_id": "medal_nu_1001",
-            "medal_icon": "icons/medal_nu_1001.png"
+            "medal_icon": "icons/medal_nu_1001.webp"
           },
           "difficulty_rating": 2,
           "base_flow_speed": 0.4,
           "environment_type": "tropical_delta",
-          "bg_asset": "TropicalDelta/001.png",
+          "bg_asset": "TropicalDelta/001.webp",
           "ambient_sound": "delta_ambient"
         },
         {
@@ -507,12 +507,12 @@
             "achievement_name": "【入海怒临】",
             "achievement_desc": "抵达萨尔温江入海口上游，解锁“三角洲航者”高级称号",
             "medal_id": "medal_nu_1002",
-            "medal_icon": "icons/medal_nu_1002.png"
+            "medal_icon": "icons/medal_nu_1002.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.6,
           "environment_type": "tropical_delta",
-          "bg_asset": "TropicalDelta/001.png",
+          "bg_asset": "TropicalDelta/001.webp",
           "ambient_sound": "delta_ambient"
         }
       ],
@@ -538,12 +538,12 @@
             "achievement_name": "【怒水归海】",
             "achievement_desc": "抵达萨尔温江入海口核心区，解锁“萨尔温征服者”高级称号",
             "medal_id": "medal_nu_1101",
-            "medal_icon": "icons/medal_nu_1101.png"
+            "medal_icon": "icons/medal_nu_1101.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.7,
           "environment_type": "tropical_ocean",
-          "bg_asset": "TropicalOcean/001.png",
+          "bg_asset": "TropicalOcean/001.webp",
           "ambient_sound": "ocean_waves_tropical"
         }
       ],
@@ -569,12 +569,12 @@
             "achievement_name": "【怒水归洋】",
             "achievement_desc": "完成怒江（萨尔温江）全流域3485km巡航，解锁“怒江终极征服者”终极称号！",
             "medal_id": "medal_nu_1201",
-            "medal_icon": "icons/medal_nu_1201.png"
+            "medal_icon": "icons/medal_nu_1201.webp"
           },
           "difficulty_rating": 3,
           "base_flow_speed": 0.8,
           "environment_type": "tropical_ocean",
-          "bg_asset": "TropicalOcean/001.png",
+          "bg_asset": "TropicalOcean/001.webp",
           "ambient_sound": "ocean_waves_tropical"
         }
       ],

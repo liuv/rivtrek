@@ -12,8 +12,8 @@
       "master_json_path": "assets/json/rivers/yangtze_master.json",
       "points_json_path": "assets/json/rivers/yangtze_points.json",
       "difficulty": 4,
-      "icon_path": "assets/icons/river_yangtze.png",
-      "cover_path": "assets/images/cover_yangtze.png"
+      "icon_path": "assets/icons/river_yangtze.webp",
+      "cover_path": "assets/images/cover_yangtze.webp"
     },
     {
       "numeric_id": 2,
@@ -25,8 +25,8 @@
       "master_json_path": "assets/json/rivers/yellow_river_master.json",
       "points_json_path": "assets/json/rivers/yellow_river_points.json",
       "difficulty": 5,
-      "icon_path": "assets/icons/river_yellow.png",
-      "cover_path": "assets/images/cover_yellow_river.png"
+      "icon_path": "assets/icons/river_yellow.webp",
+      "cover_path": "assets/images/cover_yellow_river.webp"
     },
     {
       "numeric_id": 3,
@@ -38,8 +38,8 @@
       "master_json_path": "assets/json/rivers/songhua_river_master.json",
       "points_json_path": "assets/json/rivers/songhua_river_points.json",
       "difficulty": 3,
-      "icon_path": "assets/icons/river_songhua.png",
-      "cover_path": "assets/images/cover_songhua_river.png"
+      "icon_path": "assets/icons/river_songhua.webp",
+      "cover_path": "assets/images/cover_songhua_river.webp"
     },
     {
       "numeric_id": 4,
@@ -51,8 +51,8 @@
       "master_json_path": "assets/json/rivers/nu_river_master.json",
       "points_json_path": "assets/json/rivers/nu_river_points.json",
       "difficulty": 4,
-      "icon_path": "assets/icons/river_nu.png",
-      "cover_path": "assets/images/cover_nu_river.png"
+      "icon_path": "assets/icons/river_nu.webp",
+      "cover_path": "assets/images/cover_nu_river.webp"
     },
     {
       "numeric_id": 5,
@@ -64,8 +64,8 @@
       "master_json_path": "assets/json/rivers/mekong_river_master.json",
       "points_json_path": "assets/json/rivers/mekong_river_points.json",
       "difficulty": 4,
-      "icon_path": "assets/icons/river_mekong.png",
-      "cover_path": "assets/images/cover_mekong_river.png"
+      "icon_path": "assets/icons/river_mekong.webp",
+      "cover_path": "assets/images/cover_mekong_river.webp"
     }
   ]
 }

@@ -84,7 +84,7 @@ def fill_sub_section(sub: dict, prefix: str) -> None:
     if "medal_id" not in ach:
         ach["medal_id"] = f"medal_{prefix}_{sub_id}"
     if "medal_icon" not in ach:
-        ach["medal_icon"] = f"icons/medal_{prefix}_{sub_id}.png"
+        ach["medal_icon"] = f"icons/medal_{prefix}_{sub_id}.webp"
 
 
 def process(master_base: str, dry_run: bool = False) -> None:
