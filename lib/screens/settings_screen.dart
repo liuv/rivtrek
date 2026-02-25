@@ -10,6 +10,7 @@ import 'package:app_settings/app_settings.dart';
 import '../models/river_settings.dart';
 import '../providers/theme_provider.dart';
 import '../services/backup_service.dart';
+import '../services/coze_service.dart';
 import '../services/step_sync_service.dart';
 import '../providers/challenge_provider.dart';
 import '../providers/user_profile_provider.dart';
@@ -26,6 +27,8 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   bool? _batteryOptDisabled;
   bool? _autoStartEnabled;
   bool _permissionLoading = true;
+  final TextEditingController _cozeTokenController = TextEditingController();
+  final TextEditingController _cozeBotIdController = TextEditingController();
 
   @override
   void initState() {
@@ -37,6 +40,8 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
 
   @override
   void dispose() {
+    _cozeTokenController.dispose();
+    _cozeBotIdController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -66,6 +71,29 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
 
   Future<void> _loadInitialSettings() async {
     await RiverSettings.loadFromPrefs();
+    _loadCozeConfig();
+  }
+
+  Future<void> _loadCozeConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _cozeTokenController.text = prefs.getString('coze_api_token') ?? '';
+        _cozeBotIdController.text = prefs.getString('coze_bot_id') ?? '';
+      });
+    }
+  }
+
+  Future<void> _saveCozeConfig() async {
+    await CozeService.instance.setConfig(
+      token: _cozeTokenController.text,
+      botId: _cozeBotIdController.text,
+    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Coze 配置已保存'), duration: Duration(seconds: 2)),
+      );
+    }
   }
 
   Future<void> _saveSettings({
@@ -259,6 +287,99 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               ),
               const SizedBox(height: 8),
               _buildDriftSpeedMultiplierSlider(context, settings.driftCrossScreenSeconds),
+              const SizedBox(height: 32),
+              _buildSectionTitle(context, '河川引路人（Coze）'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  CozeService.instance.isBuildTimeConfigured
+                      ? '河川引路人已由开发者配置，可直接使用。'
+                      : '配置 Coze 智能体后，可在「河川引路人」中咨询江河风土、历史典故，并生成个性化诗词签名。',
+                  style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, height: 1.35),
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (CozeService.instance.isBuildTimeConfigured)
+                Card(
+                  elevation: 0,
+                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, color: colorScheme.primary, size: 24),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            '已配置，凭证在构建时注入，用户无需填写。',
+                            style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Card(
+                  elevation: 0,
+                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _cozeTokenController,
+                          decoration: const InputDecoration(
+                            labelText: 'API Token (pat_xxx)',
+                            hintText: '从 Coze 开放平台获取',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          obscureText: true,
+                          autocorrect: false,
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _cozeBotIdController,
+                          decoration: const InputDecoration(
+                            labelText: 'Bot ID',
+                            hintText: '智能体 ID，创建后从链接中复制',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          autocorrect: false,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () async {
+                                await CozeService.instance.clearConfig();
+                                _cozeTokenController.clear();
+                                _cozeBotIdController.clear();
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('已清除 Coze 配置'), duration: Duration(seconds: 2)),
+                                  );
+                                }
+                              },
+                              child: const Text('清除'),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              onPressed: _saveCozeConfig,
+                              child: const Text('保存'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               const SizedBox(height: 32),
               _buildSectionTitle(context, '数据与备份'),
               Card(

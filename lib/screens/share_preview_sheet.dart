@@ -10,6 +10,8 @@ import 'package:rivtrek/controllers/flow_controller.dart';
 import 'package:rivtrek/models/daily_stats.dart';
 import 'package:rivtrek/providers/challenge_provider.dart';
 import 'package:rivtrek/services/database_service.dart';
+import 'package:dio/dio.dart';
+import 'package:rivtrek/services/coze_service.dart';
 import 'package:rivtrek/widgets/share_card.dart';
 import 'package:rivtrek/providers/user_profile_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -191,6 +193,23 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
                     },
                   );
                 }),
+                if (CozeService.instance.isConfiguredSync)
+                  ListTile(
+                    leading: Icon(Icons.auto_awesome, size: 20, color: themeColor),
+                    title: Text(
+                      'AI 生成诗词签名',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: cs.onSurface,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      _generatePoeticSignature(themeColor);
+                    },
+                  ),
                 ListTile(
                   title: Text(
                     '自定义一句',
@@ -218,6 +237,79 @@ class _SharePreviewSheetState extends State<SharePreviewSheet> {
         );
       },
     );
+  }
+
+  Future<void> _generatePoeticSignature(Color themeColor) async {
+    if (!await CozeService.instance.isConfigured) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请先在设置中配置 Coze API Token 和 Bot ID')),
+        );
+      }
+      return;
+    }
+    final challenge = context.read<ChallengeProvider>();
+    final profile = context.read<UserProfileProvider>();
+    final river = challenge.activeRiver;
+    if (river == null) return;
+
+    if (mounted) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 20),
+              Text('正在生成诗词签名…', style: TextStyle(color: Theme.of(ctx).colorScheme.onSurface)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    try {
+      final userId = await CozeService.instance.getOrCreateUserId();
+      final phrase = await CozeService.instance.generatePoeticSignature(
+        userId: userId,
+        nickname: profile.displayNameForShare,
+        riverName: river.name,
+        sectionName: challenge.currentSubSection?.name ?? '—',
+        currentKm: challenge.currentDistance,
+        totalKm: river.totalLengthKm,
+      );
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        setState(() {
+          _selectedPhraseIndex = -1;
+          _customPhraseText = phrase;
+          _customPhraseController.text = phrase;
+          _saveClosingPhrase(phrase);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('诗词签名已生成'), duration: Duration(seconds: 2)),
+        );
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('生成失败：${parseCozeDioError(e)}'),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('生成失败：$e'), duration: const Duration(seconds: 4)),
+        );
+      }
+    }
   }
 
   void _showCustomPhraseDialog(Color themeColor) {

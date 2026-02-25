@@ -17,6 +17,7 @@ import 'screens/initial_river_selection_screen.dart';
 import 'providers/challenge_provider.dart';
 import 'providers/user_profile_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/river_guide_provider.dart';
 import 'controllers/flow_controller.dart';
 import 'models/river_settings.dart';
 import 'repositories/river_repository.dart';
@@ -84,6 +85,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider.instance),
         ChangeNotifierProvider(create: (_) => ChallengeProvider()),
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+        ChangeNotifierProvider(create: (_) => RiverGuideProvider()),
         ChangeNotifierProxyProvider<ChallengeProvider, FlowController>(
           create: (_) => FlowController(),
           update: (_, challenge, flow) => flow!..updateFromChallenge(challenge),

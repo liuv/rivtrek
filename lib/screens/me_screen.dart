@@ -7,6 +7,7 @@ import 'package:rivtrek/screens/challenge_records_menu_screen.dart';
 import 'package:rivtrek/screens/share_preview_sheet.dart';
 import 'package:rivtrek/screens/about_rivtrek_screen.dart';
 import 'package:rivtrek/screens/profile_edit_screen.dart';
+import 'package:rivtrek/screens/river_guide_screen.dart';
 import 'package:rivtrek/providers/user_profile_provider.dart';
 import 'dart:io';
 
@@ -480,6 +481,14 @@ class MeScreen extends StatelessWidget {
                   Divider(color: cs.outline.withValues(alpha: 0.2)),
                   const SizedBox(height: 20),
                   // Settings/Menu
+                  _buildMenuItem(context, "河川引路人", Icons.auto_stories_rounded, onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RiverGuideScreen(),
+                      ),
+                    );
+                  }),
                   _buildMenuItem(context, "分享进度", Icons.share_rounded, onTap: () {
                     showModalBottomSheet<void>(
                       context: context,

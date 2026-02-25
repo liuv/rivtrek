@@ -1,0 +1,4 @@
+{
+  "COZE_API_TOKEN": "从 Coze 开放平台获取的 Personal Access Token（pat_xxx）",
+  "COZE_BOT_ID": "智能体 ID，如 7610775641889947698"
+}

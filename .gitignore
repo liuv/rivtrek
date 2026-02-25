@@ -47,3 +47,6 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 tools/amap.txt
+
+# Coze 凭证（构建时注入，勿提交）
+dart_defines.json
