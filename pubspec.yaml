@@ -61,7 +61,6 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/audio/
-    - assets/geo/rivers/yangtze/
     - assets/db/
   shaders:
     - shaders/river.frag
