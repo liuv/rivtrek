@@ -1,18 +1,25 @@
 // 涉川数据备份与恢复：主库表、SharedPreferences、用户头像打包为单文件，支持换机导入。
 // 设计：版本化 manifest、类型化 prefs 导出、表数据 JSON 序列化、二进制附件（头像），ZIP 单文件便于分享与校验。
+// v2: 核心数据（步数、里程、事件、敏感 prefs）使用 AES-256-GCM 加密，防止篡改伪造徒步数据；头像与展示类 prefs 保持明文。
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:archive/archive.dart';
+import 'package:cryptography/cryptography.dart';
 
 import 'database_service.dart';
 import '../models/daily_stats.dart';
 
-const int kBackupSchemaVersion = 1;
+const int kBackupSchemaVersion = 2;
 const String kBackupFileExtension = 'rivtrek';
+
+/// 应用内嵌密钥，用于派生加密密钥。生产环境可通过 build-time 注入替换。
+/// 即使开源可见，仍能有效阻止普通用户直接修改 JSON 伪造数据（需逆向+重加密）。
+const String _kBackupAppSecret = 'rivtrek-backup-aes256-v2-7f3e9a2b';
 
 /// 需要备份的 SharedPreferences 键及其类型（s=String, i=int, b=bool, d=double, l=List<String>）
 const Map<String, String> _prefsKeys = {
@@ -37,68 +44,135 @@ const Map<String, String> _prefsKeys = {
   'Favorites': 'l',
 };
 
+/// 敏感 prefs 键（影响挑战进度/步数同步，需加密防篡改）
+const Set<String> _sensitivePrefsKeys = {
+  'challenge_start_date',
+  'sensor_last_sync_date',
+  'sensor_last_day_end_cumulative',
+  'sensor_steps_at_day_start',
+};
+
 class BackupService {
   static final BackupService instance = BackupService._();
   BackupService._();
 
+  static final _aesGcm = AesGcm.with256bits();
+  static final _sha256 = Sha256();
+  static final _random = Random.secure();
+
+  /// 从 app secret + salt 派生 AES-256 密钥
+  Future<SecretKey> _deriveKey(List<int> salt) async {
+    final combined = utf8.encode(_kBackupAppSecret) + salt;
+    final hash = await _sha256.hash(combined);
+    return SecretKey(hash.bytes);
+  }
+
+  /// 加密 JSON 字符串，返回二进制（nonce + ciphertext + mac）
+  Future<List<int>> _encrypt(String plainJson, SecretKey key) async {
+    final plainBytes = utf8.encode(plainJson);
+    final secretBox = await _aesGcm.encrypt(
+      plainBytes,
+      secretKey: key,
+    );
+    return secretBox.concatenation();
+  }
+
+  /// 解密二进制为 JSON 字符串
+  Future<String> _decrypt(List<int> encryptedBytes, SecretKey key) async {
+    final secretBox = SecretBox.fromConcatenation(
+      encryptedBytes,
+      nonceLength: _aesGcm.nonceLength,
+      macLength: _aesGcm.macAlgorithm.macLength,
+    );
+    final decrypted = await _aesGcm.decrypt(
+      secretBox,
+      secretKey: key,
+    );
+    return utf8.decode(decrypted);
+  }
+
+  /// 生成 16 字节随机 salt
+  List<int> _randomSalt() => List<int>.generate(16, (_) => _random.nextInt(256));
+
   /// 生成备份并返回本地文件路径，便于分享或保存。
-  /// 包含：manifest、prefs、主库三张表导出、用户头像（若有）。
+  /// v2: 核心数据加密，头像与展示类 prefs 明文。
   Future<String> createBackup() async {
     final dir = await getTemporaryDirectory();
     final name = 'rivtrek_backup_${DateTime.now().toIso8601String().replaceAll(RegExp(r'[:.]'), '-')}.$kBackupFileExtension';
     final path = p.join(dir.path, name);
 
+    final salt = _randomSalt();
+    final key = await _deriveKey(salt);
+
     final archive = Archive();
 
-    // 1. manifest
+    // 1. manifest（含 salt，用于派生密钥）
     final manifest = {
       'version': kBackupSchemaVersion,
       'created_at': DateTime.now().toIso8601String(),
+      'encrypted': true,
+      'salt': base64Encode(salt),
     };
     final manifestBytes = utf8.encode(jsonEncode(manifest));
     archive.addFile(ArchiveFile('manifest.json', manifestBytes.length, manifestBytes));
 
-    // 2. prefs（按类型导出，恢复时按类型写回）
+    // 2. prefs：拆分为明文（展示类）与加密（敏感）
     final prefs = await SharedPreferences.getInstance();
-    final prefsMap = <String, dynamic>{};
+    final prefsPlain = <String, dynamic>{};
+    final prefsSensitive = <String, dynamic>{};
     for (final entry in _prefsKeys.entries) {
-      final key = entry.key;
+      final keyName = entry.key;
       final type = entry.value;
       Object? v;
       switch (type) {
         case 's':
-          v = prefs.getString(key);
+          v = prefs.getString(keyName);
           break;
         case 'i':
-          v = prefs.getInt(key);
+          v = prefs.getInt(keyName);
           break;
         case 'b':
-          v = prefs.getBool(key);
+          v = prefs.getBool(keyName);
           break;
         case 'd':
-          v = prefs.getDouble(key);
+          v = prefs.getDouble(keyName);
           break;
         case 'l':
-          v = prefs.getStringList(key);
+          v = prefs.getStringList(keyName);
           break;
       }
-      if (v != null) prefsMap[key] = v;
+      if (v != null) {
+        if (_sensitivePrefsKeys.contains(keyName)) {
+          prefsSensitive[keyName] = v;
+        } else {
+          prefsPlain[keyName] = v;
+        }
+      }
     }
-    final prefsBytes = utf8.encode(jsonEncode(prefsMap));
-    archive.addFile(ArchiveFile('prefs.json', prefsBytes.length, prefsBytes));
+    final prefsPlainBytes = utf8.encode(jsonEncode(prefsPlain));
+    archive.addFile(ArchiveFile('prefs.json', prefsPlainBytes.length, prefsPlainBytes));
 
-    // 3. 主库表导出（不关库，只读导出）
+    final prefsSensitiveJson = jsonEncode(prefsSensitive);
+    final prefsSensitiveEnc = await _encrypt(prefsSensitiveJson, key);
+    archive.addFile(ArchiveFile('prefs_sensitive.enc', prefsSensitiveEnc.length, prefsSensitiveEnc));
+
+    // 3. 主库表导出（加密）
     final activities = await DatabaseService.instance.getAllActivities();
     final weather = await DatabaseService.instance.getAllWeather();
     final events = await DatabaseService.instance.getAllEvents();
-    final activitiesBytes = utf8.encode(jsonEncode(activities.map((a) => a.toMap()).toList()));
-    final weatherBytes = utf8.encode(jsonEncode(weather.map((w) => w.toMap()).toList()));
-    final eventsBytes = utf8.encode(jsonEncode(events.map((e) => e.toMap()).toList()));
-    archive.addFile(ArchiveFile('data/activities.json', activitiesBytes.length, activitiesBytes));
-    archive.addFile(ArchiveFile('data/weather.json', weatherBytes.length, weatherBytes));
-    archive.addFile(ArchiveFile('data/events.json', eventsBytes.length, eventsBytes));
+    final activitiesJson = jsonEncode(activities.map((a) => a.toMap()).toList());
+    final weatherJson = jsonEncode(weather.map((w) => w.toMap()).toList());
+    final eventsJson = jsonEncode(events.map((e) => e.toMap()).toList());
 
-    // 4. 用户头像（若有）：备份文件内容，恢复时写到新设备应用目录并更新 prefs 中的路径
+    final activitiesEnc = await _encrypt(activitiesJson, key);
+    final weatherEnc = await _encrypt(weatherJson, key);
+    final eventsEnc = await _encrypt(eventsJson, key);
+
+    archive.addFile(ArchiveFile('data/activities.enc', activitiesEnc.length, activitiesEnc));
+    archive.addFile(ArchiveFile('data/weather.enc', weatherEnc.length, weatherEnc));
+    archive.addFile(ArchiveFile('data/events.enc', eventsEnc.length, eventsEnc));
+
+    // 4. 用户头像（明文，不加密）
     final avatarPath = prefs.getString('user_avatar_path');
     if (avatarPath != null && avatarPath.isNotEmpty) {
       final f = File(avatarPath);
@@ -127,7 +201,7 @@ class BackupService {
   }
 
   /// 从备份文件恢复。会覆盖当前主库表、prefs 中备份过的键、用户头像。
-  /// 恢复后调用方应让 ChallengeProvider / UserProfileProvider / FlowController 重新加载（如 switchRiver、load、refreshFromDb）。
+  /// 支持 v1 明文备份与 v2 加密备份。
   Future<void> restoreBackup(String backupFilePath) async {
     final file = File(backupFilePath);
     if (!file.existsSync()) throw ArgumentError('Backup file not found: $backupFilePath');
@@ -135,21 +209,16 @@ class BackupService {
     final archive = ZipDecoder().decodeBytes(bytes);
     if (archive.isEmpty) throw ArgumentError('Invalid backup: empty archive');
 
-    ArchiveFile? manifestFile;
-    ArchiveFile? prefsFile;
-    ArchiveFile? activitiesFile;
-    ArchiveFile? weatherFile;
-    ArchiveFile? eventsFile;
-    ArchiveFile? avatarFile;
+    final files = <String, ArchiveFile>{};
     for (final f in archive.files) {
-      if (f.name == 'manifest.json') manifestFile = f;
-      else if (f.name == 'prefs.json') prefsFile = f;
-      else if (f.name == 'data/activities.json') activitiesFile = f;
-      else if (f.name == 'data/weather.json') weatherFile = f;
-      else if (f.name == 'data/events.json') eventsFile = f;
-      else if (f.name == 'user/avatar.jpg') avatarFile = f;
+      files[f.name] = f;
     }
-    if (manifestFile == null || prefsFile == null) throw ArgumentError('Invalid backup: missing manifest or prefs');
+
+    final manifestFile = files['manifest.json'];
+    final prefsFile = files['prefs.json'];
+    if (manifestFile == null || prefsFile == null) {
+      throw ArgumentError('Invalid backup: missing manifest or prefs');
+    }
 
     final manifest = jsonDecode(utf8.decode(manifestFile.content)) as Map<String, dynamic>;
     final version = manifest['version'] as int? ?? 0;
@@ -157,8 +226,142 @@ class BackupService {
       throw ArgumentError('Backup was created by a newer app version. Please update 涉川.');
     }
 
+    final encrypted = manifest['encrypted'] as bool? ?? false;
+    SecretKey? key;
+    if (encrypted) {
+      final saltB64 = manifest['salt'] as String?;
+      if (saltB64 == null || saltB64.isEmpty) {
+        throw ArgumentError('Invalid encrypted backup: missing salt');
+      }
+      final salt = base64Decode(saltB64);
+      key = await _deriveKey(salt);
+    }
+
     final prefs = await SharedPreferences.getInstance();
+
+    // 恢复明文 prefs
     final prefsMap = jsonDecode(utf8.decode(prefsFile.content)) as Map<String, dynamic>;
+    await _applyPrefsMap(prefs, prefsMap);
+
+    // 恢复加密的敏感 prefs
+    final prefsSensitiveFile = files['prefs_sensitive.enc'];
+    if (encrypted && prefsSensitiveFile != null && prefsSensitiveFile.content.isNotEmpty && key != null) {
+      final decrypted = await _decrypt(prefsSensitiveFile.content, key);
+      final sensitiveMap = jsonDecode(decrypted) as Map<String, dynamic>;
+      await _applyPrefsMap(prefs, sensitiveMap);
+    } else if (!encrypted && prefsSensitiveFile == null) {
+      // v1 所有 prefs 已在 prefsMap 中
+    }
+
+    // 恢复头像
+    final avatarFile = files['user/avatar.jpg'];
+    if (avatarFile != null && avatarFile.content.isNotEmpty) {
+      final dir = await getApplicationDocumentsDirectory();
+      const name = 'avatar.jpg';
+      final dest = File(p.join(dir.path, name));
+      await dest.writeAsBytes(avatarFile.content);
+      await prefs.setString('user_avatar_path', dest.path);
+    } else {
+      await prefs.remove('user_avatar_path');
+    }
+
+    // 恢复主库
+    final db = await DatabaseService.instance.database;
+    await db.delete('daily_activities');
+    await db.delete('daily_weather');
+    await db.delete('river_events');
+
+    if (encrypted && key != null) {
+      // v2 加密格式
+      final activitiesEnc = files['data/activities.enc'];
+      final weatherEnc = files['data/weather.enc'];
+      final eventsEnc = files['data/events.enc'];
+
+      if (activitiesEnc != null && activitiesEnc.content.isNotEmpty) {
+        final jsonStr = await _decrypt(activitiesEnc.content, key);
+        final list = jsonDecode(jsonStr) as List<dynamic>;
+        for (final m in list) {
+          final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
+          await DatabaseService.instance.saveActivity(a);
+        }
+      }
+      if (weatherEnc != null && weatherEnc.content.isNotEmpty) {
+        final jsonStr = await _decrypt(weatherEnc.content, key);
+        final list = jsonDecode(jsonStr) as List<dynamic>;
+        for (final m in list) {
+          final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
+          await DatabaseService.instance.saveWeather(w);
+        }
+      }
+      if (eventsEnc != null && eventsEnc.content.isNotEmpty) {
+        final jsonStr = await _decrypt(eventsEnc.content, key);
+        final list = jsonDecode(jsonStr) as List<dynamic>;
+        for (final m in list) {
+          final map = Map<String, dynamic>.from(m as Map);
+          final e = RiverEvent(
+            id: map['id'] is int ? map['id'] as int : null,
+            date: map['date'] as String,
+            timestamp: (map['timestamp'] as num).toInt(),
+            type: RiverEventType.values.firstWhere(
+              (x) => x.name == map['type'],
+              orElse: () => RiverEventType.activity,
+            ),
+            name: map['name'] as String,
+            description: map['description'] as String,
+            latitude: (map['latitude'] as num).toDouble(),
+            longitude: (map['longitude'] as num).toDouble(),
+            distanceAtKm: (map['distance_at_km'] as num).toDouble(),
+            extraData: map['extra_data'] as String? ?? '{}',
+          );
+          await DatabaseService.instance.recordEvent(e);
+        }
+      }
+    } else {
+      // v1 明文格式
+      final activitiesFile = files['data/activities.json'];
+      final weatherFile = files['data/weather.json'];
+      final eventsFile = files['data/events.json'];
+
+      if (activitiesFile != null && activitiesFile.content.isNotEmpty) {
+        final list = jsonDecode(utf8.decode(activitiesFile.content)) as List<dynamic>;
+        for (final m in list) {
+          final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
+          await DatabaseService.instance.saveActivity(a);
+        }
+      }
+      if (weatherFile != null && weatherFile.content.isNotEmpty) {
+        final list = jsonDecode(utf8.decode(weatherFile.content)) as List<dynamic>;
+        for (final m in list) {
+          final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
+          await DatabaseService.instance.saveWeather(w);
+        }
+      }
+      if (eventsFile != null && eventsFile.content.isNotEmpty) {
+        final list = jsonDecode(utf8.decode(eventsFile.content)) as List<dynamic>;
+        for (final m in list) {
+          final map = Map<String, dynamic>.from(m as Map);
+          final e = RiverEvent(
+            id: map['id'] is int ? map['id'] as int : null,
+            date: map['date'] as String,
+            timestamp: (map['timestamp'] as num).toInt(),
+            type: RiverEventType.values.firstWhere(
+              (x) => x.name == map['type'],
+              orElse: () => RiverEventType.activity,
+            ),
+            name: map['name'] as String,
+            description: map['description'] as String,
+            latitude: (map['latitude'] as num).toDouble(),
+            longitude: (map['longitude'] as num).toDouble(),
+            distanceAtKm: (map['distance_at_km'] as num).toDouble(),
+            extraData: map['extra_data'] as String? ?? '{}',
+          );
+          await DatabaseService.instance.recordEvent(e);
+        }
+      }
+    }
+  }
+
+  Future<void> _applyPrefsMap(SharedPreferences prefs, Map<String, dynamic> prefsMap) async {
     for (final entry in prefsMap.entries) {
       final key = entry.key;
       final type = _prefsKeys[key];
@@ -180,60 +383,6 @@ class BackupService {
         case 'l':
           if (v is List) await prefs.setStringList(key, v.map((e) => e.toString()).toList());
           break;
-      }
-    }
-
-    // 恢复头像到应用目录，并覆盖 prefs 中的路径（新设备路径不同）
-    if (avatarFile != null && avatarFile.content.isNotEmpty) {
-      final dir = await getApplicationDocumentsDirectory();
-      const name = 'avatar.jpg';
-      final dest = File(p.join(dir.path, name));
-      await dest.writeAsBytes(avatarFile.content);
-      await prefs.setString('user_avatar_path', dest.path);
-    } else {
-      await prefs.remove('user_avatar_path');
-    }
-
-    // 恢复主库：清空后按备份逐条插入
-    final db = await DatabaseService.instance.database;
-    await db.delete('daily_activities');
-    await db.delete('daily_weather');
-    await db.delete('river_events');
-
-    if (activitiesFile != null && activitiesFile.content.isNotEmpty) {
-      final list = jsonDecode(utf8.decode(activitiesFile.content)) as List<dynamic>;
-      for (final m in list) {
-        final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
-        await DatabaseService.instance.saveActivity(a);
-      }
-    }
-    if (weatherFile != null && weatherFile.content.isNotEmpty) {
-      final list = jsonDecode(utf8.decode(weatherFile.content)) as List<dynamic>;
-      for (final m in list) {
-        final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
-        await DatabaseService.instance.saveWeather(w);
-      }
-    }
-    if (eventsFile != null && eventsFile.content.isNotEmpty) {
-      final list = jsonDecode(utf8.decode(eventsFile.content)) as List<dynamic>;
-      for (final m in list) {
-        final map = Map<String, dynamic>.from(m as Map);
-        final e = RiverEvent(
-          id: map['id'] is int ? map['id'] as int : null,
-          date: map['date'] as String,
-          timestamp: (map['timestamp'] as num).toInt(),
-          type: RiverEventType.values.firstWhere(
-            (x) => x.name == map['type'],
-            orElse: () => RiverEventType.activity,
-          ),
-          name: map['name'] as String,
-          description: map['description'] as String,
-          latitude: (map['latitude'] as num).toDouble(),
-          longitude: (map['longitude'] as num).toDouble(),
-          distanceAtKm: (map['distance_at_km'] as num).toDouble(),
-          extraData: map['extra_data'] as String? ?? '{}',
-        );
-        await DatabaseService.instance.recordEvent(e);
       }
     }
   }
