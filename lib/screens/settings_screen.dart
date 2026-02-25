@@ -307,13 +307,6 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                     : '通过微信、邮件等分享到云盘或新设备'),
                 onTap: () => Navigator.of(ctx).pop('share'),
               ),
-              if (!Platform.isIOS)
-                ListTile(
-                  leading: const Icon(Icons.save_alt),
-                  title: const Text('保存到手机'),
-                  subtitle: const Text('保存到本机「下载」目录，便于稍后拷贝到电脑或新机'),
-                  onTap: () => Navigator.of(ctx).pop('save'),
-                ),
               const SizedBox(height: 8),
             ],
           ),
@@ -328,17 +321,6 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('请通过分享保存到云盘或发送到新设备'), duration: Duration(seconds: 3)),
-          );
-        }
-      } else if (choice == 'save') {
-        final savedPath = await BackupService.instance.saveBackupToDownloads(path);
-        if (mounted && savedPath != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('已保存到：$savedPath'), duration: const Duration(seconds: 4)),
-          );
-        } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('无法获取下载目录，请使用「分享」保存'), duration: Duration(seconds: 3)),
           );
         }
       }

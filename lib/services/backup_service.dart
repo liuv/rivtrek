@@ -44,9 +44,14 @@ const Map<String, String> _prefsKeys = {
   'Favorites': 'l',
 };
 
-/// 敏感 prefs 键（影响挑战进度/步数同步，需加密防篡改）
+/// 敏感 prefs 键（影响挑战进度，需加密防篡改）
 const Set<String> _sensitivePrefsKeys = {
   'challenge_start_date',
+};
+
+/// 设备相关 prefs 键：与当前设备硬件绑定，换机/重装后无效，不备份不恢复。
+/// 恢复后步数同步会走「首次安装」逻辑，以当前传感器为基线重新计算今日步数。
+const Set<String> _deviceSpecificPrefsKeys = {
   'sensor_last_sync_date',
   'sensor_last_day_end_cumulative',
   'sensor_steps_at_day_start',
@@ -141,7 +146,7 @@ class BackupService {
           v = prefs.getStringList(keyName);
           break;
       }
-      if (v != null) {
+      if (v != null && !_deviceSpecificPrefsKeys.contains(keyName)) {
         if (_sensitivePrefsKeys.contains(keyName)) {
           prefsSensitive[keyName] = v;
         } else {
@@ -188,20 +193,8 @@ class BackupService {
     return path;
   }
 
-  /// 将已生成的备份文件复制到本机「下载」目录（应用专属目录，无需存储权限），返回目标路径；失败返回 null。
-  Future<String?> saveBackupToDownloads(String backupFilePath) async {
-    final src = File(backupFilePath);
-    if (!src.existsSync()) return null;
-    final dir = await getDownloadsDirectory();
-    if (dir == null) return null;
-    final name = p.basename(backupFilePath);
-    final dest = File(p.join(dir.path, name));
-    await src.copy(dest.path);
-    return dest.path;
-  }
-
   /// 从备份文件恢复。会覆盖当前主库表、prefs 中备份过的键、用户头像。
-  /// 支持 v1 明文备份与 v2 加密备份。
+  /// 仅支持 v2 加密备份格式。
   Future<void> restoreBackup(String backupFilePath) async {
     final file = File(backupFilePath);
     if (!file.existsSync()) throw ArgumentError('Backup file not found: $backupFilePath');
@@ -225,17 +218,16 @@ class BackupService {
     if (version > kBackupSchemaVersion) {
       throw ArgumentError('Backup was created by a newer app version. Please update 涉川.');
     }
-
     final encrypted = manifest['encrypted'] as bool? ?? false;
-    SecretKey? key;
-    if (encrypted) {
-      final saltB64 = manifest['salt'] as String?;
-      if (saltB64 == null || saltB64.isEmpty) {
-        throw ArgumentError('Invalid encrypted backup: missing salt');
-      }
-      final salt = base64Decode(saltB64);
-      key = await _deriveKey(salt);
+    if (!encrypted || version < 2) {
+      throw ArgumentError('此备份为早期明文格式，已不再支持恢复。请使用最新版本创建加密备份。');
     }
+
+    final saltB64 = manifest['salt'] as String?;
+    if (saltB64 == null || saltB64.isEmpty) {
+      throw ArgumentError('Invalid encrypted backup: missing salt');
+    }
+    final key = await _deriveKey(base64Decode(saltB64));
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -245,12 +237,15 @@ class BackupService {
 
     // 恢复加密的敏感 prefs
     final prefsSensitiveFile = files['prefs_sensitive.enc'];
-    if (encrypted && prefsSensitiveFile != null && prefsSensitiveFile.content.isNotEmpty && key != null) {
+    if (prefsSensitiveFile != null && prefsSensitiveFile.content.isNotEmpty) {
       final decrypted = await _decrypt(prefsSensitiveFile.content, key);
       final sensitiveMap = jsonDecode(decrypted) as Map<String, dynamic>;
       await _applyPrefsMap(prefs, sensitiveMap);
-    } else if (!encrypted && prefsSensitiveFile == null) {
-      // v1 所有 prefs 已在 prefsMap 中
+    }
+
+    // 清除设备相关 sensor 基线：换机/重装后旧设备的累计值无效，步数同步会以当前传感器为基线重新计算今日步数
+    for (final k in _deviceSpecificPrefsKeys) {
+      await prefs.remove(k);
     }
 
     // 恢复头像
@@ -271,92 +266,48 @@ class BackupService {
     await db.delete('daily_weather');
     await db.delete('river_events');
 
-    if (encrypted && key != null) {
-      // v2 加密格式
-      final activitiesEnc = files['data/activities.enc'];
-      final weatherEnc = files['data/weather.enc'];
-      final eventsEnc = files['data/events.enc'];
+    // 恢复主库（v2 加密格式）
+    final activitiesEnc = files['data/activities.enc'];
+    final weatherEnc = files['data/weather.enc'];
+    final eventsEnc = files['data/events.enc'];
 
-      if (activitiesEnc != null && activitiesEnc.content.isNotEmpty) {
-        final jsonStr = await _decrypt(activitiesEnc.content, key);
-        final list = jsonDecode(jsonStr) as List<dynamic>;
-        for (final m in list) {
-          final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
-          await DatabaseService.instance.saveActivity(a);
-        }
+    if (activitiesEnc != null && activitiesEnc.content.isNotEmpty) {
+      final jsonStr = await _decrypt(activitiesEnc.content, key);
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      for (final m in list) {
+        final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
+        await DatabaseService.instance.saveActivity(a);
       }
-      if (weatherEnc != null && weatherEnc.content.isNotEmpty) {
-        final jsonStr = await _decrypt(weatherEnc.content, key);
-        final list = jsonDecode(jsonStr) as List<dynamic>;
-        for (final m in list) {
-          final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
-          await DatabaseService.instance.saveWeather(w);
-        }
+    }
+    if (weatherEnc != null && weatherEnc.content.isNotEmpty) {
+      final jsonStr = await _decrypt(weatherEnc.content, key);
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      for (final m in list) {
+        final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
+        await DatabaseService.instance.saveWeather(w);
       }
-      if (eventsEnc != null && eventsEnc.content.isNotEmpty) {
-        final jsonStr = await _decrypt(eventsEnc.content, key);
-        final list = jsonDecode(jsonStr) as List<dynamic>;
-        for (final m in list) {
-          final map = Map<String, dynamic>.from(m as Map);
-          final e = RiverEvent(
-            id: map['id'] is int ? map['id'] as int : null,
-            date: map['date'] as String,
-            timestamp: (map['timestamp'] as num).toInt(),
-            type: RiverEventType.values.firstWhere(
-              (x) => x.name == map['type'],
-              orElse: () => RiverEventType.activity,
-            ),
-            name: map['name'] as String,
-            description: map['description'] as String,
-            latitude: (map['latitude'] as num).toDouble(),
-            longitude: (map['longitude'] as num).toDouble(),
-            distanceAtKm: (map['distance_at_km'] as num).toDouble(),
-            extraData: map['extra_data'] as String? ?? '{}',
-          );
-          await DatabaseService.instance.recordEvent(e);
-        }
-      }
-    } else {
-      // v1 明文格式
-      final activitiesFile = files['data/activities.json'];
-      final weatherFile = files['data/weather.json'];
-      final eventsFile = files['data/events.json'];
-
-      if (activitiesFile != null && activitiesFile.content.isNotEmpty) {
-        final list = jsonDecode(utf8.decode(activitiesFile.content)) as List<dynamic>;
-        for (final m in list) {
-          final a = DailyActivity.fromMap(Map<String, dynamic>.from(m as Map));
-          await DatabaseService.instance.saveActivity(a);
-        }
-      }
-      if (weatherFile != null && weatherFile.content.isNotEmpty) {
-        final list = jsonDecode(utf8.decode(weatherFile.content)) as List<dynamic>;
-        for (final m in list) {
-          final w = DailyWeather.fromMap(Map<String, dynamic>.from(m as Map));
-          await DatabaseService.instance.saveWeather(w);
-        }
-      }
-      if (eventsFile != null && eventsFile.content.isNotEmpty) {
-        final list = jsonDecode(utf8.decode(eventsFile.content)) as List<dynamic>;
-        for (final m in list) {
-          final map = Map<String, dynamic>.from(m as Map);
-          final e = RiverEvent(
-            id: map['id'] is int ? map['id'] as int : null,
-            date: map['date'] as String,
-            timestamp: (map['timestamp'] as num).toInt(),
-            type: RiverEventType.values.firstWhere(
-              (x) => x.name == map['type'],
-              orElse: () => RiverEventType.activity,
-            ),
-            name: map['name'] as String,
-            description: map['description'] as String,
-            latitude: (map['latitude'] as num).toDouble(),
-            longitude: (map['longitude'] as num).toDouble(),
-            distanceAtKm: (map['distance_at_km'] as num).toDouble(),
-            extraData: map['extra_data'] as String? ?? '{}',
-          );
-          await DatabaseService.instance.recordEvent(e);
-        }
+    }
+    if (eventsEnc != null && eventsEnc.content.isNotEmpty) {
+      final jsonStr = await _decrypt(eventsEnc.content, key);
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      for (final m in list) {
+        final map = Map<String, dynamic>.from(m as Map);
+        final e = RiverEvent(
+          id: map['id'] is int ? map['id'] as int : null,
+          date: map['date'] as String,
+          timestamp: (map['timestamp'] as num).toInt(),
+          type: RiverEventType.values.firstWhere(
+            (x) => x.name == map['type'],
+            orElse: () => RiverEventType.activity,
+          ),
+          name: map['name'] as String,
+          description: map['description'] as String,
+          latitude: (map['latitude'] as num).toDouble(),
+          longitude: (map['longitude'] as num).toDouble(),
+          distanceAtKm: (map['distance_at_km'] as num).toDouble(),
+          extraData: map['extra_data'] as String? ?? '{}',
+        );
+        await DatabaseService.instance.recordEvent(e);
       }
     }
   }
@@ -364,6 +315,7 @@ class BackupService {
   Future<void> _applyPrefsMap(SharedPreferences prefs, Map<String, dynamic> prefsMap) async {
     for (final entry in prefsMap.entries) {
       final key = entry.key;
+      if (_deviceSpecificPrefsKeys.contains(key)) continue;
       final type = _prefsKeys[key];
       if (type == null) continue;
       final v = entry.value;
