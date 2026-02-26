@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:vibration/vibration.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,10 @@ import '../providers/theme_provider.dart';
 import '../models/river_section.dart';
 import '../services/river_drift_service.dart';
 import '../services/ambient_audio_service.dart';
+import '../services/coze_service.dart';
+import '../services/coze_intro_cache.dart';
+import '../providers/river_guide_provider.dart';
+import '../models/coze_context_mode.dart';
 import 'immersive_listen_screen.dart';
 import 'lantern_ritual_screen.dart';
 import 'river_selector_sheet.dart';
@@ -73,9 +78,10 @@ class _FlowScreenState extends State<FlowScreen>
 
   // 当前里程对应 POI（按行进距离查最近点，约 0.5 km 刷新一次）
   RiverPoi? _currentPoi;
-  /// 当前位置之后的下一个 POI，用于导航式「下一站 · 还有 x.x km」
   RiverPoi? _nextPoi;
   double? _lastPoiRequestKm;
+  bool _locationIntroLoading = false;
+  bool _introCacheLoaded = false;
 
   late AnimationController _timeController;
   late AnimationController _pulseController;
@@ -154,8 +160,10 @@ class _FlowScreenState extends State<FlowScreen>
       context.read<FlowController>().init();
       context.read<FlowController>().startStepListening();
       _refreshWeather();
-      // 进入涉川首页即触发一次 POI 查询，不依赖定时器
       _updateFrame();
+      CozeIntroCache.instance.load().then((_) {
+        if (mounted) setState(() => _introCacheLoaded = true);
+      });
     });
 
     _loadShaders();
@@ -1042,9 +1050,9 @@ class _FlowScreenState extends State<FlowScreen>
 
                 SafeArea(
                     child: Column(children: [
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 10),
                   _buildHeader(sub, controller),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   _buildPoiCard(sub, controller, challenge.currentDistance),
                   const Spacer(flex: 3),
                   _buildStepsAndProgress(
@@ -1293,12 +1301,125 @@ class _FlowScreenState extends State<FlowScreen>
     ];
   }
 
+  /// 点击高亮图标：请求江川向导并缓存；成功后图标变灰，同一位置不再重复请求
+  Future<void> _fetchLocationGuideIntro() async {
+    final configured = await CozeService.instance.isConfigured;
+    if (!configured) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请先在「行者」→「应用设置」中配置江川向导（Coze）')),
+        );
+      }
+      return;
+    }
+    final challenge = context.read<ChallengeProvider>();
+    final river = challenge.activeRiver;
+    final riverId = river?.id;
+    final currentKey = _currentPoi != null
+        ? (_currentPoi!.formattedAddress?.trim().isNotEmpty == true
+            ? _currentPoi!.formattedAddress!.trim()
+            : _currentPoi!.shortLabel)
+        : null;
+    if (riverId == null || currentKey == null) return;
+    if (!mounted) return;
+    setState(() => _locationIntroLoading = true);
+    try {
+      final userId = await CozeService.instance.getOrCreateUserId();
+      final guide = context.read<RiverGuideProvider>();
+      final locationContext = await guide.buildLocationContext(
+        river: river,
+        currentSubSection: challenge.currentSubSection,
+        currentKm: challenge.currentDistance,
+        totalKm: river?.totalLengthKm ?? 0,
+        mode: CozeContextMode.locationIntro,
+      );
+      if (!mounted) return;
+      final intro = await CozeService.instance.fetchLocationIntro(
+        userId: userId,
+        locationContext: locationContext,
+      );
+      if (!mounted) return;
+      await CozeIntroCache.instance.put(riverId, currentKey, intro);
+      if (!mounted) return;
+      setState(() => _locationIntroLoading = false);
+      _showLocationIntroSheet(intro);
+    } on CozeException catch (e) {
+      if (mounted) {
+        setState(() => _locationIntroLoading = false);
+        _showLocationIntroSheet(null, error: e.message);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _locationIntroLoading = false);
+        _showLocationIntroSheet(null, error: e.toString());
+      }
+    }
+  }
+
+  /// 点击灰色图标：展示当前地点已缓存的介绍，若无则提示行至新地点后高亮获取
+  void _showCachedIntro() {
+    final challenge = context.read<ChallengeProvider>();
+    final riverId = challenge.activeRiver?.id;
+    final currentKey = _currentPoi != null
+        ? (_currentPoi!.formattedAddress?.trim().isNotEmpty == true
+            ? _currentPoi!.formattedAddress!.trim()
+            : _currentPoi!.shortLabel)
+        : null;
+    final content = CozeIntroCache.instance.get(riverId, currentKey);
+    if (content != null && content.isNotEmpty) {
+      _showLocationIntroSheet(content);
+    } else {
+      _showLocationIntroSheet(
+        null,
+        emptyHint: '行至新地点后，图标将高亮，点击可获取江川向导介绍。',
+      );
+    }
+  }
+
+  void _showLocationIntroSheet(String? intro, {String? error, String? emptyHint}) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (_, scrollController) => _LocationIntroSheetContent(
+            intro: intro,
+            error: error,
+            emptyHint: emptyHint,
+            scrollController: scrollController,
+            onClose: () => Navigator.of(ctx).pop(),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildPoiCard(SubSection? sub, FlowController controller, double accumulatedKm) {
     final cs = Theme.of(context).colorScheme;
     final poi = _currentPoi;
     final nextPoi = _nextPoi;
     final themeColor = sub?.color ?? cs.primary;
     final isLight = themeColor.computeLuminance() > 0.4;
+    final challenge = context.read<ChallengeProvider>();
+    final riverId = challenge.activeRiver?.id;
+    final currentKey = poi != null
+        ? (poi.formattedAddress?.trim().isNotEmpty == true
+            ? poi.formattedAddress!.trim()
+            : poi.shortLabel)
+        : null;
+    final hasCachedForCurrent = _introCacheLoaded &&
+        riverId != null &&
+        currentKey != null &&
+        CozeIntroCache.instance.get(riverId, currentKey) != null;
+    final hasNewLocationGuideHint = _introCacheLoaded &&
+        riverId != null &&
+        currentKey != null &&
+        !hasCachedForCurrent;
     // 当前位置：优先用 formatted_address（信息最全），无 POI 用天气城市名兜底
     final addressLine = poi != null
         ? (poi.formattedAddress?.trim() ?? poi.shortLabel)
@@ -1317,7 +1438,7 @@ class _FlowScreenState extends State<FlowScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: cs.surfaceContainerHigh.withValues(alpha: isLight ? 0.85 : 0.95),
           borderRadius: BorderRadius.circular(20),
@@ -1333,86 +1454,145 @@ class _FlowScreenState extends State<FlowScreen>
                 offset: const Offset(0, 4)),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            // 第一行：定位图标与「此刻行至」同级，图标服从字体层级、弱化色块
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.place_rounded,
-                  size: 14,
-                  color: cs.onSurface.withValues(alpha: 0.42),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  "此刻行至",
-                  style: TextStyle(
-                    color: cs.onSurface.withValues(alpha: 0.45),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 2.2,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            // 下面每行与定位图标左对齐：位置信息、下一站、POI 各占一行
-            Text(
-              addressLine,
-              style: TextStyle(
-                color: cs.onSurface.withValues(alpha: hasAddress ? 0.95 : 0.35),
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.5,
-                height: 1.35,
-                fontStyle: hasAddress ? FontStyle.normal : FontStyle.italic,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (nextPoi != null &&
-                distanceToNext != null &&
-                distanceToNext > 0 &&
-                nextStopShortLabel.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Row(
+            // 主内容：带标准 padding，第一行不再为图标预留空间
+            Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 0, left: 0, right: 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.navigation_rounded,
-                      size: 14, color: themeColor.withOpacity(0.75)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      '下一站 $nextStopShortLabel',
-                      style: TextStyle(
-                        color: cs.onSurfaceVariant.withValues(alpha: 0.9),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.3,
-                        height: 1.3,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.place_rounded,
+                        size: 14,
+                        color: cs.onSurface.withValues(alpha: 0.42),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      const SizedBox(width: 6),
+                      Text(
+                        "此刻行至",
+                        style: TextStyle(
+                          color: cs.onSurface.withValues(alpha: 0.45),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 2.2,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(height: 4),
+                  // 下面每行与定位图标左对齐：位置信息、下一站、POI 各占一行
                   Text(
-                    '还有 ${distanceToNext.toStringAsFixed(1)} km',
+                    addressLine,
                     style: TextStyle(
-                      color: themeColor.withOpacity(0.9),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
+                      color: cs.onSurface.withValues(alpha: hasAddress ? 0.95 : 0.35),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.5,
+                      height: 1.35,
+                      fontStyle: hasAddress ? FontStyle.normal : FontStyle.italic,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  if (nextPoi != null &&
+                      distanceToNext != null &&
+                      distanceToNext > 0 &&
+                      nextStopShortLabel.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Icon(Icons.navigation_rounded,
+                            size: 14, color: themeColor.withOpacity(0.75)),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '下一站 $nextStopShortLabel',
+                            style: TextStyle(
+                              color: cs.onSurfaceVariant.withValues(alpha: 0.9),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.3,
+                              height: 1.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '还有 ${distanceToNext.toStringAsFixed(1)} km',
+                          style: TextStyle(
+                            color: themeColor.withOpacity(0.9),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (poi != null) ...[
+                    ..._buildPoiNamesRow(poi.poisList),
+                  ],
                 ],
               ),
-            ],
-            if (poi != null) ...[
-              ..._buildPoiNamesRow(poi.poisList),
-            ],
+            ),
+            // 江川向导图标：贴近右上角，底部与第一行底齐平（不遮挡地址）
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Tooltip(
+                message: hasNewLocationGuideHint
+                    ? '江川向导：获取此地风土'
+                    : '江川向导：查看已缓存介绍',
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _locationIntroLoading
+                        ? null
+                        : (hasNewLocationGuideHint ? _fetchLocationGuideIntro : _showCachedIntro),
+                    borderRadius: BorderRadius.circular(9),
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: themeColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(9),
+                        boxShadow: [
+                          BoxShadow(
+                            color: cs.shadow.withValues(alpha: 0.06),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: _locationIntroLoading
+                          ? SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: themeColor,
+                              ),
+                            )
+                          : Icon(
+                              Icons.auto_stories_rounded,
+                              size: 12,
+                              color: hasNewLocationGuideHint
+                                  ? themeColor.withOpacity(0.95)
+                                  : cs.onSurface.withValues(alpha: 0.5),
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -1689,6 +1869,215 @@ class _RitualTextInputDialogState extends State<_RitualTextInputDialog> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// 江川向导「此地风土」弹层内容：支持 TTS 朗读
+class _LocationIntroSheetContent extends StatefulWidget {
+  final String? intro;
+  final String? error;
+  final String? emptyHint;
+  final ScrollController scrollController;
+  final VoidCallback onClose;
+
+  const _LocationIntroSheetContent({
+    required this.intro,
+    required this.error,
+    required this.emptyHint,
+    required this.scrollController,
+    required this.onClose,
+  });
+
+  @override
+  State<_LocationIntroSheetContent> createState() => _LocationIntroSheetContentState();
+}
+
+class _LocationIntroSheetContentState extends State<_LocationIntroSheetContent> {
+  final FlutterTts _tts = FlutterTts();
+  bool _isSpeaking = false;
+  bool _ttsPreparing = false;
+  /// 仅当成功绑定过 TTS 引擎后才在 dispose 里调用 stop，避免 "stop failed: not bound" 等日志
+  bool _ttsEverBound = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tts.setCompletionHandler(() {
+      if (mounted) setState(() => _isSpeaking = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    if (_ttsEverBound) {
+      try {
+        _tts.stop();
+      } catch (_) {}
+    }
+    super.dispose();
+  }
+
+  Future<void> _toggleSpeak() async {
+    final text = widget.intro?.trim() ?? '';
+    if (text.isEmpty) return;
+    if (_isSpeaking) {
+      if (_ttsEverBound) {
+        try {
+          await _tts.stop();
+        } catch (_) {}
+      }
+      if (mounted) setState(() => _isSpeaking = false);
+      return;
+    }
+    setState(() => _ttsPreparing = true);
+    try {
+      if (Platform.isAndroid) {
+        try {
+          await _tts.getEngines;
+        } catch (_) {}
+      }
+      final langResult = await _tts.setLanguage('zh-CN');
+      if (!mounted) return;
+      // Android 返回 int(1=成功)，iOS 返回 String；不能对 int 调 .isEmpty
+      final langOk = langResult == 1 || (langResult is String && langResult.isNotEmpty);
+      if (!langOk) {
+        if (mounted) {
+          setState(() => _ttsPreparing = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('未检测到语音引擎，请到 设置→无障碍→文字转语音 中安装或选择引擎'),
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+        return;
+      }
+      _ttsEverBound = true;
+      final result = await _tts.speak(text);
+      if (mounted) {
+        setState(() {
+          _ttsPreparing = false;
+          _isSpeaking = result == 1;
+        });
+      }
+      if (result != 1 && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('朗读失败，请到 设置→无障碍→文字转语音 中检查默认引擎'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _ttsPreparing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('朗读失败：$e'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final canSpeak = widget.error == null &&
+        widget.intro != null &&
+        widget.intro!.trim().isNotEmpty;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, 20 + MediaQuery.of(context).padding.bottom),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: cs.outlineVariant.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(Icons.auto_stories_rounded, size: 20, color: cs.primary),
+              const SizedBox(width: 8),
+              Text(
+                '江川向导 · 此地风土',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: cs.onSurface,
+                ),
+              ),
+              const Spacer(),
+              if (canSpeak)
+                IconButton(
+                  icon: _ttsPreparing
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: cs.primary,
+                          ),
+                        )
+                      : Icon(
+                          _isSpeaking ? Icons.stop_rounded : Icons.volume_up_rounded,
+                          color: _isSpeaking ? cs.error : cs.primary,
+                        ),
+                  onPressed: _ttsPreparing ? null : _toggleSpeak,
+                  tooltip: _ttsPreparing
+                      ? '正在准备朗读…'
+                      : _isSpeaking
+                          ? '停止朗读'
+                          : '朗读',
+                ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: widget.onClose,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: widget.scrollController,
+              child: widget.error != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: Text(
+                        widget.error!,
+                        style: TextStyle(color: cs.error, fontSize: 14),
+                      ),
+                    )
+                  : widget.intro != null && widget.intro!.isNotEmpty
+                      ? SelectableText(
+                          widget.intro!,
+                          style: TextStyle(
+                            fontSize: 15,
+                            height: 1.6,
+                            color: cs.onSurface,
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 24),
+                          child: Text(
+                            widget.emptyHint ?? '暂无介绍',
+                            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+                          ),
+                        ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

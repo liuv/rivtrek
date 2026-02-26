@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -37,7 +38,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _createMainDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -50,6 +51,17 @@ class DatabaseService {
         }
         if (oldVersion < 6) {
           await db.execute('DROP TABLE IF EXISTS river_pois');
+        }
+        if (oldVersion < 7) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS coze_intro_cache (
+              river_id TEXT NOT NULL,
+              location_key TEXT NOT NULL,
+              content TEXT NOT NULL,
+              updated_at INTEGER NOT NULL,
+              PRIMARY KEY (river_id, location_key)
+            )
+          ''');
         }
       },
     );
@@ -94,6 +106,17 @@ class DatabaseService {
         extra_data TEXT
       )
     ''');
+    if (version >= 7) {
+      await db.execute('''
+        CREATE TABLE coze_intro_cache (
+          river_id TEXT NOT NULL,
+          location_key TEXT NOT NULL,
+          content TEXT NOT NULL,
+          updated_at INTEGER NOT NULL,
+          PRIMARY KEY (river_id, location_key)
+        )
+      ''');
+    }
   }
 
   /// 基础数据库（POI 等静态数据，只读）。仅「首次安装或 asset 版本升级」时从 asset 拷贝到本地，其余直接打开已拷贝文件，避免每次启动都拷贝。
@@ -162,6 +185,39 @@ class DatabaseService {
         .query('daily_activities', where: 'date = ?', whereArgs: [date]);
     if (maps.isNotEmpty) return DailyActivity.fromMap(maps.first);
     return null;
+  }
+
+  /// 按日期和河流查询当日活动（用于江川向导等需区分河流的场景）
+  Future<DailyActivity?> getActivityByDateAndRiver(String date, String riverId) async {
+    final db = await instance.database;
+    final maps = await db.query(
+      'daily_activities',
+      where: 'date = ? AND river_id = ?',
+      whereArgs: [date, riverId],
+    );
+    if (maps.isNotEmpty) return DailyActivity.fromMap(maps.first);
+    return null;
+  }
+
+  /// 最近三天（今天、昨天、前天）的活动数据，按河流筛选，用于江川向导上下文
+  Future<Map<String, DailyActivity?>> getActivitiesForLast3Days(String riverId) async {
+    final db = await instance.database;
+    final now = DateTime.now();
+    final dates = [
+      DateFormat('yyyy-MM-dd').format(now),
+      DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 1))),
+      DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 2))),
+    ];
+    final result = <String, DailyActivity?>{};
+    for (final date in dates) {
+      final maps = await db.query(
+        'daily_activities',
+        where: 'date = ? AND river_id = ?',
+        whereArgs: [date, riverId],
+      );
+      result[date] = maps.isNotEmpty ? DailyActivity.fromMap(maps.first) : null;
+    }
+    return result;
   }
 
   Future<DailyWeather?> getWeatherByDate(String date) async {
@@ -237,7 +293,72 @@ class DatabaseService {
         .toList();
   }
 
-  /// 按「行进距离」（挑战累计里程）查最近 POI，使用数字主键 [numericId] 查库，避免字符串 id 的精确匹配/空格等问题。
+  // --- 江川向导介绍缓存（主库 coze_intro_cache 表）---
+
+  static const int _cozeIntroCacheMaxEntries = 30;
+
+  /// 按河流+位置取缓存的介绍文案
+  Future<String?> getCozeIntroCache(String? riverId, String? locationKey) async {
+    if (riverId == null || locationKey == null) return null;
+    final db = await instance.database;
+    final rows = await db.query(
+      'coze_intro_cache',
+      where: 'river_id = ? AND location_key = ?',
+      whereArgs: [riverId, locationKey],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return rows.first['content'] as String?;
+  }
+
+  /// 写入一条缓存；超过 [._cozeIntroCacheMaxEntries] 时删最旧的一条
+  Future<void> putCozeIntroCache(
+    String? riverId,
+    String? locationKey,
+    String content,
+  ) async {
+    if (riverId == null || locationKey == null) return;
+    final db = await instance.database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.insert(
+      'coze_intro_cache',
+      {
+        'river_id': riverId,
+        'location_key': locationKey,
+        'content': content,
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM coze_intro_cache'),
+    ) ?? 0;
+    if (count > _cozeIntroCacheMaxEntries) {
+      final oldest = await db.query(
+        'coze_intro_cache',
+        orderBy: 'updated_at ASC',
+        limit: 1,
+      );
+      if (oldest.isNotEmpty) {
+        await db.delete(
+          'coze_intro_cache',
+          where: 'river_id = ? AND location_key = ?',
+          whereArgs: [
+            oldest.first['river_id'],
+            oldest.first['location_key'],
+          ],
+        );
+      }
+    }
+  }
+
+  /// 加载全部缓存（供 CozeIntroCache 启动时同步内存）
+  Future<List<Map<String, dynamic>>> getAllCozeIntroCache() async {
+    final db = await instance.database;
+    return db.query('coze_intro_cache', orderBy: 'updated_at DESC');
+  }
+
+  /// 按「行进距离」（挑战累计里程）查最近 POI，使用数字主键 [numericId] 查库
   /// river_pois.distance_km 与 fetch_river_pois 写入一致，为挑战里程，故直接用 accumulatedKm 查，不乘修正系数。
   /// 若基础库未就绪、无 river_pois 表，静默返回 null，不抛错。
   Future<RiverPoi?> getNearestPoi(int numericId, double accumulatedKm) async {

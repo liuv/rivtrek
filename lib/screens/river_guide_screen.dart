@@ -1,4 +1,4 @@
-// 河川引路人 - 与 Coze 智能体对话的聊天界面
+// 江川向导 - 与 Coze 智能体对话的聊天界面
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -76,7 +76,7 @@ class _RiverGuideScreenState extends State<RiverGuideScreen> {
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: AppBar(
-        title: const Text('河川引路人', style: TextStyle(fontWeight: FontWeight.w300)),
+        title: const Text('江川向导', style: TextStyle(fontWeight: FontWeight.w300)),
         backgroundColor: cs.surface,
         elevation: 0,
         foregroundColor: cs.onSurface,
@@ -144,7 +144,7 @@ class _RiverGuideScreenState extends State<RiverGuideScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                '配置完成后即可与河川引路人畅聊江河风土、历史典故，并生成个性化诗词签名。',
+                '配置完成后即可与江川向导畅聊江河风土、历史典故，并生成个性化诗词签名。',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: cs.outline, height: 1.4),
               ),
@@ -166,7 +166,7 @@ class _RiverGuideScreenState extends State<RiverGuideScreen> {
             Icon(Icons.waves_rounded, size: 56, color: cs.primary.withValues(alpha: 0.7)),
             const SizedBox(height: 24),
             Text(
-              '河川引路人',
+              '江川向导',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400, color: cs.onSurface),
             ),
             const SizedBox(height: 8),
@@ -306,9 +306,10 @@ class _RiverGuideScreenState extends State<RiverGuideScreen> {
                 ),
               ),
               child: isUser
-                  ? Text(msg.content, style: TextStyle(fontSize: 15, color: cs.onSurface))
+                  ? SelectableText(msg.content, style: TextStyle(fontSize: 15, color: cs.onSurface))
                   : MarkdownBody(
                       data: msg.content,
+                      selectable: true,
                       styleSheet: MarkdownStyleSheet(
                         p: TextStyle(fontSize: 15, color: cs.onSurface, height: 1.5),
                         listBullet: TextStyle(fontSize: 15, color: cs.onSurface),

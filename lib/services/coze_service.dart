@@ -1,4 +1,4 @@
-// Coze.cn API 服务 - 河川引路人智能体集成
+// Coze.cn API 服务 - 江川向导智能体集成
 // 文档: https://www.coze.cn/api/open/docs
 
 import 'dart:async';
@@ -304,6 +304,21 @@ class CozeService {
     return answers.join('\n\n').trim();
   }
 
+  /// 后台拉取当前位置介绍：历史人文、神话传说、风土人情（首页新地点提示用，不写入对话历史）
+  Future<String> fetchLocationIntro({
+    required String userId,
+    required String locationContext,
+  }) async {
+    const message = '请简要介绍当前所在位置的历史人文、神话传说与风土人情。直接回复介绍内容即可，无需寒暄。';
+    final result = await sendAndPoll(
+      userId: userId,
+      message: message,
+      locationContext: locationContext,
+      createNewConversation: true,
+    );
+    return result.answer.trim();
+  }
+
   /// 快捷调用：生成诗词签名（用于分享卡片）
   /// [nickname] 用户昵称
   /// [riverName] 河流名
@@ -321,11 +336,13 @@ class CozeService {
     final prompt = '''
 请为涉川 App 用户生成一句个性化的诗词风格签名，用于分享卡片。
 
+【说明】涉川是虚拟徒步 App，用户通过日常步数换算为沿江河路线的行进里程，并非实地行走。诗词可体现「虚拟行至」「心随江流」等意境。
+
 用户信息：
 - 昵称：$nickname
 - 正在挑战：$riverName
 - 当前河段：$sectionName
-- 进度：${currentKm.toStringAsFixed(0)} / ${totalKm.toStringAsFixed(0)} 公里
+- 进度：${currentKm.toStringAsFixed(0)} / ${totalKm.toStringAsFixed(0)} 公里（虚拟里程）
 
 要求：
 1. 一句简短的古风/诗词风格句子，8-20 字

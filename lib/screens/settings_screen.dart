@@ -288,13 +288,13 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               const SizedBox(height: 8),
               _buildDriftSpeedMultiplierSlider(context, settings.driftCrossScreenSeconds),
               const SizedBox(height: 32),
-              _buildSectionTitle(context, '河川引路人（Coze）'),
+              _buildSectionTitle(context, '江川向导（Coze）'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   CozeService.instance.isBuildTimeConfigured
-                      ? '河川引路人已由开发者配置，可直接使用。'
-                      : '配置 Coze 智能体后，可在「河川引路人」中咨询江河风土、历史典故，并生成个性化诗词签名。',
+                      ? '江川向导已由开发者配置，可直接使用。'
+                      : '配置 Coze 智能体后，可在「江川向导」中咨询江河风土、历史典故，并生成个性化诗词签名。',
                   style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, height: 1.35),
                 ),
               ),

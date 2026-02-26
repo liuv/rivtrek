@@ -27,6 +27,10 @@
 
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
+        <!-- Android 11+ TTS：必须声明才能查询/绑定 TTS 引擎，否则 "not bound to TTS engine" -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
     </queries>
 
     <application

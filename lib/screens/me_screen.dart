@@ -481,7 +481,7 @@ class MeScreen extends StatelessWidget {
                   Divider(color: cs.outline.withValues(alpha: 0.2)),
                   const SizedBox(height: 20),
                   // Settings/Menu
-                  _buildMenuItem(context, "河川引路人", Icons.auto_stories_rounded, onTap: () {
+                  _buildMenuItem(context, "江川向导", Icons.auto_stories_rounded, onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -520,7 +520,6 @@ class MeScreen extends StatelessWidget {
                       ),
                     );
                   }),
-                  _buildMenuItem(context, "退出登录", Icons.logout_rounded),
                   const SizedBox(height: 120), // Padding for bottom nav
                 ],
               ),
